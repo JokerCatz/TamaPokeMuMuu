@@ -535,6 +535,143 @@ def icon_clean():
     return g.rows()
 
 
+# mata de hierba alta donde se esconde un premio (scene.ino): hojas en punta, las de detras
+# oscuras; B, las puntas al otro lado (al agitarse se alternan). Hecha con un script: hojas
+# como triangulos curvados, un solo contorno por fuera
+GRASS_A = [
+    "........................",
+    "........................",
+    "........................",
+    "..........k.............",
+    ".........kGk............",
+    ".........kGk.....kk.....",
+    ".........kGdk..kkGdk....",
+    ".........kGdk.kgkGdk....",
+    "....k..kkGGdk.kGGGdk....",
+    "...kdkktGGGddktGGGdk....",
+    "..kGGdktgGGddkggGddk.k..",
+    "..kGGdktgGGddGggGddkkGk.",
+    ".kGGGddGgGGddGggGddGGdk.",
+    ".ktGGddGgGGddGggGdGgGdk.",
+    ".ktgGGGtggGdGtggGdGgGdk.",
+    ".ktgGGGtggGGtgggGtggGdk.",
+    ".ktggGttggGGtgggGtggGdk.",
+    ".ktggGtgggGttgggGtggGdk.",
+    ".ktggGtgggGttgggttggGGk.",
+    ".ktggttgggGttgggttggGGdk",
+    ".ktggttgggGttgggttggGGdk",
+    "..kkkkkkkkkkkkkkkkkkkkk.",
+    "........................",
+    "........................",
+]
+
+GRASS_B = [
+    "........................",
+    "........................",
+    "........................",
+    "...........k............",
+    "..........kGk...........",
+    "..........kGk.....k.....",
+    "..........kGk...kkGk....",
+    ".........kGGdk.kGGGdk...",
+    "....kk..kkGGdkktGGddk...",
+    "...kGdkktGGGdkkgGGddk...",
+    "...kGdkkgGGGdktgGGddk.k.",
+    "...kGddGggGGddGgGGddkkdk",
+    "..kGGGdGggGGdGggGGddGGdk",
+    "..kgGGdGggGGdGggGddGGddk",
+    "..kgGGdGggGGGtggGdGgGddk",
+    "..kggGttggGGttggGGtgGdk.",
+    "..kggGttggGGtgggGtggGdk.",
+    ".ktggGttggGttgggGtggGGk.",
+    ".ktggGtgggGttgggttggGGk.",
+    ".ktggttgggGttgggttggGGdk",
+    ".ktggttgggGttgggttggGGdk",
+    "..kkkkkkkkkkkkkkkkkkkkk.",
+    "........................",
+    "........................",
+]
+
+# granja: un establo rojo con la puerta en aspa
+ICON_FARM = [
+    "................",
+    ".......kk.......",
+    ".....kkRRkk.....",
+    "...kkRRRRRRkk...",
+    ".kkRRRRRRRRRRkk.",
+    "kRRRRRRRRRRRRRRk",
+    "kkkkkkkkkkkkkkkk",
+    ".krrrrrrrrrrrrk.",
+    ".krrkkkkkkkkrrk.",
+    ".krrkwkkkkwkrrk.",
+    ".krrkkwkkwkkrrk.",
+    ".krrkkkwwkkkrrk.",
+    ".krrkkwkkwkkrrk.",
+    ".krrkwkkkkwkrrk.",
+    ".kkkkkkkkkkkkkk.",
+    "................",
+]
+
+# pruebas deportivas: una copa
+ICON_TROPHY = [
+    "................",
+    "...kkkkkkkkkk...",
+    ".kkkffffffffkkk.",
+    "k..kffffffffk..k",
+    "k..kffffffYfk..k",
+    ".k.kffffffYfk.k.",
+    "..kkffffffYfkk..",
+    "....kffffYfk....",
+    ".....kffYfk.....",
+    "......kffk......",
+    ".......kk.......",
+    "......kYYk......",
+    ".....kffffk.....",
+    "....kYYYYYYk....",
+    "....kkkkkkkk....",
+    "................",
+]
+
+# ocio: una fruta con su hoja
+ICON_FUN = [
+    "................",
+    ".........kk.....",
+    "........kGgk....",
+    ".......kGgk.....",
+    "......kkkk......",
+    "....kkrrrrkk....",
+    "...krrrrrrrrk...",
+    "..krwwrrrrrrrk..",
+    "..krwrrrrrrrrk..",
+    "..krrrrrrrrrRk..",
+    "..krrrrrrrrrRk..",
+    "..krrrrrrrrRRk..",
+    "...krrrrrrRRk...",
+    "....kkRRRRkk....",
+    "......kkkk......",
+    "................",
+]
+
+# gimnasios: un edificio con la medalla en la fachada
+ICON_GYM = [
+    "................",
+    ".......kk.......",
+    ".....kkBBkk.....",
+    "...kkBBBBBBkk...",
+    ".kkBBBBBBBBBBkk.",
+    "kkkkkkkkkkkkkkkk",
+    ".kwwwwwwwwwwwwk.",
+    ".kwkkwwffwwkkwk.",
+    ".kwkkwfYYfwkkwk.",
+    ".kwwwwfYYfwwwwk.",
+    ".kwkkwwffwwkkwk.",
+    ".kwkkwwwwwwkkwk.",
+    ".kwwwwkkkkwwwwk.",
+    ".kwwwwkSSkwwwwk.",
+    "kkkkkkkkkkkkkkkk",
+    "................",
+]
+
 SPRITES = {
     "CHARMANDER": charmander(),
     "CHARMELEON": charmeleon(),
@@ -553,6 +690,12 @@ SPRITES = {
     "ICON_PILL": icon_pill(),
     "ICON_POTION_STR": icon_potion('r', 'R'),
     "ICON_POTION_SPD": icon_potion('b', 'B'),
+    "GRASS_A": GRASS_A,
+    "GRASS_B": GRASS_B,
+    "ICON_FARM": ICON_FARM,
+    "ICON_TROPHY": ICON_TROPHY,
+    "ICON_FUN": ICON_FUN,
+    "ICON_GYM": ICON_GYM,
     "ICON_STAR": icon_star(),
     "EGG": egg(),
     "POOP": poop(),
@@ -639,6 +782,7 @@ UI_COLORS = {
     'UI_BG_DAY': '#f2efe1', 'UI_BG_NIGHT': '#141828',
     'UI_INK': '#2a2a36', 'UI_INK_NIGHT': '#d8dcf0',
     'UI_TRACK': '#d8d2bd',
+    'UI_HINT': '#7b7163',  # pistas ("desliza: volver"...) y texto apagado; UI_TRACK no se leia
     'UI_BAR_OK': '#58b868', 'UI_BAR_WARN': '#e8a23c', 'UI_BAR_BAD': '#e8503a',
     'UI_WHITE': '#ffffff',
 }

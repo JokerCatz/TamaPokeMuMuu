@@ -12,7 +12,7 @@
 #define UI_INK 0x2946  // #2a2a36
 #define UI_INK_NIGHT 0xDEFE  // #d8dcf0
 #define UI_TRACK 0xDE97  // #d8d2bd
-#define UI_HINT 0x7B8C  // #7b7163: pistas ("右滑：返回"...) y texto apagado; UI_TRACK no se leia
+#define UI_HINT 0x7B8C  // #7b7163
 #define UI_BAR_OK 0x5DCD  // #58b868
 #define UI_BAR_WARN 0xED07  // #e8a23c
 #define UI_BAR_BAD 0xEA87  // #e8503a
@@ -546,10 +546,7 @@ static const char* const SPR_ICON_POTION_SPD[16] = {  // 16x16
   "................",
 };
 
-// mata de hierba alta donde se esconde un premio (scene.ino): hojas en punta, las de detras
-// oscuras; B, las puntas al otro lado (al agitarse se alternan). Hecha con un script: hojas
-// como triangulos curvados, un solo contorno por fuera
-static const char* const SPR_GRASS_A[24] = {  // 24x24, a escala 2
+static const char* const SPR_GRASS_A[24] = {  // 24x24
   "........................",
   "........................",
   "........................",
@@ -575,7 +572,8 @@ static const char* const SPR_GRASS_A[24] = {  // 24x24, a escala 2
   "........................",
   "........................",
 };
-static const char* const SPR_GRASS_B[24] = {  // 24x24, a escala 2
+
+static const char* const SPR_GRASS_B[24] = {  // 24x24
   "........................",
   "........................",
   "........................",
@@ -601,7 +599,7 @@ static const char* const SPR_GRASS_B[24] = {  // 24x24, a escala 2
   "........................",
   "........................",
 };
-// granja: un establo rojo con la puerta en aspa
+
 static const char* const SPR_ICON_FARM[16] = {  // 16x16
   "................",
   ".......kk.......",
@@ -620,7 +618,7 @@ static const char* const SPR_ICON_FARM[16] = {  // 16x16
   ".kkkkkkkkkkkkkk.",
   "................",
 };
-// pruebas deportivas: una copa
+
 static const char* const SPR_ICON_TROPHY[16] = {  // 16x16
   "................",
   "...kkkkkkkkkk...",
@@ -639,7 +637,7 @@ static const char* const SPR_ICON_TROPHY[16] = {  // 16x16
   "....kkkkkkkk....",
   "................",
 };
-// ocio: una fruta con su hoja
+
 static const char* const SPR_ICON_FUN[16] = {  // 16x16
   "................",
   ".........kk.....",
@@ -658,7 +656,7 @@ static const char* const SPR_ICON_FUN[16] = {  // 16x16
   "......kkkk......",
   "................",
 };
-// gimnasios: un edificio con la medalla en la fachada
+
 static const char* const SPR_ICON_GYM[16] = {  // 16x16
   "................",
   ".......kk.......",
@@ -677,6 +675,7 @@ static const char* const SPR_ICON_GYM[16] = {  // 16x16
   "kkkkkkkkkkkkkkkk",
   "................",
 };
+
 static const char* const SPR_ICON_STAR[16] = {  // 16x16
   "................",
   "................",

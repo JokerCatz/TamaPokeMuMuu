@@ -25,7 +25,7 @@ jobs:
           arduino-cli core install esp32:esp32@3.3.10
 
       - name: Install libraries
-        run: arduino-cli lib install "GFX Library for Arduino" SensorLib XPowersLib U8g2
+        run: arduino-cli lib install "GFX Library for Arduino" SensorLib XPowersLib U8g2 ArduinoJson@7.4.3 WebSockets@2.7.2
 
       - name: Compile
         run: >
@@ -77,6 +77,10 @@ jobs:
       # de Arduino, con millis() y random() falsos y una NVS en memoria. Aqui es
       # donde se han roto las cosas: los tres bugs de la v1.3, v1.4 y v1.8 eran
       # logica pura y estos tests los pillan sin tocar la placa.
+      # chess.cpp, weather.cpp y stackchan.cpp usan ArduinoJson (solo cabeceras); el
+      # Makefile la busca en ~/Arduino/libraries, como la deja arduino-cli
+      - name: ArduinoJson headers
+        run: git clone --quiet --depth 1 --branch v7.4.3 https://github.com/bblanchon/ArduinoJson.git ~/Arduino/libraries/ArduinoJson
       - name: Run the suite (plus AddressSanitizer + UBSan)
         run: ./test/run_tests.sh --asan
 
