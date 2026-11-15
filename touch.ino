@@ -12,7 +12,7 @@ bool inPetZone(int16_t x, int16_t y) {
 // no debe accionar botones, pero sostenerlo 3 s sobre el bicho es a proposito
 // (antes se tragaba y "la pulsacion larga no hacia nada" al volver a la placa).
 bool holdOnPet() {
-  return !holdFired && !gestureMoved && !strokeFired && !dragFired && !galleryOpen && !farmOpen && !cardOpen && !kbOpen && !clockOpen &&
+  return !holdFired && !gestureMoved && !strokeFired && !dragFired && !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !cardOpen && !pet.questAway() && !kbOpen && !clockOpen &&
          abs(tXl - tX0) < 30 && abs(tYl - tY0) < 30 && inPetZone(tX0, tY0) &&
          !pet.isEgg() && !confirmUntil && !actionUntil && !pet.ceremony;
 }
@@ -172,7 +172,10 @@ void handleTouch() {
     if (!holdFired && !swallowGesture && !strokeFired && !dragFired && !circFired) {
       if (abs(dx) > 80 && abs(dy) < 70 && dt < 800) onSwipe(dx > 0 ? 1 : -1);
       else if (abs(dy) > 80 && abs(dx) < 70 && dt < 800) onSwipeV(dy > 0 ? 1 : -1);
-      else if (dt < 1500 && abs(dx) < 40 && abs(dy) < 40) onTap(tX0, tY0);
+      // toque: el dedo no se movio en todo el gesto (no solo al final). Un deslizar rapido
+      // podia acabar con la ultima lectura cerca del inicio y contaba como toque donde empezo
+      // (issue #3: al pasar de pagina en la tienda se compraba lo que habia debajo)
+      else if (dt < 1500 && !gestureMoved && abs(dx) < 40 && abs(dy) < 40) onTap(tX0, tY0);
     }
   }
   wasPressed = pressed;
@@ -187,7 +190,7 @@ void onSwipeV(int dir) {
     gallerySwipeV(dir);
     return;
   }
-  if (farmOpen || shopOpen || kbOpen || pet.ceremony) return;
+  if (farmOpen || hubOpen || chOpen || gymsOpen || funOpen || shopOpen || kbOpen || pet.ceremony) return;
   if (clockOpen) { clockOpen = statsOpen = false; return; }
   if (cardOpen) {
     if (dir < 0) cardOpen = false;  // arriba cierra la ficha
@@ -213,13 +216,29 @@ void onSwipe(int dir) {
     farmSwipe(dir);
     return;
   }
+  if (chOpen) {
+    sportsSwipe(dir);
+    return;
+  }
+  if (gymsOpen) {
+    gymsSwipe(dir);
+    return;
+  }
+  if (funOpen) {
+    funSwipe(dir);
+    return;
+  }
+  if (hubOpen) {
+    hubSwipe(dir);
+    return;
+  }
   if (cardOpen) {  // dentro de la ficha: cambiar entre las CARD_PAGES paginas
     int p = (int)cardPage + (dir > 0 ? -1 : 1);  // izquierda avanza
     cardPage = p < 0 ? 0 : (p > CARD_PAGES - 1 ? CARD_PAGES - 1 : p);
     return;
   }
-  // desde la pantalla principal: derecha = pokedex, izquierda = granja
-  // (como tres paginas en fila: [pokedex] [principal] [granja])
+  // desde la pantalla principal: derecha = pokedex, izquierda = actividades (granja y pruebas)
+  // (como tres paginas en fila: [pokedex] [principal] [actividades])
   if (!galleryOpen) {
     if (!pet.ceremony && !confirmUntil && !actionUntil) {
       if (dir > 0) {
@@ -230,7 +249,7 @@ void onSwipe(int dir) {
         galleryDetail = 0;
         galleryDirty = true;
       } else {
-        openFarm();
+        openHub();
       }
     }
     return;
@@ -293,6 +312,22 @@ void onTap(int16_t x, int16_t y) {
     farmTap(x, y);
     return;
   }
+  if (chOpen) {
+    sportsTap(x, y);
+    return;
+  }
+  if (gymsOpen) {
+    gymsTap(x, y);
+    return;
+  }
+  if (funOpen) {
+    funTap(x, y);
+    return;
+  }
+  if (hubOpen) {
+    hubTap(x, y);
+    return;
+  }
   if (galleryOpen) {
     galleryTap(x, y);
     return;
@@ -340,7 +375,18 @@ void onTap(int16_t x, int16_t y) {
     return;
   }
   if (feedMenuUntil) {       // selector de comida
-    if (timeLeft(feedMenuUntil) && y >= 288 && y <= 352 && x >= FEED_X && x < FEED_X + 3 * 66) {
+    uint8_t ex[5];
+    int ne = feedExtras(ex), ex0 = CX - ne * 33;
+    if (timeLeft(feedMenuUntil) && ne && y >= FEED_Y2 && y < FEED_Y2 + FEED_H && x >= ex0 && x < ex0 + ne * 66) {
+      uint8_t it = ex[(x - ex0) / 66];  // pescado o fruta (lo del ocio)
+      if (it == ITEM_FISH) {
+        if (pet.eatFish()) { sfxPlay(SFX_EAT); toast(T(S_FISH_YUM)); }
+      } else {
+        uint8_t r = pet.eatFruit(it);
+        if (r == FRUIT_UP || r == FRUIT_FULL) sfxPlay(SFX_EAT);
+        toast(r == FRUIT_UP ? T(fruitUpMsg(it)) : r == FRUIT_FULL ? T(S_FRUIT_FULL) : T(S_MAXED));
+      }
+    } else if (timeLeft(feedMenuUntil) && y >= FEED_Y && y <= FEED_Y + FEED_H && x >= FEED_X && x < FEED_X + 3 * 66) {
       int item = (x - FEED_X) / 66;  // 0 baya, 1 chuche, 2 medicina
       if (item == 2 && pet.bag[ITEM_MEDICINE] == 0) toast(T(S_NONE_LEFT));
       else if (item == 2 && !pet.sick) toast(T(S_NOT_SICK));
@@ -359,7 +405,7 @@ void onTap(int16_t x, int16_t y) {
     reportPending = false;
     return;
   }
-  if (y < 44 && x >= 250 && x <= 360) {  // contador de puntos: abre la tienda
+  if (y < 48 && x >= gPtsX0 - 12 && x <= gPtsX1 + 12) {  // contador de puntos: abre la tienda
     openShop(0);
     return;
   }
@@ -370,6 +416,10 @@ void onTap(int16_t x, int16_t y) {
   if (pet.isEgg()) {
     pet.eggTap();
     sfxPlay(SFX_TAP);
+    return;
+  }
+  if (pet.questAway()) {  // de expedicion: no esta para botones ni mimos
+    toast(T(S_AWAY));
     return;
   }
   // boton de evolucion: abre el dialogo evolucionar/mantener
@@ -401,6 +451,7 @@ void onTap(int16_t x, int16_t y) {
       return;
     }
   }
+  if (grassTap(x, y)) return;  // la mata con premio (scene.ino)
   // tocar al bicho = caricia (y segun como: doble toque, cosquillas, cabeza o barriga)
   if (inPetZone(x, y)) {
     Serial.println("PET");

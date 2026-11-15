@@ -62,7 +62,6 @@ static const ExpectedFmt EXPECTED[] = {
   { S_VISIT_FMT,       "%s" },
   { S_HOL_BIRTHDAY,    "%s" },  // OWNER_NAME (config.h)
   { S_SAY_LOVE,        "%s" },  // OWNER_NAME (config.h)
-  { S_RESTORE_FMT,     "%u,%u" },
   { S_HARVEST_PTS_FMT, "%u" },
   { S_FX_STA_FMT,      "%u" },
   { S_FX_VIT_FMT,      "%u" },
@@ -70,6 +69,35 @@ static const ExpectedFmt EXPECTED[] = {
   { S_DATE_FMT,        "%u,%u" },
   { S_REPORT_FMT,      "%u,%u" },
   { S_REPORT_PTS_FMT,  "%ld" },
+  { S_MEGA_NAME_FMT,   "%s,%s" },  // nombre, " X" / " Y" / ""
+  { S_SECS_FMT,        "%u,%u" },  // segundos y decimas
+  { S_METERS_FMT,      "%u,%u" },   // metros y centimetros (%02u)
+  { S_VS_FMT,          "%s,%s" },  // los dos rivales
+  { S_BONUS_UP_FMT,    "%u" },
+  { S_BONUS_DOWN_FMT,  "%u" },  { S_KG_FMT,          "%u" },
+  { S_PTS_FMT,         "%u,%u" },
+  { S_MINSEC_FMT,      "%u,%u" },
+  { S_GYMS_TITLE_FMT,  "%s" },
+  { S_BADGES_FMT,      "%u" },
+  { S_ROUND_FMT,       "%s,%u" },
+  { S_GOT_BADGE_FMT,   "%s" },
+  { S_BADGES_TOTAL_FMT, "%u" },
+  { S_HOURS_FMT,       "%u" },
+  { S_BUY_FOR_FMT,     "%u" },
+  { S_SPEND_Q_FMT,     "%u" },
+  { S_MINS_FMT,        "%u" },
+  { S_FARM_SUB_FMT,    "%u" },
+  { S_OWN_FMT,         "%u" },
+  { S_GOOD_AT_FMT,     "%s,%s" },
+  { S_BASE_FMT,        "%u,%u,%u,%u" },
+  { S_TRAIN_FMT,       "%u,%u,%u" },
+  { S_FUN_TITLE_FMT,   "%ld" },
+  { S_FUN_WHO_FMT,     "%u" },
+  { S_PTS_COST_FMT,    "%u" },
+  { S_MIN_LEFT_FMT,    "%u" },
+  { S_HOURS_LEFT_FMT,  "%u" },
+  { S_RIPE_FMT,        "%u" },
+  { S_ALSO_GOT_FMT,    "%s" },
 };
 static const int NUM_EXPECTED = (int)(sizeof(EXPECTED) / sizeof(EXPECTED[0]));
 

@@ -51,9 +51,32 @@ void renderGallery() {
       const uint8_t *t = thumbs.get(galleryDetail);
       if (t) drawThumb(t, CX - GAL_CELL, 135, 4, !reg);
     }
-    gfx->setTextColor(UI_INK);
+    if (reg) {  // su tipo, sus stats de especie y en que pruebas del torneo destaca
+      uint8_t ty = typeOf(galleryDetail);
+      gfx->setTextColor(TYPE_COL[ty]);
+      setSize(2);
+      setCur(centerX(T((StrId)(S_TY_NORMAL + ty)), 2), 96);
+      printT(T((StrId)(S_TY_NORMAL + ty)));
+      char l[64];
+      snprintf(l, sizeof(l), T(S_BASE_FMT), d.bHp, d.bAtk, d.bDef, d.bSpe);
+      gfx->setTextColor(UI_INK);
+      setCur(centerX(l, 2), 316);
+      printT(l);
+      Athlete a = athleteOf(galleryDetail);
+      uint8_t e1 = 0, e2 = 1;  // las dos mejores
+      for (uint8_t e = 0; e < EV_COUNT; e++) {
+        float r = athleteRating(a, e);
+        if (r > athleteRating(a, e1)) { e2 = e1; e1 = e; }
+        else if (e != e1 && r > athleteRating(a, e2)) e2 = e;
+      }
+      if (e2 == e1) e2 = e1 ? 0 : 1;
+      snprintf(l, sizeof(l), T(S_GOOD_AT_FMT), T(EV_NAME[e1]), T(EV_NAME[e2]));
+      setCur(centerX(l, 2), 344);
+      printT(l);
+    }
+    gfx->setTextColor(UI_HINT);
     setSize(2);
-    setCur(centerX(T(S_DETAIL_BACK), 2), 408);
+    setCur(centerX(T(S_DETAIL_BACK), 2), 396);
     printT(T(S_DETAIL_BACK));
     gfx->flush();
     return;
@@ -98,7 +121,7 @@ void renderGallery() {
       } else {
         char num[6];
         snprintf(num, sizeof(num), "%d", dex);
-        gfx->setTextColor(UI_TRACK);
+        gfx->setTextColor(UI_HINT);
         setSize(2);
         setCur(x + 24, y + 32);
         printT(num);
@@ -165,7 +188,7 @@ static uint16_t dimRegionPx(uint16_t v) {
 void renderRegionCover() {
   bool abierta = galleryShowAll || galleryRegion < pet.unlockedRegions();
   const char *nm = T((StrId)(S_REGION_1 + galleryRegion));
-  gfx->setTextColor(abierta ? UI_INK : UI_TRACK);
+  gfx->setTextColor(abierta ? UI_INK : UI_HINT);
   setSize(4);
   setCur(centerX(nm, 4), 96);
   printT(nm);
@@ -194,7 +217,7 @@ void renderRegionCover() {
     setSize(3);
     setCur(centerX(cnt, 3), bajo + 18);
     printT(cnt);
-    gfx->setTextColor(UI_TRACK);
+    gfx->setTextColor(UI_HINT);
     setSize(2);
     setCur(centerX(T(S_TAP_OPEN), 2), bajo + 64);
     printT(T(S_TAP_OPEN));

@@ -2,7 +2,10 @@
 #include "dex.h"
 #include "regions.h"  // rangos de cada region (los paisajes no se usan aqui: el compilador los quita)
 #include "audio.h"
+#include "mega.h"
+#include "fun.h"
 #include <string.h>
+#include <time.h>
 
 static_assert(PET_DEX_MAX == DEX_COUNT, "PET_DEX_MAX (pet.h) no coincide con DEX_COUNT (dex.h)");
 static_assert(PET_DEX_BYTES == DEX_BITMAP_BYTES, "bitmap de la pokedex desalineado");
@@ -134,6 +137,11 @@ void Pet::update(uint32_t nowMs) {
 }
 
 void Pet::tick() {
+  if (megaUntil && lastSeenEpoch >= megaUntil) {  // paso el dia: vuelve a su forma
+    megaUntil = 0;
+    megaEvent = 2;
+    pendingSave = true;
+  }
   if (ceremony != CER_NONE) return;  // el tiempo se detiene en la despedida
   if (vacant) return;                // sin compañero no pasa nada
   if (starterPick) return;  // la partida no empieza hasta elegir inicial: si el
@@ -146,6 +154,9 @@ void Pet::tick() {
     if (ageMinutes >= 3) hatch();  // si no lo tocas, eclosiona solo a los 3 min
     return;
   }
+  // de expedicion (ocio): esta fuera pasandolo bien; ni bajan sus necesidades ni enferma
+  // (en la principal no se le puede atender). Crece igual.
+  if (questAway()) return;
 
   // el sueño es descanso: la energia se recupera y las necesidades bajan MUCHO
   // mas lento que despierto y con suelo (amanece pidiendo algo de mimo, no a
@@ -307,6 +318,18 @@ int16_t Pet::pickEggSpecies(uint8_t kind) {
     return CLASSIC_DEX[random(NUM_CLASSIC_DEX)];
   }
   if (kind >= EGG_KINDS) kind = EGG_COMMON;
+  int16_t maxDex = REGIONS[unlockedRegions() - 1].last;
+  if (kind == EGG_FOSSIL) {  // un fosil de las regiones abiertas (mejor uno sin registrar)
+    static const int16_t FOSIL[] = { 138, 140, 142, 345, 347, 408, 410, 564, 566, 696, 698, 880, 881, 882, 883 };
+    for (int pass = 0; pass < 2; pass++) {
+      int16_t cand[sizeof(FOSIL) / sizeof(FOSIL[0])];
+      int n = 0;
+      for (int16_t d : FOSIL)
+        if (d <= maxDex && !inFarm(d) && (pass == 1 || lineHasUnregistered(d))) cand[n++] = d;
+      if (n > 0) return cand[random(n)];
+    }
+    return 138;
+  }
 
   // la base la pone el tipo de huevo; el cuidado (racha + vinculo) y una
   // despedida la mejoran. Una escapada quita esas mejoras (antes forzaba
@@ -322,7 +345,6 @@ int16_t Pet::pickEggSpecies(uint8_t kind) {
   if (r < leg) tier = R_LEGENDARIO;
   else if (r < leg + rare) tier = R_RARO;
   // solo de las regiones abiertas (son rangos seguidos de la pokedex)
-  int16_t maxDex = REGIONS[unlockedRegions() - 1].last;
 
   // candidatos del tier con linea incompleta; si no hay, baja de tier;
   // si la pokedex del tier esta completa, vale cualquiera del tier
@@ -332,6 +354,7 @@ int16_t Pet::pickEggSpecies(uint8_t kind) {
       int n = 0;
       for (int16_t d = 1; d <= maxDex; d++) {
         if (DEX_TBL[d].rarity != t) continue;
+        if (kind == EGG_WATER && typeOf(d) != TY_WATER) continue;  // el de la pesca: de agua
         if (inFarm(d)) continue;  // ya hay uno en la granja (vale para el shiny)
         if (pass == 0 && !lineHasUnregistered(d)) continue;
         cand[n++] = d;
@@ -539,9 +562,12 @@ void Pet::addSteps(uint32_t n) {
   if (!n) return;
   stepsToday += n;
   stepsTotal += n;
+  // stepPts = lo dado hoy: hasta STEP_PTS_MAX por los miles y STEP_BONUS_PTS mas a los diez mil
   uint32_t ganados = stepsToday / STEP_PTS_EVERY;
   if (ganados > STEP_PTS_MAX) ganados = STEP_PTS_MAX;
+  if (stepsToday >= STEP_BONUS_AT) ganados += STEP_BONUS_PTS;
   if (ganados > stepPts) {
+    if (stepPts <= STEP_PTS_MAX && ganados > STEP_PTS_MAX) stepBonus = true;
     points += ganados - stepPts;
     stepPts = (uint8_t)ganados;
   }
@@ -552,6 +578,146 @@ void Pet::addSteps(uint32_t n) {
     heartUntil = millis() + HEART_MS;
   }
   pendingSave = true;
+}
+
+void Pet::phoneSteps(uint32_t n) {
+  addSteps(0);  // por si ha cambiado el dia
+  if (n > stepsToday) addSteps(n - stepsToday);
+}
+
+uint8_t Pet::useMegaStone() {
+  if (!megaFor(speciesId)) return MEGA_NO_FORM;
+  if (isMega()) return MEGA_ALREADY;
+  if (bag[ITEM_MEGA_STONE] == 0) return MEGA_NO_STONE;
+  if (isEgg() || vacant || sleeping || ceremony != CER_NONE || !lastSeenEpoch) return MEGA_BUSY;
+  bag[ITEM_MEGA_STONE]--;
+  megaUntil = lastSeenEpoch + MEGA_SECONDS;
+  megaEvent = 1;
+  joy = clamp100(joy + 10);
+  sfxPlay(SFX_EVOLVE);
+  pendingSave = true;
+  return MEGA_OK;
+}
+
+bool Pet::takeMegaChange(bool &on) {
+  if (!megaEvent) return false;
+  on = megaEvent == 1;
+  megaEvent = 0;
+  return true;
+}
+
+bool Pet::grantSportsStone() {
+  uint32_t d = today();
+  if (!d || d == stoneDay) return false;
+  stoneDay = d;
+  if (bag[ITEM_MEGA_STONE] < 999) bag[ITEM_MEGA_STONE]++;
+  pendingSave = true;
+  return true;
+}
+
+// semana (de lunes a domingo) y mes de un dia contado desde 1970 (el 1/1/1970 fue jueves)
+static uint32_t weekOf(uint32_t day) { return (day + 3) / 7 + 1; }
+static uint32_t monthOf(uint32_t day) {
+  time_t t = (time_t)day * 86400;
+  struct tm tm;
+  gmtime_r(&t, &tm);
+  return (uint32_t)(tm.tm_year + 1900) * 12 + tm.tm_mon + 1;
+}
+
+uint8_t Pet::grassReady() const {
+  uint32_t d = today();
+  if (!d) return GRASS_NONE;  // sin hora no se sabe que dia es
+  if (grassMonth != monthOf(d)) return GRASS_MONTH;
+  if (grassWeek != weekOf(d)) return GRASS_WEEK;
+  if (grassDay != d) return GRASS_DAY;
+  return GRASS_NONE;
+}
+
+uint8_t Pet::collectGrass(GrassPrize &g) {
+  uint8_t tier = grassReady();
+  if (!tier) return GRASS_NONE;
+  uint32_t d = today();
+  g.qty = 1;
+  g.item2 = 0xFF;
+  if (tier == GRASS_MONTH) {  // bueno: huevo legendario, piedra megaevolucion o pocion de evolucion
+    static const uint8_t alto[3] = { ITEM_EGG_LEGEND, ITEM_MEGA_STONE, ITEM_POTION_EVO };
+    g.item = alto[random(3)];
+    grassMonth = monthOf(d);
+  } else if (tier == GRASS_WEEK) {  // medio: huevo raro, amuleto shiny o las dos pociones
+    uint8_t r = random(3);
+    g.item = r == 0 ? ITEM_EGG_RARE : r == 1 ? ITEM_SHINY_CHARM : ITEM_POTION_STR;
+    if (r == 2) g.item2 = ITEM_POTION_SPD;
+    grassWeek = weekOf(d);
+  } else {  // poco: dos chuches, una medicina, una pocion o un huevo normal
+    static const uint8_t bajo[5] = { ITEM_CANDY, ITEM_MEDICINE, ITEM_POTION_STR, ITEM_POTION_SPD, ITEM_EGG_COMMON };
+    g.item = bajo[random(5)];
+    if (g.item == ITEM_CANDY) g.qty = 2;
+    grassDay = d;
+  }
+  bag[g.item] = bag[g.item] + g.qty > 999 ? 999 : bag[g.item] + g.qty;
+  if (g.item2 != 0xFF && bag[g.item2] < 999) bag[g.item2]++;
+  pendingSave = true;
+  return tier;
+}
+
+uint8_t Pet::leagueTitles() const {
+  uint8_t n = 0;
+  for (uint8_t r = 0; r < 9; r++) n += leagueChampion(r);
+  return n;
+}
+
+uint16_t Pet::totalBadges() const {
+  uint16_t n = 0;
+  for (int r = 0; r < 9; r++) n += badgeCount(r);
+  return n;
+}
+
+bool Pet::gymOpen(uint8_t region, uint8_t gym) const {
+  if (region >= unlockedRegions() || gym >= 8) return false;
+  return gym == 0 || hasBadge(region, gym - 1);
+}
+
+bool Pet::startGym(uint8_t region, uint8_t gym) {
+  uint16_t d = (uint16_t)today();
+  if (!d || !gymOpen(region, gym) || gymTry[region * 8 + gym] == d) return false;
+  gymTry[region * 8 + gym] = d;
+  pendingSave = true;
+  return true;
+}
+
+bool Pet::winGym(uint8_t region, uint8_t gym, uint8_t &item) {
+  item = 0xFF;
+  if (region >= 9 || gym >= 8 || hasBadge(region, gym)) return false;
+  badges[region] |= 1 << gym;
+  uint8_t n = badgeCount(region);  // regalos por medallas de la region: 2, 4, 6 y 8
+  if (n == 8) item = ITEM_EGG_LEGEND;
+  else if (n % 2 == 0) item = ITEM_EGG_RARE;
+  if (item != 0xFF && bag[item] < 999) bag[item]++;
+  pendingSave = true;
+  return true;
+}
+
+bool Pet::startLeague(uint8_t region) {
+  uint16_t d = (uint16_t)today();
+  if (!d || !leagueOpen(region) || leagueTry[region] == d) return false;
+  leagueTry[region] = d;
+  pendingSave = true;
+  return true;
+}
+
+bool Pet::winLeague(uint8_t region) {
+  if (region >= 9 || leagueChampion(region)) return false;
+  leagueWon |= 1 << region;
+  if (bag[ITEM_EGG_LEGEND] < 999) bag[ITEM_EGG_LEGEND]++;
+  if (bag[ITEM_SHINY_CHARM] < 999) bag[ITEM_SHINY_CHARM]++;
+  pendingSave = true;
+  return true;
+}
+
+bool Pet::takeStepBonus() {
+  if (!stepBonus) return false;
+  stepBonus = false;
+  return true;
 }
 
 void Pet::noteEnding(uint8_t how) {
@@ -634,6 +800,7 @@ void Pet::exportRec(PetRec &r) const {
 // vuelve como lo dejaste, pero crecido (despacio) y sano: ver farmAge
 void Pet::importRec(const PetRec &r) {
   speciesId = r.speciesId;
+  megaUntil = 0;
   prevSpeciesId = -1;
   shiny = r.shiny;
   fullness = r.fullness; joy = r.joy; energy = r.energy; hygiene = r.hygiene;
@@ -689,6 +856,7 @@ void Pet::release() {
 
 void Pet::hatch() {
   speciesId = eggTarget;
+  megaUntil = 0;
   bornEpoch = lastSeenEpoch;
   raisedCount++;
   nature = (uint8_t)random(NAT_COUNT);
@@ -753,6 +921,7 @@ void Pet::evolve() {
   for (int i = 0; i < nAll; i++)
     if (!isRegistered(all[i])) opts[n++] = all[i];
   speciesId = n > 0 ? opts[random(n)] : all[random(nAll)];
+  megaUntil = 0;  // la nueva forma no es mega
   evoCount++;
   evoBoost = false;
   registerSpecies(speciesId);
@@ -797,12 +966,96 @@ void Pet::giveMedicine() {
 }
 
 void Pet::chessMedals(uint16_t wins, bool record) {
+  // suerte del ocio: se llama tras cada sincronizacion, con los puntos ya sumados
+  if (chessPtsTotal != chessSeen) {
+    chessSeen = chessPtsTotal;
+    chessDay = dayNow();
+  }
+  if (wins) chessWinDay = dayNow();
+  pendingSave = true;
   if (ceremony != CER_NONE) return;
   checkMedals((wins ? MED_CHESS : 0) | (record ? MED_RECORD : 0));
 }
 
+// ---------- ocio ----------
+
+uint8_t Pet::chessLuck() const {
+  uint16_t hoy = dayNow();
+  return chessWinDay == hoy ? LUCK_WON : chessDay == hoy ? LUCK_PLAYED : LUCK_NONE;
+}
+
+bool Pet::spend(uint16_t pts) {
+  if (points < pts) return false;
+  points -= pts;
+  pendingSave = true;
+  return true;
+}
+
+void Pet::give(uint8_t item, uint16_t n) {
+  if (item >= ITEM_COUNT) return;
+  bag[item] = bag[item] + n > 999 ? 999 : bag[item] + n;
+  while (bag[ITEM_MEGA_SHARD] >= SHARDS_PER_STONE && bag[ITEM_MEGA_STONE] < 999) {  // se juntan solos
+    bag[ITEM_MEGA_SHARD] -= SHARDS_PER_STONE;
+    bag[ITEM_MEGA_STONE]++;
+  }
+  pendingSave = true;
+}
+
+uint8_t Pet::eatFruit(uint8_t item) {
+  if (!isFruit(item) || bag[item] == 0 || ceremony != CER_NONE || isEgg() || sleeping) return FRUIT_NO;
+  uint16_t hoy = dayNow();
+  if (fruitDay != hoy) { fruitDay = hoy; fruitCnt = 0; }
+  uint8_t r = FRUIT_FULL;
+  if (fruitCnt < FRUITS_PER_DAY) {
+    uint8_t s = trAtk, d = trDef, v = trSpe;
+    if (!fruitRaise(item, s, d, v)) return FRUIT_MAXED;  // ya al maximo: no se gasta
+    trAtk = s; trDef = d; trSpe = v;
+    fruitCnt++;
+    r = FRUIT_UP;
+  }
+  bag[item]--;
+  lastFood = FOOD_BERRY;
+  fullness = clamp100(fullness + 10);
+  if (item == ITEM_FRUIT_GOLD) joy = 100;
+  eatUntil = millis() + EAT_ANIM_MS;
+  registerCare();
+  save();
+  return r;
+}
+
+bool Pet::eatFish() {
+  if (bag[ITEM_FISH] == 0 || ceremony != CER_NONE || isEgg() || sleeping) return false;
+  bag[ITEM_FISH]--;
+  lastFood = FOOD_BERRY;
+  fullness = clamp100(fullness + 30);
+  joy = clamp100(joy + 5);
+  eatUntil = millis() + EAT_ANIM_MS;
+  registerCare();
+  save();
+  return true;
+}
+
+bool Pet::usePearl() {
+  if (bag[ITEM_PEARL] == 0 || ceremony != CER_NONE || isEgg()) return false;
+  bag[ITEM_PEARL]--;
+  joy = 100;
+  heartUntil = millis() + HEART_MS;
+  addBond(2);
+  save();
+  return true;
+}
+
+void Pet::funDone() {
+  if (ceremony != CER_NONE || isEgg() || vacant) return;
+  energy = clamp100(energy - 5);
+  joy = clamp100(joy + 6);
+  addBond(1);
+  registerCare();
+  pendingSave = true;
+}
+
 bool Pet::buy(uint8_t item) {
-  if (item >= ITEM_COUNT || points < ITEM_PRICE[item] || bag[item] >= 999) return false;
+  if (item >= SHOP_ITEMS || points < ITEM_PRICE[item] || bag[item] >= 999) return false;
   points -= ITEM_PRICE[item];
   bag[item]++;
   save();
@@ -821,8 +1074,8 @@ bool Pet::usePotion(uint8_t item) {
 }
 
 bool Pet::hatchEgg(uint8_t kind) {
-  if (!vacant || kind >= EGG_KINDS || bag[ITEM_EGG_COMMON + kind] == 0) return false;
-  bag[ITEM_EGG_COMMON + kind]--;
+  if (!vacant || kind >= EGG_KINDS || bag[eggItem(kind)] == 0) return false;
+  bag[eggItem(kind)]--;
   newEgg(kind);
   return true;
 }
@@ -839,6 +1092,7 @@ void Pet::becomeVacant() {
   neglectTicks = 0;
   speciesId = -1;
   prevSpeciesId = -1;
+  megaUntil = 0;
   vacant = true;
   fromFarm = false;
   sick = false;
@@ -847,6 +1101,16 @@ void Pet::becomeVacant() {
   poops = 0;
   eggTaps = 0;
   save();
+}
+
+void Pet::sportsDone(bool won) {
+  if (ceremony != CER_NONE || isEgg() || vacant) return;
+  energy = clamp100(energy - 6);
+  joy = clamp100(joy + (won ? 12 : 5));
+  if (won) heartUntil = millis() + HEART_MS;
+  addBond(won ? 2 : 1);
+  registerCare();
+  pendingSave = true;
 }
 
 void Pet::play() {
@@ -1046,6 +1310,15 @@ void Pet::save() {
   prefs.putUInt("stp", stepsToday);
   prefs.putUInt("stpd", stepsDay);
   prefs.putUChar("stpp", stepPts);
+  prefs.putUInt("mega", megaUntil);
+  prefs.putUInt("stoned", stoneDay);
+  prefs.putUInt("grd", grassDay);
+  prefs.putUInt("grw", grassWeek);
+  prefs.putUInt("grm", grassMonth);
+  prefs.putBytes("gymb", badges, sizeof(badges));
+  prefs.putUShort("gyml", leagueWon);
+  prefs.putBytes("gymt", gymTry, sizeof(gymTry));
+  prefs.putBytes("leagt", leagueTry, sizeof(leagueTry));
   prefs.putBool("stpj", stepJoy);
   prefs.putUChar("nat", nature);
   prefs.putUChar("acco", accOwned);
@@ -1058,6 +1331,16 @@ void Pet::save() {
   prefs.putUShort("raised", raisedCount);
   prefs.putUInt("stpt", stepsTotal);
   prefs.putUInt("chst", chessPtsTotal);
+  prefs.putBytes("plot", plotAt, sizeof(plotAt));
+  prefs.putUChar("plotw", plotWet);
+  prefs.putUInt("qend", questEnd);
+  prefs.putShort("qdex", questDex);
+  prefs.putUShort("frday", fruitDay);
+  prefs.putUChar("frcnt", fruitCnt);
+  prefs.putUShort("chday", chessDay);
+  prefs.putUShort("chwin", chessWinDay);
+  prefs.putUInt("chseen", chessSeen);
+  prefs.putUInt("funf", funFinds);
   prefs.putUShort("sickm", sickMinutes);
   prefs.putUChar("wgt", weight);
   prefs.putUChar("gatk", geneAtk);
@@ -1106,6 +1389,15 @@ void Pet::load() {
   stepsToday = prefs.getUInt("stp", 0);
   stepsDay = prefs.getUInt("stpd", 0);
   stepPts = prefs.getUChar("stpp", 0);
+  megaUntil = prefs.getUInt("mega", 0);
+  stoneDay = prefs.getUInt("stoned", 0);
+  grassDay = prefs.getUInt("grd", 0);
+  grassWeek = prefs.getUInt("grw", 0);
+  grassMonth = prefs.getUInt("grm", 0);
+  prefs.getBytes("gymb", badges, sizeof(badges));
+  leagueWon = prefs.getUShort("gyml", 0);
+  prefs.getBytes("gymt", gymTry, sizeof(gymTry));
+  prefs.getBytes("leagt", leagueTry, sizeof(leagueTry));
   stepJoy = prefs.getBool("stpj", false);
   nature = prefs.getUChar("nat", NAT_EASY);
   if (nature >= NAT_COUNT) nature = NAT_EASY;
@@ -1119,6 +1411,16 @@ void Pet::load() {
   raisedCount = prefs.getUShort("raised", 0);
   stepsTotal = prefs.getUInt("stpt", stepsToday);
   chessPtsTotal = prefs.getUInt("chst", 0);
+  prefs.getBytes("plot", plotAt, sizeof(plotAt));
+  plotWet = prefs.getUChar("plotw", 0);
+  questEnd = prefs.getUInt("qend", 0);
+  questDex = prefs.getShort("qdex", 0);
+  fruitDay = prefs.getUShort("frday", 0);
+  fruitCnt = prefs.getUChar("frcnt", 0);
+  chessDay = prefs.getUShort("chday", 0);
+  chessWinDay = prefs.getUShort("chwin", 0);
+  chessSeen = prefs.getUInt("chseen", chessPtsTotal);  // lo de antes no cuenta como de hoy
+  funFinds = prefs.getUInt("funf", 0);
   sickMinutes = prefs.getUShort("sickm", 0);
   weight = prefs.getUChar("wgt", 0);
   geneAtk = prefs.getUChar("gatk", 0);

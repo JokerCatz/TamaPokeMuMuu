@@ -14,7 +14,7 @@ enum Lang : uint8_t { LANG_EN = 0, LANG_ZH, LANG_COUNT };
 extern Lang gLang;  // idioma activo (definido en i18n.cpp)
 
 // IDs de cadena. El orden debe coincidir con la tabla STRINGS de i18n.cpp.
-enum StrId : uint8_t {
+enum StrId : uint16_t {  // mas de 256 textos
   // estado del bicho (statusMsg)
   S_EVOLVING, S_EATING, S_LIKES, S_HUNGRY, S_NEEDS_BATH,
   S_EXHAUSTED, S_SAD, S_CHUBBY, S_IS_SHINY, S_HAPPY,
@@ -96,7 +96,7 @@ enum StrId : uint8_t {
   // visita de la granja
   S_VISIT_FMT,
   // copia de seguridad (ajustes)
-  S_RESTORE_FMT, S_NO_BACKUP, S_RESTORE_Q, S_RESTORING,
+  S_NO_BACKUP, S_RESTORE_Q, S_RESTORING,
   // caricia, cosecha de la granja
   S_SAY_STROKE, S_HARVEST, S_HARVEST_PTS_FMT,
   // gestos: cabeza, barriga, cosquillas, harto, vuelta
@@ -121,6 +121,56 @@ enum StrId : uint8_t {
   // la cuenta de chess.com se pone en el portal Wi-Fi: pista en su pantalla y
   // aviso si se pide sincronizar sin ella
   S_WIFI_HINT3, S_NEED_CHESS,
+  // diez mil pasos en el dia: premio
+  S_SAY_STEP_BONUS,
+  // pagina de actividades (a la izquierda de la principal): granja y pruebas deportivas
+  S_HUB_TITLE, S_HUB_SPORTS, S_HUB_SPORTS_HINT, S_ASLEEP, S_SWIPE_R_BACK,
+  // megaevolucion: la piedra, el nombre, por que no se puede, y los avisos de empezar y acabar
+  S_ITEM_MEGA_STONE, S_MEGA_NAME_FMT, S_MEGA_NO_FORM, S_MEGA_ALREADY, S_SAY_MEGA, S_SAY_MEGA_END,
+  // sports day: nombres, que cuenta en cada prueba, rivales, marcas y resultado
+  S_EV_SPRINT, S_EV_HURDLES, S_EV_SWIM, S_EV_LONGJUMP, S_EV_HIGHJUMP,
+  S_HOW_SPRINT, S_HOW_HURDLES, S_HOW_SWIM, S_HOW_LONGJUMP, S_HOW_HIGHJUMP,
+  S_TAP_START, S_GO, S_GOLD, S_SILVER, S_BRONZE,
+  S_GOT_STONE, S_STONE_TODAY, S_SECS_FMT, S_METERS_FMT, S_VS_FMT, S_TOO_TIRED, S_YOU,
+  // tipos con ventaja en cada prueba, y lo que le toca al compañero
+  S_BONUS_SPRINT, S_BONUS_HURDLES, S_BONUS_SWIM, S_BONUS_LONGJUMP, S_BONUS_HIGHJUMP, S_BONUS_UP_FMT, S_BONUS_DOWN_FMT,
+  // premio de la hierba: delante va lo que habia
+  S_GRASS_FOUND,
+  // estadisticas: codigo para el Atajo del movil que manda los pasos
+  S_ST_PHONE,
+  // pruebas nuevas (gimnasios y torneo) y gimnasios: lista, equipo, rondas, tipos
+  S_EV_LIFT, S_EV_CLIMB, S_EV_DIVE, S_EV_SKATE, S_EV_TORCH, S_EV_TRAIL,
+  S_HOW_LIFT, S_HOW_CLIMB, S_HOW_DIVE, S_HOW_SKATE, S_HOW_TORCH, S_HOW_TRAIL,
+  S_BONUS_LIFT, S_BONUS_CLIMB, S_BONUS_DIVE, S_BONUS_SKATE, S_BONUS_TORCH, S_BONUS_TRAIL,
+  S_KG_FMT, S_PTS_FMT, S_MINSEC_FMT, S_GYMS, S_GYMS_TITLE_FMT, S_BADGES_FMT,
+  S_LEAGUE, S_CHAMPION, S_GYMS_HINT, S_LEAGUE_LOCKED, S_GYM_TRIED, S_GYM_NEED_BADGE,
+  S_NEED_FARM2, S_ELITE, S_CHAMP_ROLE, S_CHALLENGE, S_REMATCH, S_PICK_TWO,
+  S_NEXT, S_LINEUP, S_LINEUP_HINT, S_START, S_ROUND_FMT, S_ROUND_WON,
+  S_ROUND_LOST, S_TAP_NEXT, S_GOT_BADGE_FMT, S_ALSO_GOT_FMT, S_GYM_LOST, S_LEAGUE_WON,
+  S_LEAGUE_LOST, S_TY_NORMAL, S_TY_FIRE, S_TY_WATER, S_TY_GRASS, S_TY_ELECTRIC,
+  S_TY_ICE, S_TY_FIGHTING, S_TY_POISON, S_TY_GROUND, S_TY_FLYING, S_TY_PSYCHIC,
+  S_TY_BUG, S_TY_ROCK, S_TY_GHOST, S_TY_DRAGON, S_TY_DARK, S_TY_STEEL,
+  S_TY_FAIRY,
+  S_BADGES_TOTAL_FMT,
+  // ocio (fun.ino): actividades, huerto, pesca, mina, expedicion, objetos y frutas
+  S_HUB_FUN, S_HUB_FUN_HINT, S_FUN_TITLE_FMT, S_FUN_GARDEN, S_FUN_FISH,
+  S_FUN_MINE, S_FUN_QUEST, S_NEED_GARDEN, S_NEED_FISH, S_NEED_MINE,
+  S_NEED_QUEST, S_FUN_WHO_FMT, S_PTS_COST_FMT, S_LUCK_WON, S_LUCK_PLAYED,
+  S_LUCK_NONE, S_WHO_GOES, S_AWAY, S_MIN_LEFT_FMT, S_HOURS_LEFT_FMT,
+  S_RIPE_FMT, S_QUEST_BACK, S_PLANT, S_WATER, S_REAP,
+  S_WATERED, S_RIPE, S_TIME_UNSET, S_CAST, S_WAIT_BITE,
+  S_BITE, S_GREAT_CATCH, S_SMALL_CATCH, S_DIG, S_TAP_ROCK,
+  S_GO_OUT, S_BACK_IN_HOUR, S_CLAIM, S_QUEST_BUSY, S_LOOT,
+  S_ITEM_FRUIT_STA, S_ITEM_FRUIT_RES, S_ITEM_FRUIT_VIT, S_ITEM_FRUIT_GOLD, S_ITEM_FISH,
+  S_ITEM_PEARL, S_ITEM_SHARD, S_ITEM_EGG_WATER, S_ITEM_EGG_FOSSIL, S_FRUIT_FULL,
+  S_SHARD_AUTO, S_FRUIT_STA_UP, S_FRUIT_RES_UP, S_FRUIT_VIT_UP, S_FRUIT_GOLD_UP,
+  S_PEARL_HAPPY, S_FISH_YUM,
+  // revision de pantallas: activ., ajustes, tienda, pokedex, granja, gimnasio, estadisticas
+  S_HUB_FARM, S_FARM_SUB_FMT, S_RESTORE, S_OWN_FMT, S_GOOD_AT_FMT,
+  S_BASE_FMT, S_TRAIN_FMT, S_GYM_TIP1, S_GYM_TIP2, S_ST_BADGES,
+  S_ST_CHAMP, S_ST_FUN,
+  S_HOURS_FMT, S_MINS_FMT,  // huerto: lo que le falta a cada parcela (corto, para que quepa)
+  S_BUY_FOR_FMT, S_SPEND_Q_FMT,  // confirmar antes de gastar puntos (tienda, ocio)
   STR_COUNT
 };
 

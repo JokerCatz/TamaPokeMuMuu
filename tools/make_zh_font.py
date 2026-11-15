@@ -326,6 +326,10 @@ def used_chars():
     for tabla in ('STRINGS', 'MED_NAME', 'MED_LBL', 'MED_DSC'):
         textos += [lit[1:-1] for lit in fmt.extract_table(src, tabla, len(fmt.LANGS))[zh]]
     textos += [n['zh'] for n in LOCAL_NAMES.values() if 'zh' in n]
+    gyms = os.path.join(ROOT, 'gyms.h')  # lideres, ciudades y medallas (tools/gen_gyms.py)
+    if os.path.exists(gyms):
+        with open(gyms, encoding='utf-8') as fh:
+            textos += re.findall(r'"((?:[^"\\]|\\.)*)"', fh.read())
     return sorted({ord(c) for t in textos for c in t if ord(c) > 126})
 
 

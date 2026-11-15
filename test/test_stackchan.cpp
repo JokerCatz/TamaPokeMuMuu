@@ -140,8 +140,31 @@ TEST(stackchan, la_lista_de_herramientas) {
   JsonDocument d;
   JsonArray t = d["tools"].to<JsonArray>();
   stackchanToolList(t);
-  CHECK_EQ((int)t.size(), (int)MCP_TOOL_COUNT);
-  CHECK_EQ(stackchanFind("tamapoke_buy"), (int)MCP_BUY);
-  CHECK_EQ(stackchanFind("nada"), -1);
-  CHECK(d["tools"][(int)MCP_BUY]["inputSchema"]["properties"]["item"]["enum"].size() == 4);
+  CHECK_EQ((int)t.size(), 4);  // pocas: xiaozhi corta la lista si el agente tiene demasiadas
+  CHECK(d["tools"][3]["name"] == "tamapoke_buy");
+  CHECK(d["tools"][3]["inputSchema"]["properties"]["item"]["enum"].size() == 4);
+  CHECK(d["tools"][1]["inputSchema"]["properties"]["action"]["enum"].size() == 8);
+  CHECK(d["tools"][2]["inputSchema"]["required"][0] == "kind");
+
+  JsonDocument a;
+  JsonVariantConst nada = a.as<JsonVariantConst>();
+  CHECK_EQ(stackchanFind("tamapoke_status", nada), (int)MCP_STATUS);
+  CHECK_EQ(stackchanFind("tamapoke_buy", nada), (int)MCP_BUY);
+  CHECK_EQ(stackchanFind("nada", nada), -1);
+  CHECK_EQ(stackchanFind(nullptr, nada), -1);
+  a["action"] = "feed";
+  CHECK_EQ(stackchanFind("tamapoke_care", a.as<JsonVariantConst>()), (int)MCP_FEED);
+  a["action"] = "medicine";
+  CHECK_EQ(stackchanFind("tamapoke_care", a.as<JsonVariantConst>()), (int)MCP_MEDICINE);
+  a["action"] = "bailar";
+  CHECK_EQ(stackchanFind("tamapoke_care", a.as<JsonVariantConst>()), -1);
+  CHECK_EQ(stackchanFind("tamapoke_care", nada), -1);
+  JsonDocument k;
+  k["kind"] = "farm";
+  CHECK_EQ(stackchanFind("tamapoke_info", k.as<JsonVariantConst>()), (int)MCP_FARM);
+  k["kind"] = "chess";
+  CHECK_EQ(stackchanFind("tamapoke_info", k.as<JsonVariantConst>()), (int)MCP_CHESS);
+  // los nombres de antes siguen funcionando
+  CHECK_EQ(stackchanFind("tamapoke_feed", nada), (int)MCP_FEED);
+  CHECK_EQ(stackchanFind("tamapoke_pokedex", nada), (int)MCP_POKEDEX);
 }

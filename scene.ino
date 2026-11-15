@@ -295,7 +295,7 @@ void renderStandby() {
 
 // la pantalla principal esta libre (sin otras pantallas ni dialogos encima)
 bool mainScreenFree() {
-  return !galleryOpen && !farmOpen && !shopOpen && !cardOpen && !kbOpen && !clockOpen && !wifiPortalActive() &&
+  return !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !shopOpen && !cardOpen && !kbOpen && !clockOpen && !wifiPortalActive() &&
          !feedMenuUntil && !actionUntil && !confirmUntil && !choiceKind && !reportPending && !pet.awaitingStarter();
 }
 
@@ -952,4 +952,55 @@ void renderStarterSelect() {
     printT(dexName(d));
   }
   gfx->flush();
+}
+
+// ---------- premios escondidos en la hierba ----------
+// Cuando hay uno (pet.grassReady), una mata se mueve en el suelo de la principal; tocarla lo
+// coge. La del dia es verde; la de la semana brilla en azul y la del mes en dorado.
+
+static const int GRASS_GROUND = PET_GROUND - 4;
+static int grassX() { return 60 + (int)((pet.lastSeenEpoch / 86400 * 71) % 9) * 38; }  // un sitio por dia
+
+static bool grassShown() {
+  bool fx = grassFxUntil && (int32_t)(millis() - grassFxUntil) < 0;
+  return (pet.grassReady() || fx) && !pet.isEgg() && !pet.vacant && !pet.ceremony && mainScreenFree();
+}
+
+void drawGrassPrize() {
+  if (!grassShown()) return;
+  uint32_t now = millis();
+  int x = grassX();
+  bool agita = now % 1600 < 450 && (now / 110) % 2;  // de vez en cuando se agita: las puntas a un lado y a otro
+  drawMap(agita ? SPR_GRASS_B : SPR_GRASS_A, 24, x - 24, GRASS_GROUND - 44, 2, false);
+  uint8_t tier = pet.grassReady();
+  if (tier == GRASS_DAY) return;
+  uint16_t col = tier == GRASS_MONTH ? 0xFECB : 0x4C98;  // dorado el del mes, azul el de la semana
+  static const int8_t SP[3][2] = { { -26, -40 }, { 22, -48 }, { 28, -14 } };
+  for (int i = 0; i < 3; i++) {
+    if (((now / 300) + i) % 3 == 0) continue;  // titilan
+    int sx = x + SP[i][0], sy = GRASS_GROUND + SP[i][1];
+    gfx->fillRect(sx - 1, sy - 5, 3, 11, col);
+    gfx->fillRect(sx - 5, sy - 1, 11, 3, col);
+  }
+}
+
+static char grassMsg[80];
+
+// tocar la mata: el premio a la mochila y un aviso con lo que habia
+bool grassTap(int16_t x, int16_t y) {
+  if (!grassShown()) return false;
+  int gx = grassX();
+  if (abs(x - gx) > 34 || y < GRASS_GROUND - 58 || y > GRASS_GROUND + 10) return false;
+  GrassPrize g;
+  if (!pet.collectGrass(g)) return false;
+  char que[48];
+  if (g.qty > 1) snprintf(que, sizeof(que), "%s x%u", T(ITEM_NAME[g.item]), g.qty);
+  else snprintf(que, sizeof(que), "%s", T(ITEM_NAME[g.item]));
+  if (g.item2 != 0xFF) snprintf(que + strlen(que), sizeof(que) - strlen(que), " + %s", T(ITEM_NAME[g.item2]));
+  snprintf(grassMsg, sizeof(grassMsg), "%s%s", T(S_GRASS_FOUND), que);
+  toast(grassMsg);
+  sfxPlay(SFX_MEDAL);
+  showEmote(EMO_HEART, 1800);
+  Serial.printf("hierba: %s\n", grassMsg);
+  return true;
 }

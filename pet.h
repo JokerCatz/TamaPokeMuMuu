@@ -58,14 +58,46 @@ enum : uint8_t {
   ITEM_CANDY = 0, ITEM_MEDICINE, ITEM_POTION_STR, ITEM_POTION_SPD, ITEM_SHINY_CHARM,
   ITEM_EGG_COMMON, ITEM_EGG_RARE, ITEM_EGG_LEGEND,
   ITEM_POTION_EVO,  // al final: la mochila guardada antes sigue cuadrando
+  ITEM_MEGA_STONE,  // piedra megaevolucion (tambien la da una prueba deportiva ganada al dia)
+  // del ocio (fun.h): no se venden. Frutas: +FRUIT_GAIN a una capacidad (la dorada, a las tres)
+  ITEM_FRUIT_STA, ITEM_FRUIT_RES, ITEM_FRUIT_VIT, ITEM_FRUIT_GOLD,
+  ITEM_FISH,        // comida que llena mucho
+  ITEM_PEARL,       // le alegra del todo
+  ITEM_MEGA_SHARD,  // SHARDS_PER_STONE hacen una piedra megaevolucion (solas)
+  ITEM_EGG_WATER, ITEM_EGG_FOSSIL,
   ITEM_COUNT
 };
-static const uint16_t ITEM_PRICE[ITEM_COUNT] = { 2, 3, 5, 5, 50, 10, 30, 100, 100 };
+#define SHOP_ITEMS (ITEM_MEGA_STONE + 1)  // los que se venden (los primeros)
+#define FUN_ITEM0 ITEM_FRUIT_STA          // los del ocio: la pagina "cosecha" de la mochila
+#define FUN_ITEMS (ITEM_COUNT - FUN_ITEM0)
+static const uint16_t ITEM_PRICE[ITEM_COUNT] = { 2, 3, 5, 5, 50, 10, 30, 100, 100, 150 };  // 0: no se vende
+// premios escondidos en la hierba de la principal: uno al dia (poco), uno a la semana (de lunes
+// a domingo, algo mejor) y uno al mes (bueno). Sale el de mas valor que quede; no dan puntos
+enum : uint8_t { GRASS_NONE = 0, GRASS_DAY, GRASS_WEEK, GRASS_MONTH };
+struct GrassPrize {
+  uint8_t item, qty;
+  uint8_t item2;  // un segundo objeto (0xFF = no hay)
+};
+// megaevolucion (mega.h): una piedra la da durante un dia y luego vuelve a su forma
+#define MEGA_SECONDS (24UL * 3600)
+enum : uint8_t { MEGA_OK = 0, MEGA_NO_FORM, MEGA_ALREADY, MEGA_NO_STONE, MEGA_BUSY };
 // tipos de huevo (ITEM_EGG_COMMON + tipo) y su probabilidad base (%) de salir
 // raro y legendario; el resto es comun. El cuidado y la despedida la mejoran.
-enum : uint8_t { EGG_COMMON = 0, EGG_RARE, EGG_LEGEND, EGG_KINDS };
-static const uint8_t EGG_RARE_PCT[EGG_KINDS] = { 10, 20, 30 };
-static const uint8_t EGG_LEG_PCT[EGG_KINDS] = { 3, 6, 10 };
+// Los del ocio: de agua (pesca: sale uno de tipo agua) y fosil (mina: un fosil).
+enum : uint8_t { EGG_COMMON = 0, EGG_RARE, EGG_LEGEND, EGG_WATER, EGG_FOSSIL, EGG_KINDS };
+#define EGG_BASIC 3  // los de la tienda (salen siempre en la pantalla de elegir huevo)
+static const uint8_t EGG_RARE_PCT[EGG_KINDS] = { 10, 20, 30, 15, 0 };
+static const uint8_t EGG_LEG_PCT[EGG_KINDS] = { 3, 6, 10, 2, 0 };
+static inline uint8_t eggItem(uint8_t kind) {
+  return kind == EGG_WATER ? ITEM_EGG_WATER : kind == EGG_FOSSIL ? ITEM_EGG_FOSSIL : ITEM_EGG_COMMON + kind;
+}
+// ocio (fun.h): el huerto, la expedicion, frutas al dia y la suerte del ajedrez
+#define GARDEN_PLOTS 3
+#define FRUITS_PER_DAY 3   // frutas que suben capacidades al dia (por pokemon); las demas solo llenan
+#define FRUIT_GAIN 3
+#define SHARDS_PER_STONE 10
+enum : uint8_t { LUCK_NONE = 0, LUCK_PLAYED, LUCK_WON };
+enum : uint8_t { FRUIT_UP = 0, FRUIT_FULL, FRUIT_MAXED, FRUIT_NO };  // lo que hizo comerse una fruta
 #define POTION_GAIN 5      // cada pocion de fuerza/velocidad
 // Capacidades (no hay combates): cada una de 0 a 100 y cada una cuida algo.
 //   aguante (trAtk, pocion de fuerza): la energia baja hasta un 50% mas despacio
@@ -84,6 +116,8 @@ static const uint8_t EGG_LEG_PCT[EGG_KINDS] = { 3, 6, 10 };
 #define STEP_PTS_EVERY 1000
 #define STEP_PTS_MAX 5
 #define STEP_JOY_AT 3000
+#define STEP_BONUS_AT 10000  // y al llegar a 10000 en el dia, STEP_BONUS_PTS mas (una vez)
+#define STEP_BONUS_PTS 10
 // el tiempo de fuera que siente el compañero (lo pone el sketch con el real)
 enum : uint8_t { PW_NONE = 0, PW_RAIN, PW_SNOW, PW_SUN };
 // caracter del individuo (se sortea al nacer): una necesidad le baja un poco
@@ -118,7 +152,8 @@ struct PetRec {
   char nick[12];
   uint32_t bornEpoch;  // v2
   uint32_t farmEpoch;  // v3: hora local a la que entro en la granja (0 = no se sabe)
-  uint8_t evoCount, evoBoost, pad4[2];  // v4: veces que ha evolucionado; pocion tomada
+  uint8_t evoCount, evoBoost;  // v4: veces que ha evolucionado; pocion tomada
+  uint8_t fruitCnt, fruitDay8;  // frutas de hoy en la granja (dia % 256); antes relleno a 0
 };
 #define PET_REC_V1_SIZE offsetof(PetRec, bornEpoch)
 #define PET_REC_V2_SIZE offsetof(PetRec, farmEpoch)
@@ -222,6 +257,17 @@ public:
   uint16_t raisedCount = 0;   // compañeros nacidos
   uint32_t stepsTotal = 0;    // pasos de siempre
   uint32_t chessPtsTotal = 0; // puntos ganados con el ajedrez
+  // ocio (fun.ino): huerto (hora a la que se planto cada parcela, 0 = vacia; regada: bit p),
+  // expedicion (hora de vuelta y quien fue), frutas de hoy del compañero y el ajedrez de hoy
+  uint32_t plotAt[GARDEN_PLOTS] = {};
+  uint8_t plotWet = 0;
+  uint32_t questEnd = 0;
+  int16_t questDex = 0;
+  uint16_t fruitDay = 0;
+  uint8_t fruitCnt = 0;
+  uint16_t chessDay = 0, chessWinDay = 0;  // dia (today()) en que se jugo / se gano al ajedrez
+  uint32_t chessSeen = 0;                  // chessPtsTotal ya visto (si sube, se jugo)
+  uint32_t funFinds = 0;                   // cosas sacadas del ocio, de siempre (estadisticas)
   // para la animacion: que comio la ultima vez (FOOD_*) y cuantas veces ha jugado
   uint8_t lastFood = 0;
   uint16_t playSeq = 0;
@@ -271,6 +317,32 @@ public:
   int8_t weatherFeel() const;  // +1 le gusta el tiempo, -1 no (o tiene frio), 0 le da igual
   bool feelsCold() const { return weather == PW_SNOW && weatherFeel() < 0; }
   void addSteps(uint32_t n);   // pasos nuevos (0: solo cambia de dia si toca)
+  // pasos de hoy segun el movil: cuentan solo los que pasen de los de la placa
+  void phoneSteps(uint32_t n);
+  bool takeStepBonus();        // acaba de llegar a los diez mil: true una vez, para enseñarlo
+  // megaevolucion: gasta una piedra (MEGA_OK) o dice por que no (MEGA_*, sin gastarla)
+  uint8_t useMegaStone();
+  bool isMega() const { return megaUntil && lastSeenEpoch < megaUntil; }
+  bool takeMegaChange(bool &on);  // empezo (on) o acabo la megaevolucion: una vez, para enseñarlo
+  bool grantSportsStone();        // premio de una prueba ganada: una piedra, como mucho una al dia
+  uint8_t grassReady() const;      // el premio de la hierba que hay ahora (GRASS_*), el de mas valor
+  // gimnasios (gym.h): 8 por region, en orden, solo en regiones abiertas, un intento al dia
+  // cada uno; la liga de la region con las 8 medallas
+  bool hasBadge(uint8_t region, uint8_t gym) const { return region < 9 && gym < 8 && (badges[region] >> gym) & 1; }
+  uint8_t badgeCount(uint8_t region) const { return region < 9 ? __builtin_popcount(badges[region]) : 0; }
+  uint16_t totalBadges() const;
+  uint8_t leagueTitles() const;  // ligas ganadas (estadisticas)
+  bool gymOpen(uint8_t region, uint8_t gym) const;
+  bool startGym(uint8_t region, uint8_t gym);          // gasta el intento de hoy (false: no se puede)
+  bool winGym(uint8_t region, uint8_t gym, uint8_t &item);  // medalla nueva (y regalo en item, o 0xFF)
+  bool gymTriedToday(uint8_t r, uint8_t k) const { return r < 9 && k < 8 && gymTry[r * 8 + k] == (uint16_t)today(); }
+  bool leagueTriedToday(uint8_t r) const { return r < 9 && leagueTry[r] == (uint16_t)today(); }
+  bool leagueOpen(uint8_t region) const { return region < unlockedRegions() && badgeCount(region) == 8; }
+  bool leagueChampion(uint8_t region) const { return region < 9 && (leagueWon >> region) & 1; }
+  bool startLeague(uint8_t region);
+  bool winLeague(uint8_t region);  // campeon por primera vez: huevo legendario y amuleto shiny
+  uint8_t collectGrass(GrassPrize &g);  // lo coge: a la mochila; devuelve cual era (GRASS_NONE: nada)
+  uint32_t megaUntil = 0;         // epoch en que vuelve a su forma (0 = no es mega)
   bool takeMemoir(MemRec &r);  // el ultimo final, una vez, para guardarlo en el album
   bool buyAccessory(uint8_t a);   // paga y lo guarda (ya comprado: false)
   void wearAccessory(uint8_t a);  // ponerselo; si ya lo llevaba, quitarselo
@@ -283,6 +355,18 @@ public:
   void addPoints(int32_t n);
   // sincronizacion de ajedrez: medallas para el compañero que estaba presente
   void chessMedals(uint16_t wins, bool record);
+  // ocio (fun.ino / fun.h)
+  uint8_t chessLuck() const;            // LUCK_*: hoy se jugo / se gano al ajedrez
+  bool spend(uint16_t pts);             // paga (false: no llega)
+  void give(uint8_t item, uint16_t n);  // a la mochila (los fragmentos se juntan en piedras)
+  uint8_t eatFruit(uint8_t item);       // FRUIT_*: subio / solo lleno (tope del dia) / ya al maximo
+  bool eatFish();
+  bool usePearl();
+  void funDone();                       // el compañero hizo algo del ocio: cansa un poco y alegra
+  bool questAway() const {              // el compañero esta de expedicion
+    return questEnd && questDex == speciesId && !vacant && lastSeenEpoch < questEnd;
+  }
+  uint16_t dayNow() const { return (uint16_t)today(); }
 
   // stats de combate: base real de gen 1 x genes + nivel + entrenamiento
   uint16_t atkStat() const;
@@ -293,6 +377,7 @@ public:
   uint8_t vitalityPct() const { return trSpe / 2; }
   uint8_t resistPct() const { return (uint8_t)(trDef * 6 / 10); }
   void play();
+  void sportsDone(bool won);  // acabo una prueba deportiva: cansa un poco y alegra (mas si gana)
   void toggleLight();  // dormir / despertar
   // pantalla apagada con el boton PWR: se duerme; al encenderla despierta, pero
   // solo si se durmio por eso (si ya dormia, sigue dormido)
@@ -395,6 +480,7 @@ public:
   // cuando la pantalla esta atenuada/apagada (la escritura a flash congela
   // ~1s ambos cores: asi no se ve ni corta el tactil)
   bool savePending() const { return pendingSave; }
+  void markDirty() { pendingSave = true; }  // cambiado desde fuera (ocio): guardar cuando toque
   // ultima hora real persistida; sirve para resembrar un RTC que perdio la hora
   uint32_t savedEpoch() { return prefs.getUInt("seen", 0); }
   void flushSave();
@@ -423,6 +509,14 @@ private:
   uint32_t milestoneUntil = 0; // celebracion de hito de racha
   uint32_t regionUntil = 0;    // celebracion de region completada
   bool selfMed = false;        // se curo solo con una de la mochila
+  bool stepBonus = false;      // premio de los diez mil pasos, sin enseñar aun
+  uint8_t megaEvent = 0;       // 1 empezo la megaevolucion, 2 acabo (sin enseñar aun)
+  uint32_t stoneDay = 0;       // dia (today()) de la ultima piedra ganada en las pruebas
+  uint32_t grassDay = 0, grassWeek = 0, grassMonth = 0;  // ultimo premio de la hierba cogido de cada clase
+  uint8_t badges[9] = {};       // medallas de gimnasio: un bit por gimnasio de cada region
+  uint16_t leagueWon = 0;       // ligas ganadas: un bit por region
+  uint16_t gymTry[72] = {};     // dia (today()) del ultimo intento en cada gimnasio
+  uint16_t leagueTry[9] = {};
   bool guardian = false;       // se cuida solo (ver setGuardian); asi no enferma
   void autoCare();
   uint8_t weather = PW_NONE;

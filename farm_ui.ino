@@ -14,6 +14,27 @@ void drawToast() {
   printT(toastMsg);
 }
 
+// Confirmar antes de gastar puntos (tienda, ocio): que (l1) y cuanto (l2), SI / NO. Como el
+// de restaurar la copia. askTap: 1 = SI, 0 = NO o fuera (se cancela)
+void drawAskBox(const char *l1, const char *l2) {
+  gfx->fillRoundRect(64, 160, 338, 160, 16, UI_WHITE);
+  gfx->drawRoundRect(64, 160, 338, 160, 16, UI_INK);
+  gfx->setTextColor(UI_INK);
+  setSize(2);
+  setCur(centerX(l1, 2), 184);
+  printT(l1);
+  setCur(centerX(l2, 2), 214);
+  printT(l2);
+  gfx->fillRoundRect(118, 252, 100, 52, 12, UI_BAR_OK);
+  gfx->fillRoundRect(248, 252, 100, 52, 12, UI_BAR_BAD);
+  gfx->setTextColor(UI_WHITE);
+  setCur(118 + (100 - textW(T(S_YES), 2)) / 2, 270);
+  printT(T(S_YES));
+  setCur(248 + (100 - textW(T(S_NO), 2)) / 2, 270);
+  printT(T(S_NO));
+}
+int askTap(int16_t x, int16_t y) { return (x >= 118 && x <= 218 && y >= 252 && y <= 304) ? 1 : 0; }
+
 // RECOGER: guarda al compañero tal cual en la granja y se despide hacia alla
 void collectCurrent() {
   if (pet.isEgg() || pet.ceremony) return;
@@ -21,6 +42,94 @@ void collectCurrent() {
   PetRec r;
   pet.exportRec(r);
   if (farmPut(pet, r)) pet.startCollect();
+}
+
+// ---------- actividades: la pagina a la izquierda de la principal ----------
+// cuatro filas: granja, torneo, gimnasios y ocio
+#define HUB_ROW_X 63
+#define HUB_ROW_W 340
+#define HUB_ROW_H 66
+#define HUB_ROW_Y0 88
+#define HUB_ROW_STEP 74
+enum { HUB_FARM, HUB_SPORTS, HUB_GYMS, HUB_FUN, HUB_ROWS };
+
+void openHub() {
+  if (pet.ceremony) return;
+  hubOpen = true;
+}
+
+// por que no se puede competir ahora (nullptr = si se puede)
+const char *sportsBlocked() {
+  if (pet.vacant || pet.isEgg()) return T(S_NO_PARTNER);
+  if (pet.sleeping) return T(S_ASLEEP);
+  if (pet.sick) return T(S_SICK);
+  if (pet.evolving()) return T(S_EVOLVING);
+  if (pet.questAway()) return T(S_AWAY);
+  if (pet.energy < 15) return T(S_TOO_TIRED);
+  return nullptr;
+}
+
+static void hubRow(int row, uint16_t fill, const char *const *icon, bool on, const char *title, const char *sub) {
+  int y = HUB_ROW_Y0 + row * HUB_ROW_STEP;
+  gfx->fillRoundRect(HUB_ROW_X, y, HUB_ROW_W, HUB_ROW_H, 18, on ? fill : UI_TRACK);
+  gfx->drawRoundRect(HUB_ROW_X, y, HUB_ROW_W, HUB_ROW_H, 18, UI_INK);
+  drawMap(icon, 16, HUB_ROW_X + 14, y + 9, 3, !on);
+  gfx->setTextColor(UI_INK);
+  setSize(3);
+  setCur(HUB_ROW_X + 76, y + 8);
+  printT(title);
+  setSize(2);
+  setCur(HUB_ROW_X + 76, y + 42);
+  printT(sub);
+}
+
+void renderHub() {
+  gfx->fillScreen(RGB565_BLACK);
+  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  gfx->setTextColor(UI_INK);
+  setSize(3);
+  setCur(centerX(T(S_HUB_TITLE), 3), 50);
+  printT(T(S_HUB_TITLE));
+  char n[24];
+  snprintf(n, sizeof(n), T(S_FARM_SUB_FMT), (unsigned)farmCount());
+  hubRow(HUB_FARM, 0xB6F2, SPR_ICON_FARM, true, T(S_HUB_FARM), farmReady() ? n : T(S_NEED_SD));
+  const char *why = sportsBlocked();
+  hubRow(HUB_SPORTS, 0xFF2E, SPR_ICON_TROPHY, !why, T(S_HUB_SPORTS), why ? why : T(S_HUB_SPORTS_HINT));
+  char b[32];
+  snprintf(b, sizeof(b), T(S_BADGES_TOTAL_FMT), (unsigned)pet.totalBadges());
+  hubRow(HUB_GYMS, 0xAEFF, SPR_ICON_GYM, true, T(S_GYMS), b);  // la lista sirve tambien de vitrina
+  hubRow(HUB_FUN, C565(0xf8, 0xd0, 0xc8), SPR_ICON_FUN, true, T(S_HUB_FUN), T(S_HUB_FUN_HINT));
+  gfx->setTextColor(UI_HINT);
+  setSize(2);
+  setCur(centerX(T(S_SWIPE_R_BACK), 2), 392);
+  printT(T(S_SWIPE_R_BACK));
+  drawToast();
+  gfx->flush();
+}
+
+void hubTap(int16_t x, int16_t y) {
+  if (x < HUB_ROW_X || x >= HUB_ROW_X + HUB_ROW_W || y < HUB_ROW_Y0) return;
+  int row = (y - HUB_ROW_Y0) / HUB_ROW_STEP;
+  if (row >= HUB_ROWS || y - HUB_ROW_Y0 - row * HUB_ROW_STEP > HUB_ROW_H) return;  // entre filas
+  if (row == HUB_FARM) {
+    sfxPlay(SFX_TAP);
+    openFarm();
+  } else if (row == HUB_SPORTS) {
+    const char *why = sportsBlocked();
+    if (why) { toast(why); return; }
+    sfxPlay(SFX_TAP);
+    openSports();
+  } else if (row == HUB_GYMS) {
+    sfxPlay(SFX_TAP);
+    openGyms();
+  } else {
+    sfxPlay(SFX_TAP);
+    openFun();
+  }
+}
+
+void hubSwipe(int dir) {
+  if (dir > 0) hubOpen = false;  // a la derecha: vuelta a la principal
 }
 
 void openFarm() {
@@ -41,7 +150,7 @@ void closeFarm() {
 // rejilla de la granja: 3 x 3 casillas grandes (miniaturas a x3)
 #define FARM_COLS 3
 #define FARM_PER_PAGE 9
-#define FARM_CELL 112
+#define FARM_CELL 106
 #define FARM_X0 (CX - FARM_COLS * FARM_CELL / 2)
 #define FARM_Y0 70
 static int farmPages() { return farmCount() > 0 ? (farmCount() + FARM_PER_PAGE - 1) / FARM_PER_PAGE : 1; }
@@ -89,9 +198,37 @@ void farmSwipe(int dir) {
 #define FARM_BTN_H 48
 
 #define ALBUM_BTN_X 173
-#define ALBUM_BTN_Y 424
+#define ALBUM_BTN_Y 398  // mas abajo lo cortaba el circulo
 #define ALBUM_BTN_W 120
 #define ALBUM_BTN_H 32
+
+// frutas para los de la granja: la misma regla que el compañero (FRUITS_PER_DAY al dia,
+// en su ficha); alli no pasan hambre, asi que pasado el tope no se gasta
+#define FF_Y 128
+static PetRec farmRec;        // la ficha (SD) del que se esta viendo: tipo y capacidades
+static bool farmRecOk = false;
+static int fruitRowX(int k) { return CX - 96 + k * 64; }
+static bool hasStatFruit() {
+  for (int k = 0; k < 4; k++)
+    if (pet.bag[ITEM_FRUIT_STA + k]) return true;
+  return false;
+}
+static void feedFarmFruit(int idx, uint8_t item) {
+  if (pet.bag[item] == 0) { toast(T(S_NONE_LEFT)); return; }
+  PetRec r;
+  if (!farmPeek(farmAt(idx).speciesId, r)) return;
+  uint8_t hoy = (uint8_t)(pet.dayNow() & 0xFF);
+  if (r.fruitDay8 != hoy) { r.fruitDay8 = hoy; r.fruitCnt = 0; }
+  if (r.fruitCnt >= FRUITS_PER_DAY) { toast(T(S_FRUIT_FULL)); return; }
+  if (!fruitRaise(item, r.trAtk, r.trDef, r.trSpe)) { toast(T(S_MAXED)); return; }
+  r.fruitCnt++;
+  if (!farmPut(pet, r)) return;
+  farmRec = r;
+  pet.bag[item]--;
+  pet.markDirty();
+  toast(T(fruitUpMsg(item)));
+  sfxPlay(SFX_EAT);
+}
 
 void farmTap(int16_t x, int16_t y) {
   if (albumOpen) {
@@ -109,6 +246,13 @@ void farmTap(int16_t x, int16_t y) {
       farmSwapIn(farmDetail);
       return;
     }
+    if (hasStatFruit() && abs(y - FF_Y) <= 26) {  // fila de frutas: darle una
+      for (int k = 0; k < 4; k++)
+        if (abs(x - fruitRowX(k)) <= 28) {
+          feedFarmFruit(farmDetail, ITEM_FRUIT_STA + k);
+          return;
+        }
+    }
     farmDetail = -1;  // fuera del boton: volver a la rejilla
     galleryPmd.unload();
     farmDirty = true;
@@ -122,6 +266,7 @@ void farmTap(int16_t x, int16_t y) {
   if (idx >= farmCount()) return;
   farmDetail = idx;
   galleryPmd.load(farmAt(idx).speciesId, farmAt(idx).shiny);
+  farmRecOk = farmPeek(farmAt(idx).speciesId, farmRec);
 }
 
 void renderFarm() {
@@ -142,13 +287,38 @@ void renderFarm() {
     setSize(ts);
     setCur(centerX(head, ts), 52);
     printT(head);
+    // nivel y tipo en una linea; abajo, sus capacidades (lo que cuenta en gimnasios y torneo)
     char lv[16];
     snprintf(lv, sizeof(lv), T(S_LVL_FMT), farmLevel(e, pet.lastSeenEpoch));
-    gfx->setTextColor(UI_INK);
+    uint8_t ty = typeOf(e.speciesId);
+    const char *tn = T((StrId)(S_TY_NORMAL + ty));
     setSize(2);
-    setCur(centerX(lv, 2), 92);
+    int wl = textW(lv, 2), x0 = CX - (wl + 16 + textW(tn, 2)) / 2;
+    gfx->setTextColor(UI_INK);
+    setCur(x0, 92);
     printT(lv);
+    gfx->setTextColor(TYPE_COL[ty]);
+    setCur(x0 + wl + 16, 92);
+    printT(tn);
+    if (farmRecOk) {
+      char tr[48];
+      snprintf(tr, sizeof(tr), T(S_TRAIN_FMT), farmRec.trAtk, farmRec.trDef, farmRec.trSpe);
+      gfx->setTextColor(UI_INK);
+      setCur(centerX(tr, 2), 326);
+      printT(tr);
+    }
     if (galleryPmd.loaded) drawPmdActM(galleryPmd, PMD_IDLE, CX, 320, millis(), true, false, 5);
+    if (hasStatFruit())  // las frutas de la mochila: tocar una se la da
+      for (int k = 0; k < 4; k++) {
+        uint8_t it = ITEM_FRUIT_STA + k;
+        drawFruitIcon(it, fruitRowX(k) - 8, FF_Y, 13, pet.bag[it] == 0);
+        char n[8];
+        snprintf(n, sizeof(n), "x%u", pet.bag[it]);
+        gfx->setTextColor(UI_INK);
+        setSize(2);
+        setCur(fruitRowX(k) + 8, FF_Y - 7);
+        printT(n);
+      }
     gfx->fillRoundRect(FARM_BTN_X, FARM_BTN_Y, FARM_BTN_W, FARM_BTN_H, 12, UI_BAR_OK);
     gfx->setTextColor(UI_WHITE);
     setSize(2);
@@ -212,9 +382,9 @@ void renderFarm() {
 // ---------- album de recuerdos: una fila por compañero que acabo ----------
 
 #define ALBUM_ROWS 4
-#define ALBUM_X 62
+#define ALBUM_X 70
 #define ALBUM_Y 78
-#define ALBUM_W 342
+#define ALBUM_W 326
 #define ALBUM_RH 76
 
 static int albumPages() {

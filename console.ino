@@ -83,7 +83,7 @@ void handleShake(uint32_t now) {
   }
   orientation(gy, gz, now);
   if (!ev || screenOff || pet.awaitingStarter() || pet.ceremony) return;
-  if (galleryOpen || farmOpen || shopOpen || cardOpen || kbOpen || clockOpen || wifiPortalActive()) return;
+  if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || shopOpen || cardOpen || kbOpen || clockOpen || wifiPortalActive()) return;
   wakeUI();
   if (pet.isEgg()) {
     if (!pet.vacant && (ev & SHAKE_SOFT)) {
@@ -316,6 +316,35 @@ void handleSerial() {
     uint32_t e = 0;
     bool hay = backupInfo(e);
     Serial.printf("copia=%d hora=%lu\n", hay, (unsigned long)e);
+    Serial.println("DONE");
+  } else if (line.startsWith("SPORT ")) {  // abre la prueba n de entrenamiento: sin premio ni cansancio (pruebas)
+    int n = line.substring(6).toInt();
+    if (n >= 0 && n < EV_COUNT) sportsPractice(n);
+    else if (chOpen) sportsSwipe(1);
+    Serial.println("DONE");
+  } else if (line.startsWith("GRASSFX ")) {  // GRASSFX s: la mata de la hierba se ve s segundos (solo se ve)
+    grassFxUntil = millis() + line.substring(8).toInt() * 1000UL;
+    Serial.println("DONE");
+  } else if (line.startsWith("BAG ")) {  // BAG i n: deja n del objeto i en la mochila (pruebas)
+    int i = line.substring(4).toInt(), sp = line.indexOf(' ', 4);
+    if (sp > 0 && i >= 0 && i < ITEM_COUNT) pet.bag[i] = (uint16_t)line.substring(sp + 1).toInt();
+    Serial.println("DONE");
+  } else if (line.startsWith("AWAY ")) {  // AWAY s: el compañero "de expedicion" s segundos (cartel); 0 lo quita
+    long s = line.substring(5).toInt();
+    pet.questEnd = s > 0 ? pet.lastSeenEpoch + s : 0;
+    pet.questDex = pet.speciesId;
+    Serial.println("DONE");
+  } else if (line.startsWith("FUN ")) {  // FUN a: actividad a del ocio, de prueba (sin puntos ni premios, 600x); -1 sale
+    funPractice(line.substring(4).toInt());
+    Serial.println("DONE");
+  } else if (line.startsWith("GYM ")) {  // GYM r k: ficha del gimnasio k (8 = liga) de la region r, de prueba
+    int r = line.substring(4).toInt(), sp = line.indexOf(' ', 4);
+    if (sp > 0) gymsPractice((uint8_t)r, (uint8_t)line.substring(sp + 1).toInt());
+    Serial.println("DONE");
+  } else if (line.startsWith("MEGA ")) {  // se ve megaevolucionado n segundos (0 = ya no), sin gastar piedra (pruebas)
+    long s = line.substring(5).toInt();
+    pet.megaUntil = s > 0 && pet.lastSeenEpoch ? pet.lastSeenEpoch + s : 0;
+    Serial.printf("mega=%d hasta=%lu\n", pet.isMega(), (unsigned long)pet.megaUntil);
     Serial.println("DONE");
   } else if (line == "VISIT") {  // que venga ya alguien de la granja (pruebas)
     nextVisit = millis();

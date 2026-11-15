@@ -8,15 +8,16 @@ bool sdDirty = false;
 SdThumbs thumbs;
 SdBg bg;
 
-bool PmdMon::load(uint16_t dexNum, bool shiny) {
+bool PmdMon::load(uint16_t dexNum, bool shiny, bool mega) {
   unload();
   if (!sdReady) return false;
 
   char path[28];
-  snprintf(path, sizeof(path), "/mons/p%s%03u.bin", shiny ? "s" : "", dexNum);
+  const char *pre = mega ? "m" : "p";
+  snprintf(path, sizeof(path), "/mons/%s%s%03u.bin", pre, shiny ? "s" : "", dexNum);
   File f = SD_MMC.open(path, FILE_READ);
   if (!f && shiny) {  // sin shiny PMD: usa el normal
-    snprintf(path, sizeof(path), "/mons/p%03u.bin", dexNum);
+    snprintf(path, sizeof(path), "/mons/%s%03u.bin", pre, dexNum);
     f = SD_MMC.open(path, FILE_READ);
   }
   if (!f) return false;
@@ -69,6 +70,14 @@ bool PmdMon::load(uint16_t dexNum, bool shiny) {
     }
     a.base = base;
   }
+  // alto real del bicho quieto (primer frame de Idle), sin el margen del lienzo
+  idleH = 0;
+  const PmdAct &q = acts[PMD_IDLE];
+  int r0 = -1, r1 = -1;
+  for (int r = 0; q.frames && r < q.h; r++)
+    for (int c = 0; c < q.w; c++)
+      if (q.data[r * q.w + c] != 0xFF) { if (r0 < 0) r0 = r; r1 = r; break; }
+  if (r0 >= 0) idleH = r1 - r0 + 1;
   loaded = true;
   Serial.printf("cargado %s (%u KB)\n", path, size / 1024);
   return true;

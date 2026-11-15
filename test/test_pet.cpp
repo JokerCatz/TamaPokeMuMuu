@@ -4,6 +4,7 @@
 #include "../pet.h"
 #include "../dex.h"
 #include "../regions.h"
+#include "../fun.h"
 #include <string.h>
 #include <set>
 
@@ -978,7 +979,7 @@ static void tiradas(uint8_t kind, int registradas, double &raro, double &leg) {
 }
 
 TEST(egg, cada_tipo_de_huevo_tiene_su_probabilidad) {
-  for (uint8_t k = 0; k < EGG_KINDS; k++) {
+  for (uint8_t k = 0; k < EGG_BASIC; k++) {  // los de la tienda (agua y fosil: test_pet "fun")
     double raro, leg;
     tiradas(k, 30, raro, leg);
     char msg[96];
@@ -1750,14 +1751,49 @@ TEST(steps, un_punto_cada_mil_hasta_cinco_al_dia) {
   CHECK_EQ(p.points, base);
   p.addSteps(1);
   CHECK_EQ(p.points, base + 1);
-  p.addSteps(9000);
-  CHECK_EQ(p.stepsToday, (uint32_t)10000);
+  p.addSteps(8999);
+  CHECK_EQ(p.stepsToday, (uint32_t)9999);
   CHECK_EQ(p.points, base + STEP_PTS_MAX);
+  p.addSteps(1);  // 10000: el premio de los diez mil, ademas
+  CHECK_EQ(p.points, base + STEP_PTS_MAX + STEP_BONUS_PTS);
   // dia nuevo: vuelve a contar
   p.lastSeenEpoch += 86400;
   p.addSteps(1500);
   CHECK_EQ(p.stepsToday, (uint32_t)1500);
-  CHECK_EQ(p.points, base + STEP_PTS_MAX + 1);
+  CHECK_EQ(p.points, base + STEP_PTS_MAX + STEP_BONUS_PTS + 1);
+}
+
+TEST(steps, el_premio_de_diez_mil_es_una_vez_al_dia_y_se_avisa_una_vez) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = 1000u * 86400 + 3600;
+  int32_t base = p.points;
+  p.addSteps(STEP_BONUS_AT + 3000);
+  CHECK_EQ(p.points, base + STEP_PTS_MAX + STEP_BONUS_PTS);
+  CHECK(p.takeStepBonus());
+  CHECK(!p.takeStepBonus());
+  p.addSteps(20000);  // mas pasos el mismo dia: nada mas
+  CHECK_EQ(p.points, base + STEP_PTS_MAX + STEP_BONUS_PTS);
+  CHECK(!p.takeStepBonus());
+  p.lastSeenEpoch += 86400;  // otro dia, otro premio
+  p.addSteps(STEP_BONUS_AT);
+  CHECK_EQ(p.points, base + 2 * (STEP_PTS_MAX + STEP_BONUS_PTS));
+}
+
+TEST(steps, los_del_movil_solo_cuentan_lo_que_pasen_de_la_placa) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = 1000u * 86400 + 3600;
+  int32_t base = p.points;
+  p.addSteps(4000);              // la placa contó 4000
+  p.phoneSteps(3000);            // el movil menos: no cambia nada
+  CHECK_EQ(p.stepsToday, (uint32_t)4000);
+  CHECK_EQ(p.points, base + 4);
+  p.phoneSteps(10500);           // el movil mas: hoy son 10500, sin contar dos veces
+  CHECK_EQ(p.stepsToday, (uint32_t)10500);
+  CHECK_EQ(p.points, base + STEP_PTS_MAX + STEP_BONUS_PTS);
+  p.phoneSteps(10500);           // el mismo envio otra vez: nada
+  CHECK_EQ(p.points, base + STEP_PTS_MAX + STEP_BONUS_PTS);
 }
 
 TEST(steps, el_paseo_alegra_una_vez_al_dia) {
@@ -1783,6 +1819,337 @@ TEST(steps, se_guardan) {
   b.begin();
   CHECK_EQ(b.stepsToday, (uint32_t)2345);
   CHECK_EQ(b.stepPts, (uint8_t)2);
+}
+
+// ---------------------------------------------------------------- megaevolucion
+TEST(mega, una_piedra_da_un_dia_de_megaevolucion) {
+  Pet p;
+  makePet(p, 6);  // Charizard: tiene Mega X
+  p.lastSeenEpoch = 1000u * 86400;
+  p.bag[ITEM_MEGA_STONE] = 1;
+  CHECK(!p.isMega());
+  CHECK_EQ((int)p.useMegaStone(), (int)MEGA_OK);
+  CHECK(p.isMega());
+  CHECK_EQ(p.bag[ITEM_MEGA_STONE], (uint16_t)0);
+  bool on = false;
+  CHECK(p.takeMegaChange(on));
+  CHECK(on);
+  CHECK(!p.takeMegaChange(on));
+  p.lastSeenEpoch += MEGA_SECONDS - 60;
+  advance(p, 1);
+  CHECK(p.isMega());  // aun le queda un minuto
+  p.lastSeenEpoch += 60;
+  advance(p, 1);
+  CHECK(!p.isMega());  // pasado el dia vuelve a su forma
+  CHECK(p.takeMegaChange(on));
+  CHECK(!on);
+}
+
+TEST(mega, sin_megaevolucion_o_ya_mega_o_sin_piedra_no_gasta_nada) {
+  Pet p;
+  makePet(p, 4);  // Charmander: no tiene
+  p.lastSeenEpoch = 1000u * 86400;
+  p.bag[ITEM_MEGA_STONE] = 2;
+  CHECK_EQ((int)p.useMegaStone(), (int)MEGA_NO_FORM);
+  CHECK_EQ(p.bag[ITEM_MEGA_STONE], (uint16_t)2);
+
+  Pet q;
+  makePet(q, 6);
+  q.lastSeenEpoch = 1000u * 86400;
+  CHECK_EQ((int)q.useMegaStone(), (int)MEGA_NO_STONE);
+  q.bag[ITEM_MEGA_STONE] = 2;
+  CHECK_EQ((int)q.useMegaStone(), (int)MEGA_OK);
+  CHECK_EQ((int)q.useMegaStone(), (int)MEGA_ALREADY);
+  CHECK_EQ(q.bag[ITEM_MEGA_STONE], (uint16_t)1);
+  q.toggleLight();  // dormido no
+  q.megaUntil = 0;
+  CHECK_EQ((int)q.useMegaStone(), (int)MEGA_BUSY);
+  CHECK_EQ(q.bag[ITEM_MEGA_STONE], (uint16_t)1);
+}
+
+TEST(mega, se_acaba_si_cambia_de_compañero) {
+  Pet p;
+  makePet(p, 6);
+  p.lastSeenEpoch = 1000u * 86400;
+  p.bag[ITEM_MEGA_STONE] = 1;
+  CHECK_EQ((int)p.useMegaStone(), (int)MEGA_OK);
+  PetRec r;
+  Pet otro;
+  makePet(otro, 7);
+  otro.exportRec(r);
+  p.importRec(r);  // sale otro de la granja
+  CHECK(!p.isMega());
+}
+
+TEST(mega, la_piedra_de_las_pruebas_es_una_al_dia_y_se_guarda) {
+  Pet p;
+  makePet(p, 6);
+  p.lastSeenEpoch = 1000u * 86400;
+  CHECK(p.grantSportsStone());
+  CHECK(!p.grantSportsStone());  // ya gano una hoy
+  CHECK_EQ(p.bag[ITEM_MEGA_STONE], (uint16_t)1);
+  CHECK_EQ((int)p.useMegaStone(), (int)MEGA_OK);
+  uint32_t hasta = p.megaUntil;
+  p.rename("X");  // guarda
+  Pet b;
+  b.begin();
+  CHECK_EQ(b.megaUntil, hasta);
+  CHECK(!b.grantSportsStone());  // el dia de la piedra tambien se guarda
+  b.lastSeenEpoch += 86400;
+  CHECK(b.grantSportsStone());
+  CHECK_EQ(ITEM_PRICE[ITEM_MEGA_STONE], (uint16_t)150);
+}
+
+TEST(mega, una_prueba_deportiva_cansa_y_alegra) {
+  Pet p;
+  makePet(p, 4);
+  setStats(p, 60, 50, 60, 60);
+  p.sportsDone(true);
+  CHECK_EQ(p.energy, (uint8_t)54);
+  CHECK_EQ(p.joy, (uint8_t)62);
+  p.sportsDone(false);
+  CHECK_EQ(p.energy, (uint8_t)48);
+  CHECK_EQ(p.joy, (uint8_t)67);
+}
+
+// ---------------------------------------------------------------- premios en la hierba
+// 2026-11-14 (sabado) a mediodia, en dias desde 1970
+static const uint32_t SAB = 20771;
+
+static uint16_t bagTotal(const Pet &p) {
+  uint16_t n = 0;
+  for (int i = 0; i < ITEM_COUNT; i++) n += p.bag[i];
+  return n;
+}
+
+TEST(grass, primero_el_del_mes_luego_la_semana_luego_el_dia) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  CHECK_EQ((int)p.grassReady(), (int)GRASS_MONTH);
+  GrassPrize g;
+  CHECK_EQ((int)p.collectGrass(g), (int)GRASS_MONTH);
+  CHECK(g.item == ITEM_EGG_LEGEND || g.item == ITEM_MEGA_STONE || g.item == ITEM_POTION_EVO);
+  CHECK_EQ((int)p.grassReady(), (int)GRASS_WEEK);
+  CHECK_EQ((int)p.collectGrass(g), (int)GRASS_WEEK);
+  CHECK(g.item == ITEM_EGG_RARE || g.item == ITEM_SHINY_CHARM || g.item == ITEM_POTION_STR);
+  CHECK_EQ((int)p.grassReady(), (int)GRASS_DAY);
+  CHECK_EQ((int)p.collectGrass(g), (int)GRASS_DAY);
+  CHECK(g.item == ITEM_CANDY || g.item == ITEM_MEDICINE || g.item == ITEM_POTION_STR ||
+        g.item == ITEM_POTION_SPD || g.item == ITEM_EGG_COMMON);
+  CHECK_EQ((int)p.grassReady(), (int)GRASS_NONE);  // hoy ya no hay mas
+  CHECK_EQ((int)p.collectGrass(g), (int)GRASS_NONE);
+}
+
+TEST(grass, cada_dia_uno_cada_lunes_otro_y_cada_mes_otro) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  GrassPrize g;
+  while (p.collectGrass(g)) {}
+  p.lastSeenEpoch += 86400;  // domingo: solo el del dia
+  CHECK_EQ((int)p.grassReady(), (int)GRASS_DAY);
+  p.collectGrass(g);
+  p.lastSeenEpoch += 86400;  // lunes: semana nueva
+  CHECK_EQ((int)p.grassReady(), (int)GRASS_WEEK);
+  while (p.collectGrass(g)) {}
+  p.lastSeenEpoch += 17 * 86400;  // 3 de diciembre (jueves): mes nuevo
+  CHECK_EQ((int)p.grassReady(), (int)GRASS_MONTH);
+}
+
+TEST(grass, los_premios_van_a_la_mochila_y_se_guarda_lo_cogido) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  uint16_t antes = bagTotal(p);
+  GrassPrize g;
+  int cogidos = 0;
+  while (p.collectGrass(g)) {
+    cogidos++;
+    CHECK(g.qty >= 1);
+  }
+  CHECK_EQ(cogidos, 3);
+  CHECK(bagTotal(p) >= antes + 3);
+  p.rename("X");  // guarda
+  Pet b;
+  b.begin();
+  b.lastSeenEpoch = SAB * 86400 + 50000;
+  CHECK_EQ((int)b.grassReady(), (int)GRASS_NONE);  // lo de hoy ya se cogio
+  Pet c;
+  makePet(c, 4);  // sin hora no hay premios
+  c.lastSeenEpoch = 0;
+  CHECK_EQ((int)c.grassReady(), (int)GRASS_NONE);
+}
+
+// ---------------------------------------------------------------- gimnasios
+TEST(gyms, en_orden_y_solo_en_regiones_abiertas) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  CHECK(p.gymOpen(0, 0));
+  CHECK(!p.gymOpen(0, 1));    // el 2º, tras la medalla del 1º
+  CHECK(!p.gymOpen(1, 0));    // Johto aun cerrada (solo Kanto abierta)
+  CHECK(p.startGym(0, 0));
+  CHECK(!p.startGym(0, 0));   // una vez al dia
+  uint8_t item = 0xFF;
+  CHECK(p.winGym(0, 0, item));
+  CHECK(p.hasBadge(0, 0));
+  CHECK_EQ(item, (uint8_t)0xFF);  // la 1ª medalla no trae regalo
+  CHECK(p.gymOpen(0, 1));
+  p.lastSeenEpoch += 86400;   // otro dia: se puede volver a intentar
+  CHECK(p.startGym(0, 0));
+}
+
+TEST(gyms, regalos_con_las_medallas_y_la_liga) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  uint16_t raros = p.bag[ITEM_EGG_RARE], legend = p.bag[ITEM_EGG_LEGEND];
+  uint8_t item;
+  for (int k = 0; k < 8; k++) {  // los 8 de Kanto
+    CHECK(p.startGym(0, k));
+    CHECK(p.winGym(0, k, item));
+  }
+  CHECK_EQ((int)p.badgeCount(0), 8);
+  CHECK_EQ(p.bag[ITEM_EGG_RARE], (uint16_t)(raros + 3));    // con la 2ª, 4ª y 6ª
+  CHECK_EQ(p.bag[ITEM_EGG_LEGEND], (uint16_t)(legend + 1)); // y la 8ª
+  CHECK(!p.winGym(0, 3, item));  // repetir uno ganado: sin nada
+  CHECK(p.leagueOpen(0));
+  CHECK(!p.leagueOpen(1));
+  CHECK(p.startLeague(0));
+  CHECK(!p.startLeague(0));      // una vez al dia
+  uint16_t charm = p.bag[ITEM_SHINY_CHARM];
+  CHECK(p.winLeague(0));
+  CHECK(p.leagueChampion(0));
+  CHECK_EQ(p.bag[ITEM_EGG_LEGEND], (uint16_t)(legend + 2));
+  CHECK_EQ(p.bag[ITEM_SHINY_CHARM], (uint16_t)(charm + 1));
+  CHECK(!p.winLeague(0));        // campeon otra vez: ya no regala
+}
+
+TEST(gyms, se_guardan) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  uint8_t item;
+  p.startGym(0, 0);
+  p.winGym(0, 0, item);
+  p.startGym(0, 1);
+  p.rename("X");  // guarda
+  Pet b;
+  b.begin();
+  b.lastSeenEpoch = SAB * 86400 + 50000;
+  CHECK(b.hasBadge(0, 0));
+  CHECK(!b.hasBadge(0, 1));
+  CHECK(!b.startGym(0, 1));  // el intento de hoy tambien se guardo
+  CHECK_EQ((int)b.totalBadges(), 1);
+}
+
+// ---------------------------------------------------------------- ocio
+TEST(fun, frutas_tres_al_dia_y_luego_solo_llenan) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  p.give(ITEM_FRUIT_STA, 5);
+  uint8_t a = p.trAtk;
+  for (int i = 0; i < 3; i++) CHECK_EQ((int)p.eatFruit(ITEM_FRUIT_STA), (int)FRUIT_UP);
+  CHECK_EQ((int)p.trAtk, a + 3 * FRUIT_GAIN);
+  CHECK_EQ((int)p.eatFruit(ITEM_FRUIT_STA), (int)FRUIT_FULL);  // la 4ª: solo llena
+  CHECK_EQ((int)p.trAtk, a + 3 * FRUIT_GAIN);
+  CHECK_EQ(p.bag[ITEM_FRUIT_STA], (uint16_t)1);
+  p.lastSeenEpoch += 86400;  // otro dia
+  CHECK_EQ((int)p.eatFruit(ITEM_FRUIT_STA), (int)FRUIT_UP);
+  p.trDef = 100;
+  p.give(ITEM_FRUIT_RES, 1);
+  CHECK_EQ((int)p.eatFruit(ITEM_FRUIT_RES), (int)FRUIT_MAXED);  // al maximo: no se gasta
+  CHECK_EQ(p.bag[ITEM_FRUIT_RES], (uint16_t)1);
+}
+
+TEST(fun, los_fragmentos_se_juntan_en_piedras) {
+  Pet p;
+  makePet(p, 4);
+  uint16_t piedras = p.bag[ITEM_MEGA_STONE];
+  p.give(ITEM_MEGA_SHARD, 7);
+  CHECK_EQ(p.bag[ITEM_MEGA_SHARD], (uint16_t)7);
+  p.give(ITEM_MEGA_SHARD, 5);
+  CHECK_EQ(p.bag[ITEM_MEGA_SHARD], (uint16_t)2);
+  CHECK_EQ(p.bag[ITEM_MEGA_STONE], (uint16_t)(piedras + 1));
+  CHECK(!p.buy(ITEM_FRUIT_GOLD));  // lo del ocio no se vende
+}
+
+TEST(fun, la_suerte_del_ajedrez_es_de_hoy) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  CHECK_EQ((int)p.chessLuck(), (int)LUCK_NONE);
+  p.chessMedals(0, false);  // sincroniza sin partidas nuevas: nada
+  CHECK_EQ((int)p.chessLuck(), (int)LUCK_NONE);
+  p.chessPtsTotal += 1;     // una partida
+  p.chessMedals(0, false);
+  CHECK_EQ((int)p.chessLuck(), (int)LUCK_PLAYED);
+  p.chessPtsTotal += 11;
+  p.chessMedals(1, false);  // y una ganada
+  CHECK_EQ((int)p.chessLuck(), (int)LUCK_WON);
+  p.lastSeenEpoch += 86400;  // mañana ya no
+  CHECK_EQ((int)p.chessLuck(), (int)LUCK_NONE);
+}
+
+TEST(fun, huevos_de_agua_y_fosil) {
+  Pet p;
+  makePet(p, 4);
+  for (int i = 0; i < 30; i++) {
+    int16_t d = p.pickEggSpecies(EGG_WATER);
+    CHECK_EQ((int)typeOf(d), (int)TY_WATER);
+    CHECK(d <= 151);  // solo Kanto abierta
+    int16_t f = p.pickEggSpecies(EGG_FOSSIL);
+    CHECK(f == 138 || f == 140 || f == 142);
+  }
+  p.release();
+  p.update(0);
+  p.give(ITEM_EGG_FOSSIL, 1);
+  if (p.vacant) {
+    CHECK(p.hatchEgg(EGG_FOSSIL));
+    CHECK_EQ(p.bag[ITEM_EGG_FOSSIL], (uint16_t)0);
+  }
+}
+
+TEST(fun, de_expedicion_no_bajan_sus_necesidades) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  setStats(p, 60, 60, 60, 60);
+  p.questEnd = p.lastSeenEpoch + 3600;
+  p.questDex = p.speciesId;
+  advance(p, 30);
+  CHECK_EQ((int)p.fullness, 60);
+  CHECK_EQ((int)p.joy, 60);
+  CHECK_EQ((int)p.hygiene, 60);
+  p.lastSeenEpoch = p.questEnd;  // ya volvio: vuelve a bajar
+  advance(p, 30);
+  CHECK(p.fullness < 60);
+}
+
+TEST(fun, se_guarda_el_ocio) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  p.plotAt[1] = p.lastSeenEpoch;
+  p.plotWet = 2;
+  p.questEnd = p.lastSeenEpoch + 3600;
+  p.questDex = p.speciesId;
+  p.chessPtsTotal += 3;
+  p.chessMedals(1, false);
+  p.give(ITEM_PEARL, 2);
+  p.rename("X");  // guarda
+  Pet b;
+  b.begin();
+  b.lastSeenEpoch = SAB * 86400 + 43300;
+  CHECK_EQ(b.plotAt[1], p.plotAt[1]);
+  CHECK_EQ((int)b.plotWet, 2);
+  CHECK(b.questAway());
+  CHECK_EQ((int)b.chessLuck(), (int)LUCK_WON);
+  CHECK_EQ(b.bag[ITEM_PEARL], (uint16_t)2);
+  b.lastSeenEpoch = p.questEnd;  // ya volvio
+  CHECK(!b.questAway());
 }
 
 // ---------------------------------------------------------------- album

@@ -144,6 +144,9 @@ uint8_t pmdFrameAt(const PmdAct &a, uint32_t t, bool loop) {
   return i;
 }
 
+// lo que media Mewtwo quieto a x2 (56 px): por debajo, el sprite sale diminuto
+#define PMD_SMALL_PX 56
+
 // dibuja una accion anclada por la base (centro-x, suelo) y devuelve su escala
 // dibuja una accion de un PmdMon concreto (m); drawPmdAct usa el global pmd
 void drawPmdActM(PmdMon &m, uint8_t actId, int cx, int groundY, uint32_t t, bool loop, bool sil, uint8_t maxS) {
@@ -151,6 +154,9 @@ void drawPmdActM(PmdMon &m, uint8_t actId, int cx, int groundY, uint32_t t, bool
   if (!a.frames) return;
   uint8_t sBase = m.acts[PMD_IDLE].h ? 170 / m.acts[PMD_IDLE].h : 5;
   if (sBase < 2) sBase = 2;
+  // lienzos con mucho margen (Mewtwo, Snorlax, Fearow...): el bicho quieto salia
+  // mas pequeño que los demas; si no pasa de PMD_SMALL_PX de alto, una escala mas
+  if (m.idleH && m.idleH * sBase <= PMD_SMALL_PX) sBase++;
   if (sBase > maxS) sBase = maxS;
   uint8_t s = sBase;
   while (s > 2 && a.h * s > 250) s--;  // acciones con frame grande (ataque)
@@ -582,7 +588,7 @@ static int barLabelGap() {
   }
   // por debajo del umbral original se deja EXACTAMENTE 48, para no mover nada en
   // los idiomas latinos; por encima se anade aire para que la etiqueta respire
-  return ancho <= 48 ? 48 : ancho + 8;
+  return ancho + 8 < 48 ? 48 : ancho + 8;  // "FOOD" (48 px) quedaba pegada a su barra
 }
 
 void drawBar(int x, int y, const char *label, uint8_t val) {
@@ -621,6 +627,7 @@ const char *eggMsg() {
 }
 
 const char *statusMsg() {
+  if (pet.questAway()) return T(S_AWAY);  // de expedicion (fun.ino)
   if (pet.evolving()) return T(S_EVOLVING);
   if (bathUntil) return "Splish splash!";  // onomatopeya universal
   if (pet.sleeping) return "Zzz...";

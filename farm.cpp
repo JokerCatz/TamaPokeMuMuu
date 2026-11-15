@@ -121,6 +121,13 @@ bool farmPut(Pet &p, const PetRec &r) {
   return true;
 }
 
+bool farmPeek(int16_t dex, PetRec &out) {
+  if (!sdReady || dex < 1 || dex > PET_DEX_MAX) return false;
+  char path[32];
+  farmPath(path, sizeof(path), dex);
+  return readRec(path, out);
+}
+
 bool farmTake(Pet &p, int16_t dex, PetRec &out) {
   if (!sdReady || dex < 1 || dex > PET_DEX_MAX) return false;
   char path[32];

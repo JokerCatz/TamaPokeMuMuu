@@ -33,12 +33,13 @@ struct PmdAct {
 // sprite PMD multi-accion cargado de la SD a PSRAM
 struct PmdMon {
   bool loaded = false;
+  uint8_t idleH = 0;  // alto con pixeles del primer frame de Idle (ver drawPmdActM)
   uint16_t palCount = 0;
   uint16_t pal[256];
   uint8_t *blob = nullptr;
   PmdAct acts[PMD_NACTS];
 
-  bool load(uint16_t dexNum, bool shiny = false);
+  bool load(uint16_t dexNum, bool shiny = false, bool mega = false);  // mega: /mons/m(s)NNN.bin
   void unload();
   bool has(uint8_t a) const { return loaded && a < PMD_NACTS && acts[a].frames > 0; }
 };

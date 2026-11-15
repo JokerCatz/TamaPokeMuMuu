@@ -85,14 +85,21 @@ static void drawBrightnessBtn() {
   }
 }
 
-static void setButton(int x, int y, const char *l, bool on, bool apagado) {
+// un boton de los ajustes; ts: el tamaño de toda la pagina (el mismo en todos); sub: 2a linea
+static void setButton(int x, int y, const char *l, bool on, bool apagado, int ts, const char *sub = nullptr) {
   gfx->fillRoundRect(x, y, SET_BTN_W, SET_BTN_H, 14, apagado ? UI_TRACK : on ? UI_BAR_OK : UI_WHITE);
   gfx->drawRoundRect(x, y, SET_BTN_W, SET_BTN_H, 14, UI_INK);
-  gfx->setTextColor(on ? UI_BG_DAY : UI_INK);
-  int ts = textW(l, 3) <= SET_BTN_W - 16 ? 3 : 2;  // tan grande como quepa
+  gfx->setTextColor(on ? UI_BG_DAY : apagado ? UI_HINT : UI_INK);
   setSize(ts);
-  setCur(x + (SET_BTN_W - textW(l, ts)) / 2, y + (SET_BTN_H - 7 * ts) / 2);
+  int alto = 7 * ts + (sub ? 18 : 0), y0 = y + (SET_BTN_H - alto) / 2;
+  setCur(x + (SET_BTN_W - textW(l, ts)) / 2, y0);
   printT(l);
+  if (sub) {
+    gfx->setTextColor(apagado ? UI_HINT : UI_INK);
+    setSize(2);
+    setCur(x + (SET_BTN_W - textW(sub, 2)) / 2, y0 + 7 * ts + 4);
+    printT(sub);
+  }
 }
 
 void renderClock() {
@@ -124,42 +131,47 @@ void renderClock() {
     printT(u);
   }
 
-  // sonido, wi-fi (verde si ya hay red), idioma, restaurar la copia
-  setButton(SET_BTN_X0, SET_BTN_Y0, audioEnabled() ? T(S_SND_ON) : T(S_SND_OFF), audioEnabled(), false);
-  setButton(SET_BTN_X1, SET_BTN_Y0, T(S_WIFI_SETUP), wifiHasCreds(), false);
+  // sonido, wi-fi (verde si ya hay red), idioma, restaurar la copia (su fecha debajo)
   char lp[10];
   snprintf(lp, sizeof(lp), "%s >", LANG_CODES[gLang]);
-  setButton(SET_BTN_X0, SET_BTN_Y1, lp, false, false);
   uint32_t bk = 0;
   bool hayCopia = backupInfo(bk);
-  char rl[40];
+  char fecha[12] = "";
   if (hayCopia) {
     time_t bt = bk;
     struct tm btm;
     gmtime_r(&bt, &btm);
-    snprintf(rl, sizeof(rl), T(S_RESTORE_FMT), (unsigned)(btm.tm_mon + 1), (unsigned)btm.tm_mday);
-  } else {
-    snprintf(rl, sizeof(rl), "%s", T(S_NO_BACKUP));
+    snprintf(fecha, sizeof(fecha), "%u/%u", (unsigned)(btm.tm_mon + 1), (unsigned)btm.tm_mday);
   }
-  setButton(SET_BTN_X1, SET_BTN_Y1, rl, false, !hayCopia);
+  const char *snd = audioEnabled() ? T(S_SND_ON) : T(S_SND_OFF), *rest = hayCopia ? T(S_RESTORE) : T(S_NO_BACKUP);
+  const StrId bl[2] = { S_STATS, S_SYNC_NOW };
+  // un solo tamaño para todos los botones: el 3 si caben todos, si no el 2
+  const char *grandes[4] = { snd, T(S_WIFI_SETUP), lp, rest };
+  int ts = 3;
+  for (const char *l : grandes)
+    if (textW(l, 3) > SET_BTN_W - 16) ts = 2;
+  for (StrId id : bl)
+    if (textW(T(id), 3) > STATS_BTN_W - 14) ts = 2;
+  setButton(SET_BTN_X0, SET_BTN_Y0, snd, audioEnabled(), false, ts);
+  setButton(SET_BTN_X1, SET_BTN_Y0, T(S_WIFI_SETUP), wifiHasCreds(), false, ts);
+  setButton(SET_BTN_X0, SET_BTN_Y1, lp, false, false, ts);
+  setButton(SET_BTN_X1, SET_BTN_Y1, rest, false, !hayCopia, ts, hayCopia ? fecha : nullptr);
 
   // debajo: estadisticas, brillo y sincronizar el ajedrez ya (gris sin wi-fi o sin cuenta de chess.com)
   const int16_t bx[2] = { SET_BTN_X0, STATS_BTN_X1 };
-  const StrId bl[2] = { S_STATS, S_SYNC_NOW };
   bool puedeSync = wifiHasCreds() && chessHasAccount();
   for (int i = 0; i < 2; i++) {
     gfx->fillRoundRect(bx[i], STATS_BTN_Y, STATS_BTN_W, STATS_BTN_H, 14, UI_WHITE);
     gfx->drawRoundRect(bx[i], STATS_BTN_Y, STATS_BTN_W, STATS_BTN_H, 14, UI_INK);
-    gfx->setTextColor(i == 1 && !puedeSync ? UI_TRACK : UI_INK);
+    gfx->setTextColor(i == 1 && !puedeSync ? UI_HINT : UI_INK);
     const char *l = T(bl[i]);
-    int ts = textW(l, 3) <= STATS_BTN_W - 16 ? 3 : 2;  // tan grande como quepa (como setButton)
     setSize(ts);
     setCur(bx[i] + (STATS_BTN_W - textW(l, ts)) / 2, STATS_BTN_Y + (STATS_BTN_H - 7 * ts) / 2);
     printT(l);
   }
   drawBrightnessBtn();
 
-  gfx->setTextColor(UI_TRACK);
+  gfx->setTextColor(UI_HINT);
   setSize(2);
   setCur(centerX(T(S_CLOCK_CANCEL), 2), 396);
   printT(T(S_CLOCK_CANCEL));
@@ -211,31 +223,39 @@ void renderStats() {
   for (int d = 1; d <= PET_DEX_MAX; d++)
     if (pet.isShinyRegistered(d)) shiny++;
   char v[24];
-  int y = 84;
+  int y = 76, dy = 24;  // 14 filas: mas juntas, para que quepan en el circulo
   snprintf(v, sizeof(v), "%u", pet.raisedCount);
   statRow(y, S_ST_RAISED, v);
   snprintf(v, sizeof(v), "%u/%d", pet.registeredCount(), PET_DEX_MAX);
-  statRow(y += 28, S_ST_DEX, v);
+  statRow(y += dy, S_ST_DEX, v);
   snprintf(v, sizeof(v), "%u", shiny);
-  statRow(y += 28, S_ST_SHINY, v);
+  statRow(y += dy, S_ST_SHINY, v);
   snprintf(v, sizeof(v), "%u/%d", pet.unlockedRegions(), REGION_COUNT);
-  statRow(y += 28, S_ST_UNLOCKED, v);
+  statRow(y += dy, S_ST_UNLOCKED, v);
   snprintf(v, sizeof(v), "%d/%d", __builtin_popcount(pet.regionDone), REGION_COUNT);
-  statRow(y += 28, S_ST_DONE, v);
+  statRow(y += dy, S_ST_DONE, v);
   snprintf(v, sizeof(v), "%u", pet.bestStreak);
-  statRow(y += 28, S_ST_STREAK, v);
+  statRow(y += dy, S_ST_STREAK, v);
   snprintf(v, sizeof(v), "%u", pet.totalMedals);
-  statRow(y += 28, S_ST_MEDALS, v);
+  statRow(y += dy, S_ST_MEDALS, v);
+  snprintf(v, sizeof(v), "%u", pet.totalBadges());
+  statRow(y += dy, S_ST_BADGES, v);
+  snprintf(v, sizeof(v), "%u", pet.leagueTitles());
+  statRow(y += dy, S_ST_CHAMP, v);
+  snprintf(v, sizeof(v), "%lu", (unsigned long)pet.funFinds);
+  statRow(y += dy, S_ST_FUN, v);
   snprintf(v, sizeof(v), "%lu", (unsigned long)pet.stepsTotal);
-  statRow(y += 28, S_ST_STEPS, v);
+  statRow(y += dy, S_ST_STEPS, v);
   snprintf(v, sizeof(v), "%lu", (unsigned long)pet.chessPtsTotal);
-  statRow(y += 28, S_ST_CHESS, v);
+  statRow(y += dy, S_ST_CHESS, v);
   if (farmReady()) snprintf(v, sizeof(v), "%d", farmCount());
   else snprintf(v, sizeof(v), "-");
-  statRow(y += 28, S_ST_FARM, v);
-  gfx->setTextColor(UI_TRACK);
+  statRow(y += dy, S_ST_FARM, v);
+  snprintf(v, sizeof(v), "%u", phoneStepsCode());  // para el Atajo del movil que manda los pasos
+  statRow(y += dy, S_ST_PHONE, v);
+  gfx->setTextColor(UI_HINT);
   setSize(2);
-  setCur(centerX(T(S_BACK), 2), 396);
+  setCur(centerX(T(S_BACK), 2), 424);
   printT(T(S_BACK));
   gfx->flush();
 }
@@ -308,21 +328,6 @@ void clockTap(int16_t x, int16_t y) {
   }
 }
 
-// llama + numero de racha: en la 2a fila de arriba, a la izquierda. En la
-// esquina (26,16) quedaba fuera del circulo de la pantalla y no se veia.
-void drawStreakBadge() {
-  if (pet.streak < 1) return;
-  int x = 144, y = 32;
-  gfx->fillTriangle(x + 8, y, x + 1, y + 17, x + 15, y + 17, UI_BAR_BAD);
-  gfx->fillTriangle(x + 8, y + 7, x + 4, y + 17, x + 12, y + 17, UI_BAR_WARN);
-  char s[6];
-  snprintf(s, sizeof(s), "%u", pet.streak);
-  gfx->setTextColor(inkColor());
-  setSize(2);
-  setCur(x + 22, y + 2);
-  printT(s);
-}
-
 // banner temporal: medalla nueva o hito de racha
 void drawCelebration() {
   const char *l1 = nullptr, *l2 = nullptr;
@@ -376,9 +381,8 @@ void drawMedalBadge(int x, int y, int i) {
 // pagina 0: perfil (retrato grande, identidad, racha, vinculo, edad)
 void renderCardProfile() {
   const DexEntry &d = DEX_TBL[pet.speciesId];
-  const char *nm = pet.nick[0] ? pet.nick : dexName(pet.speciesId);
-  char head[32];
-  snprintf(head, sizeof(head), T(S_NAME_FMT), pet.shiny ? "*" : "", nm, pet.level());
+  char head[48], nb[40];
+  snprintf(head, sizeof(head), T(S_NAME_FMT), pet.shiny ? "*" : "", petName(nb, sizeof(nb)), pet.level());
   gfx->setTextColor(d.accent);
   // auto-encoge: a tamano 3 los nombres largos no caben en la franja estrecha de
   // arriba de la pantalla redonda, asi que se cortaban por el borde. El ancho se
@@ -395,7 +399,7 @@ void renderCardProfile() {
     const char *sp = dexName(pet.speciesId);
     char par[32];
     snprintf(par, sizeof(par), "(%s)", sp);
-    gfx->setTextColor(UI_TRACK);
+    gfx->setTextColor(UI_HINT);
     setSize(2);
     setCur(centerX(par, 2), 64);   // medido, no contado en bytes
     printT(par);
@@ -426,7 +430,7 @@ void renderCardProfile() {
   setCur(centerX(lin, 2), 296);
   printT(lin);
 
-  gfx->setTextColor(UI_TRACK);
+  gfx->setTextColor(UI_HINT);
   setCur(centerX(T(S_RENAME_HINT), 2), 332);
   printT(T(S_RENAME_HINT));
 }
@@ -437,8 +441,8 @@ static void drawAbility(int y, const char *label, uint8_t val, uint16_t color, S
   drawCardStat(y, label, val, 100, color);
   char l[48];
   snprintf(l, sizeof(l), T(fx), pct);
-  gfx->setTextColor(pct ? UI_INK : UI_TRACK);
-  setSize(1);
+  gfx->setTextColor(pct ? UI_INK : UI_HINT);
+  setSize(2);
   setCur(statBarX(), y + 20);
   printT(l);
 }
@@ -479,7 +483,7 @@ void renderCardMedals(int first) {
 
   for (int i = first; i < MED_COUNT && i < first + MED_PER_PAGE; i++) {
     int k = i - first;
-    int x = 28 + (k % 2) * 206, y = 104 + (k / 2) * 54;
+    int x = CX - 201 + (k % 2) * 206, y = 120 + (k / 2) * 54;  // a y=120 el circulo ya deja 402 px
     bool g = pet.hasMedal(medalBit(i));
     gfx->fillRoundRect(x, y, 196, 44, 10, g ? UI_BAR_OK : UI_TRACK);
     if (g) {  // marca de conseguida
@@ -526,7 +530,7 @@ void renderCardProgress() {
   printT(nx);
 
   // estado de evolucion
-  gfx->setTextColor(UI_TRACK);
+  gfx->setTextColor(UI_HINT);
   setCur(centerX(T(S_EVO_LABEL), 2), 230);
   printT(T(S_EVO_LABEL));
   char evoBuf[32];
@@ -574,7 +578,7 @@ void renderCard() {
     if (i == cardPage) gfx->fillCircle(dot0 + i * 26, 374, 5, UI_INK);
     else gfx->drawCircle(dot0 + i * 26, 374, 4, UI_INK);
   }
-  gfx->setTextColor(UI_TRACK);
+  gfx->setTextColor(UI_HINT);
   setSize(2);
   setCur(centerX(T(S_BACK), 2), 398);
   printT(T(S_BACK));

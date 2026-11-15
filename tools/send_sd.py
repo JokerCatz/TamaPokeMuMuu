@@ -4,6 +4,7 @@
   python3 tools/send_sd.py                  # envia tools/sdcard/mons/*.bin
   python3 tools/send_sd.py --port /dev/cu.usbmodem101
   python3 tools/send_sd.py --ls             # lista lo que hay en la SD
+  python3 tools/send_sd.py --port P tools/sdcard/mons/m*.bin   # solo esos
 """
 import argparse
 import glob
@@ -35,6 +36,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--port')
     ap.add_argument('--ls', action='store_true')
+    ap.add_argument('files', nargs='*', help='solo estos .bin (por defecto, todo tools/sdcard/mons)')
     args = ap.parse_args()
 
     port = args.port or find_port()
@@ -48,7 +50,7 @@ def main():
         wait_line(ser, 'DONE', 5)
         return
 
-    files = sorted(glob.glob(os.path.join(os.path.dirname(__file__), 'sdcard', 'mons', '*.bin')))
+    files = sorted(args.files) or sorted(glob.glob(os.path.join(os.path.dirname(__file__), 'sdcard', 'mons', '*.bin')))
     if not files:
         sys.exit("no hay .bin; ejecuta antes tools/pack_pmd.py")
 

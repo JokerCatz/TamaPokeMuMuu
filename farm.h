@@ -23,3 +23,4 @@ int farmCount();
 const FarmEntry &farmAt(int i);        // ordenada por especie
 bool farmPut(Pet &p, const PetRec &r); // guarda (o reemplaza) y lo marca en p.farmReg
 bool farmTake(Pet &p, int16_t dex, PetRec &out);  // lo lee, lo borra y lo desmarca
+bool farmPeek(int16_t dex, PetRec &out);          // solo lo lee (los gimnasios: genes y entrenamiento)

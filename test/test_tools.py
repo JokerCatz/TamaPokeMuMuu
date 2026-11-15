@@ -258,6 +258,12 @@ class TestBuffersDeTexto(unittest.TestCase):
         'S_VISIT_FMT': ('nombre_o_apodo',),
         'S_HOL_BIRTHDAY': ('dueño',),
         'S_SAY_LOVE': ('dueño',),
+        'S_VS_FMT': ('nombre', 'nombre'),  # los dos rivales del sports day
+        'S_GYMS_TITLE_FMT': ('region',),
+        'S_ROUND_FMT': ('lider',),        # lider de gimnasio o de la liga (gyms.h)
+        'S_GOT_BADGE_FMT': ('medalla_gym',),
+        'S_ALSO_GOT_FMT': ('objeto',),
+        'S_GOOD_AT_FMT': ('prueba', 'prueba'),  # las dos pruebas del torneo en que destaca
     }
     CIFRAS = {'u': 5, 'd': 5, 'lu': 10}
     ESPEC = re.compile(r'%0?\d*(lu|u|d|s)')
@@ -280,6 +286,20 @@ class TestBuffersDeTexto(unittest.TestCase):
         cls.ino = {f: leer(f).splitlines() for f in sorted(os.listdir(ROOT)) if f.endswith('.ino')}
         cls.APODO = int(re.search(r'char\s+nick\[(\d+)\]', leer('pet.h')).group(1)) - 1
         cls.DUENO = int(re.search(r'sizeof\(OWNER_NAME\)\s*<=\s*(\d+)', leer('config.h')).group(1)) - 1
+        # gyms.h: nombres de lideres (y de la liga) y de medallas, en ingles y en chino;
+        # en los demas idiomas sale el ingles (gtx)
+        gh = leer('gyms.h')
+        cad = r'"((?:[^"\\]|\\.)*)"'
+        personas = re.findall(r'\{ ' + cad + ', ' + cad + r', (?:TY_\w+|0xFF),', gh)
+        medallas = re.findall(r'\}, ' + cad + ', ' + cad + ', ' + cad + ', ' + cad + r' \},', gh)
+        assert personas and medallas, 'gyms.h sin lideres o sin medallas'
+        cls.GYM = {}
+        for lang in cls.LANGS:
+            k = 1 if lang == 'ZH' else 0
+            cls.GYM[('lider', lang)] = max(len(p[k].encode('utf-8')) for p in personas)
+            cls.GYM[('medalla_gym', lang)] = max(len(m[2 + k].encode('utf-8')) for m in medallas)
+        cuerpo_items = re.search(r'StrId\s+ITEM_NAME\[\w+\]\s*=\s*\{(.*?)\}', leer('TamaPoke.ino'), re.S).group(1)
+        cls.ITEMS = re.findall(r'\b(S_[A-Z0-9_]+)\b', cuerpo_items)
         base = max(len(row[2].encode()) for row in DEX)
         cls.NOMBRE = {}
         for lang in cls.LANGS:
@@ -323,6 +343,12 @@ class TestBuffersDeTexto(unittest.TestCase):
                 total += self.DUENO
             elif arg == 'region':
                 total += max(self.bytes_literal(self.LIT[f'S_REGION_{k}'][li]) for k in range(1, 10))
+            elif arg in ('lider', 'medalla_gym'):
+                total += self.GYM[(arg, lang)]
+            elif arg == 'prueba':
+                total += max(self.bytes_literal(v[li]) for k, v in self.LIT.items() if k.startswith('S_EV_'))
+            elif arg == 'objeto':
+                total += max(self.bytes_literal(self.LIT[s][li]) for s in self.ITEMS)
         return total
 
     def test_cada_texto_formateado_cabe_en_su_buffer_en_todos_los_idiomas(self):

@@ -33,6 +33,22 @@ bool render() {
     renderFarm();
     return true;
   }
+  if (chOpen) {
+    renderSports();
+    return true;
+  }
+  if (gymsOpen) {
+    renderGyms();
+    return true;
+  }
+  if (funOpen) {
+    renderFun();
+    return true;
+  }
+  if (hubOpen) {
+    renderHub();
+    return true;
+  }
   if (galleryOpen) {
     renderGallery();
     return true;
@@ -105,13 +121,13 @@ bool render() {
     printT(reg);
   } else {
     const DexEntry &d = DEX_TBL[pet.speciesId];
-    char name[28];
-    const char *base = pet.nick[0] ? pet.nick : dexName(pet.speciesId);
-    snprintf(name, sizeof(name), T(S_NAME_FMT), pet.shiny ? "*" : "", base, pet.level());
+    char name[48], nb[40];
+    snprintf(name, sizeof(name), T(S_NAME_FMT), pet.shiny ? "*" : "", petName(nb, sizeof(nb)), pet.level());
     drawHeader(name, gNight ? UI_INK_NIGHT : d.accent, statusMsg());
-    drawStreakBadge();
+    drawGrassPrize();  // detras del bicho
     drawVisitor(millis());
-    drawPet();
+    if (pet.questAway()) drawAwaySign();  // de expedicion (fun.ino)
+    else drawPet();
     drawBath();
     drawPoops();
     // panel inferior: base limpia para barras y botones sobre el paisaje
@@ -119,12 +135,13 @@ bool render() {
     drawBars();
     drawButtons();
     drawCelebration();
-    if (pet.wantEvolveButton()) drawEvolveButton();        // CTA rojo: evolucionar
+    if (pet.questAway()) {}                                // de expedicion: nada que decidirle
+    else if (pet.wantEvolveButton()) drawEvolveButton();   // CTA rojo: evolucionar
     else if (pet.canRunawayNow()) drawRunawayButton();     // CTA sombrio: escapada (abandono)
     else if (pet.wantFarewellButton()) drawFarewellButton();  // CTA dorado: despedida
   }
 
-  if (pet.sleeping) {
+  if (pet.sleeping && !pet.questAway()) {
     gfx->setTextColor(UI_INK_NIGHT);
     setSize(3);
     setCur(320, 130);
@@ -147,18 +164,35 @@ bool render() {
     if (!timeLeft(feedMenuUntil)) {
       feedMenuUntil = 0;
     } else {
-      gfx->fillRoundRect(FEED_X, 288, 3 * 66, 64, 14, UI_WHITE);
-      gfx->drawRoundRect(FEED_X, 288, 3 * 66, 64, 14, inkColor());
+      gfx->fillRoundRect(FEED_X, FEED_Y, 3 * 66, FEED_H, 14, UI_WHITE);
+      gfx->drawRoundRect(FEED_X, FEED_Y, 3 * 66, FEED_H, 14, inkColor());
       const char *const *items[3] = { SPR_ICON_FOOD, SPR_ICON_CANDY, SPR_ICON_PILL };
-      for (int i = 0; i < 3; i++) drawMap(items[i], 16, FEED_X + 9 + i * 66, 296, 3, false);
-      // chuche y medicina: cuantas quedan en la mochila
+      for (int i = 0; i < 3; i++) drawMap(items[i], 16, FEED_X + 9 + i * 66, FEED_Y + 4, 3, false);
+      gfx->setTextColor(UI_INK);
+      setSize(2);
+      // chuche y medicina: cuantas quedan en la mochila (la baya es gratis)
       for (int i = 1; i < 3; i++) {
         char n[8];
-        snprintf(n, sizeof(n), "%u", pet.bag[i == 1 ? ITEM_CANDY : ITEM_MEDICINE]);
-        gfx->setTextColor(UI_INK);
-        setSize(1);
-        setCur(FEED_X + 52 + i * 66, 340);
+        snprintf(n, sizeof(n), "x%u", pet.bag[i == 1 ? ITEM_CANDY : ITEM_MEDICINE]);
+        setCur(FEED_X + 33 + i * 66 - textW(n, 2) / 2, FEED_Y + 52);
         printT(n);
+      }
+      // encima: pescado y frutas del ocio, si hay
+      uint8_t ex[5];
+      int ne = feedExtras(ex);
+      if (ne) {
+        int x0 = CX - ne * 33;
+        gfx->fillRoundRect(x0, FEED_Y2, ne * 66, FEED_H, 14, UI_WHITE);
+        gfx->drawRoundRect(x0, FEED_Y2, ne * 66, FEED_H, 14, inkColor());
+        for (int i = 0; i < ne; i++) {
+          drawItemIcon(ex[i], x0 + 9 + i * 66, FEED_Y2 + 2);
+          char n[8];
+          snprintf(n, sizeof(n), "x%u", pet.bag[ex[i]]);
+          gfx->setTextColor(UI_INK);
+          setSize(2);
+          setCur(x0 + 33 + i * 66 - textW(n, 2) / 2, FEED_Y2 + 52);
+          printT(n);
+        }
       }
     }
   }
@@ -176,9 +210,10 @@ bool render() {
       setCur(centerX(nm, 2), 196);
       printT(nm);
       gfx->fillRoundRect(118, 252, 100, 52, 12, farmReady() ? UI_BAR_OK : UI_TRACK);
-      gfx->setTextColor(UI_WHITE);
+      gfx->setTextColor(farmReady() ? UI_WHITE : UI_HINT);
       setCur(118 + (100 - textW(T(S_COLLECT), 2)) / 2, 270);
       printT(T(S_COLLECT));
+      gfx->setTextColor(UI_WHITE);
       gfx->fillRoundRect(248, 252, 100, 52, 12, UI_BAR_BAD);
       setCur(248 + (100 - textW(T(S_RELEASE), 2)) / 2, 270);
       printT(T(S_RELEASE));
@@ -248,10 +283,10 @@ void drawReport() {
   }
 }
 
-void drawBattery() {
+void drawBattery(int x, int y) {
   int pc = batPercent();
   if (pc < 0) return;  // sin bateria conectada
-  int x = CX - 14, y = 12, w = 24, h = 11;
+  int w = 24, h = 11;
   bool charging = batCharging();
   uint16_t col = charging ? UI_BAR_OK
                  : (pc >= 40) ? inkColor()
@@ -271,32 +306,86 @@ void drawBattery() {
   }
 }
 
-// temperatura real arriba, a la izquierda de la bateria
-void drawTemp() {
+// temperatura real arriba (x: donde empieza)
+void drawTemp(int x, int y) {
   Weather w = weatherNow();
   if (!w.valid) return;
   char t[8];
   snprintf(t, sizeof(t), "%d", tempF ? w.tempF : w.tempC);
   setSize(2);
-  int x = CX - 26 - textW(t, 2), y = 12;
   gfx->setTextColor(inkColor());
   setCur(x, y);
   printT(t);
   gfx->drawCircle(x + textW(t, 2) + 4, y + 2, 2, inkColor());  // grado
 }
 
+// nombre del compañero: el apodo o el de su especie, con "MEGA ... X" si esta megaevolucionado
+const char *petName(char *buf, size_t n) {
+  const char *base = pet.nick[0] ? pet.nick : dexName(pet.speciesId);
+  const MegaForm *m = pet.isMega() ? megaFor(pet.speciesId) : nullptr;
+  if (!m) return base;
+  char tag[4] = "";
+  if (m->tag[0]) snprintf(tag, sizeof(tag), " %s", m->tag);
+  snprintf(buf, n, T(S_MEGA_NAME_FMT), base, tag);
+  return buf;
+}
+
+// trebol de la suerte del ajedrez (hoy se jugo; con el centro dorado si se gano)
+static void drawClover(int cx, int cy, bool won) {
+  for (int k = 0; k < 4; k++) gfx->fillCircle(cx + (k % 2 ? 4 : -4), cy + (k / 2 ? 4 : -4), 5, UI_BAR_OK);
+  gfx->drawLine(cx + 2, cy + 2, cx + 8, cy + 11, C565(0x3c, 0x8a, 0x4c));
+  gfx->fillCircle(cx, cy, 2, won ? UI_BAR_WARN : C565(0x3c, 0x8a, 0x4c));
+}
+
+// fila de arriba: racha (llama), temperatura, bateria y puntos, centrados todos juntos. Arriba
+// la pantalla redonda es estrecha: con la llama aparte (en la 2a fila) se montaba sobre el nombre
+static void drawStatusRow() {
+  char rs[6] = "", ts[8] = "", ps[12];
+  if (pet.streak >= 1 && !pet.isEgg()) snprintf(rs, sizeof(rs), "%u", pet.streak);
+  Weather w = weatherNow();
+  if (w.valid) snprintf(ts, sizeof(ts), "%d", tempF ? w.tempF : w.tempC);
+  snprintf(ps, sizeof(ps), "%ld", (long)pet.points);
+  setSize(2);
+  int wr = rs[0] ? 18 + textW(rs, 2) : 0, wt = ts[0] ? textW(ts, 2) + 8 : 0;
+  int wb = batPercent() >= 0 ? 27 : 0, wp = 18 + textW(ps, 2), gap = 10;
+  int total = wp + (wr ? wr + gap : 0) + (wt ? wt + gap : 0) + (wb ? wb + gap : 0);
+  int x = CX - total / 2, y = STATUS_Y;
+  if (wr) {
+    gfx->fillTriangle(x + 8, y - 2, x + 1, y + 15, x + 15, y + 15, UI_BAR_BAD);
+    gfx->fillTriangle(x + 8, y + 5, x + 4, y + 15, x + 12, y + 15, UI_BAR_WARN);
+    gfx->setTextColor(inkColor());
+    setCur(x + 18, y);
+    printT(rs);
+    x += wr + gap;
+  }
+  if (wt) {
+    drawTemp(x, y);
+    x += wt + gap;
+  }
+  if (wb) {
+    drawBattery(x, y + 2);
+    x += wb + gap;
+  }
+  drawPointsBadge(x, y);
+  gPtsX0 = x;
+  gPtsX1 = x + wp;
+}
+
 void drawHeader(const char *name, uint16_t nameColor, const char *msg) {
-  drawBattery();
-  drawTemp();
-  drawPointsBadge();
+  drawStatusRow();
   gfx->setTextColor(nameColor);
+  // arriba la pantalla redonda solo deja ~290 px: un nombre largo (MEGA ..., apodos) baja a 2
   setSize(3);
-  setCur(centerX(name, 3), 52);
+  int ts = textW(name, 3) <= 290 ? 3 : 2;
+  setSize(ts);
+  setCur(centerX(name, ts), ts == 3 ? 52 : 58);
   printT(name);
   gfx->setTextColor(inkColor());
   setSize(2);
   setCur(centerX(msg, 2), 90);
   printT(msg);
+  uint8_t luck = pet.isEgg() ? LUCK_NONE : pet.chessLuck();
+  if (luck) drawClover(centerX(msg, 2) - (msg[0] ? 18 : 0), 98, luck == LUCK_WON);  // hoy se jugo al ajedrez
 }
 
 // animacion de la ceremonia (10s): despedida = reverencia con corazones y se

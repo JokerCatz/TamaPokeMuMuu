@@ -7,31 +7,37 @@
 #include <string.h>
 #include <time.h>
 
+// nombres de antes (una herramienta por accion): se siguen aceptando en tools/call
 static const char *const NAME[MCP_TOOL_COUNT] = {
   "tamapoke_status", "tamapoke_feed", "tamapoke_play", "tamapoke_bath", "tamapoke_pet",
   "tamapoke_sleep", "tamapoke_wake", "tamapoke_candy", "tamapoke_medicine", "tamapoke_chess",
   "tamapoke_pokedex", "tamapoke_buy", "tamapoke_farm",
 };
-static const char *const DESC[MCP_TOOL_COUNT] = {
-  "查看 " OWNER_NAME " 的电子宠物 TamaPoke（一只宝可梦）现在的状态：名字、等级、饱食、心情、精力、清洁（0-100）、"
-  "是否在睡觉或生病、便便、积分、背包、今天走了多少步。Check the virtual pet's current status.",
-  "给宠物喂一颗树果（免费），饱食 +25。睡觉时不能吃。Feed the pet a free berry.",
-  "陪宠物玩一会儿：心情 +25，精力 -10。睡觉或生病时不能玩。Play with the pet.",
-  "给宠物洗澡，清掉便便，清洁回到 100。Give the pet a bath and clean up.",
-  "摸摸宠物，心情 +5。Pet / stroke the pet.",
-  "关灯让宠物去睡觉，睡觉时精力恢复。Turn off the light so the pet sleeps.",
-  "开灯叫醒宠物。Turn on the light and wake the pet up.",
-  "喂一颗糖果（用背包里的，没有要先买）：心情 +12、饱食 +10，但会变胖。Feed a candy from the bag.",
-  "宠物生病时喂一颗药治好它（用背包里的）。Give medicine from the bag when the pet is sick.",
-  OWNER_NAME " 在 chess.com 下棋赚积分：查最近一次同步（每晚 12 点）的结果：下了几盘、赢了几盘、"
-  "得了多少分，还有现在的积分和记录过的最好等级分。Last chess.com sync result and points.",
-  "查宝可梦图鉴：一共登记了多少只（共 1025 只）、每个地区集了多少、哪些地区集齐了、异色有几只。"
-  "Pokedex progress.",
+
+// Lo que se anuncia en tools/list: 4 herramientas. care e info eligen la accion con un argumento.
+enum { T_STATUS, T_CARE, T_INFO, T_BUY, T_COUNT };
+static const char *const TOOL_NAME[T_COUNT] = { "tamapoke_status", "tamapoke_care", "tamapoke_info",
+                                                "tamapoke_buy" };
+static const char *const TOOL_DESC[T_COUNT] = {
+  "查看 " OWNER_NAME " 的电子宠物 TamaPoke（一只宝可梦，主人常直接叫它的名字，比如“小火龙”）现在怎么样："
+  "名字、等级、饱食、心情、精力、清洁（0-100）、是否在睡觉或生病、便便、积分、背包、今天走了多少步。"
+  "主人问宠物、宝可梦或它的名字怎么样时用。Check the virtual pet's current status.",
+  "照顾宠物，做完会告诉你它现在的状态。action：feed 喂一颗树果（免费，饱食 +25）、play 陪它玩（心情 +25，"
+  "精力 -10）、bath 洗澡（清掉便便）、pet 摸摸（心情 +5；还是蛋时摸三下会孵出来）、sleep 关灯睡觉、"
+  "wake 开灯叫醒、candy 喂背包里的糖果（心情 +12、饱食 +10，会变胖）、medicine 生病时喂背包里的药。"
+  "Take care of the pet.",
+  "查宠物游戏的其他信息。kind：chess " OWNER_NAME " 在 chess.com 下棋赚积分的最近一次同步结果（每晚 12 点）、"
+  "现在的积分和最好等级分；pokedex 宝可梦图鉴进度（共 1025 只，各地区、异色）；farm 农场里收藏的宝可梦。"
+  "Chess points, Pokedex progress or the farm.",
   "用积分在商店买东西放进背包。只能买：candy 糖果(2分)、medicine 药(3分)、strength_potion 体力药剂(5分，"
   "喝了精力掉得慢)、speed_potion 活力药剂(5分，喝了心情掉得慢)；蛋、异色护符和进化药水要在板子上买。"
   "Buy cheap items with points.",
-  "查农场里收藏了哪些宝可梦。List the Pokemon kept in the farm.",
 };
+static const char *const CARE_ID[8] = { "feed", "play", "bath", "pet", "sleep", "wake", "candy", "medicine" };
+static const uint8_t CARE_ACT[8] = { MCP_FEED, MCP_PLAY,  MCP_BATH,  MCP_PET,
+                                     MCP_SLEEP, MCP_WAKE, MCP_CANDY, MCP_MEDICINE };
+static const char *const INFO_ID[3] = { "chess", "pokedex", "farm" };
+static const uint8_t INFO_ACT[3] = { MCP_CHESS, MCP_POKEDEX, MCP_FARM };
 static const char *const BUY_ID[4] = { "candy", "medicine", "strength_potion", "speed_potion" };
 static const uint8_t BUY_ITEM[4] = { ITEM_CANDY, ITEM_MEDICINE, ITEM_POTION_STR, ITEM_POTION_SPD };
 static const char *const ITEM_ZH[ITEM_COUNT] = { "糖果", "药", "体力药剂", "活力药剂", "异色护符",
@@ -40,15 +46,28 @@ static const char *const NAT_ZH[NAT_COUNT] = { "乖巧", "贪吃", "爱玩", "�
 static const char *const REGION_ZH[REGION_COUNT] = { "关都", "城都", "丰缘", "神奥", "合众",
                                                      "卡洛斯", "阿罗拉", "伽勒尔", "帕底亚" };
 
+// argumento obligatorio de texto con una lista cerrada de valores
+static void opciones(JsonObject sch, JsonObject props, const char *key, const char *const *ids, int n,
+                     const char *desc) {
+  JsonObject p = props[key].to<JsonObject>();
+  p["type"] = "string";
+  JsonArray en = p["enum"].to<JsonArray>();
+  for (int i = 0; i < n; i++) en.add(ids[i]);
+  p["description"] = desc;
+  sch["required"].to<JsonArray>().add(key);
+}
+
 void stackchanToolList(JsonArray tools) {
-  for (int i = 0; i < MCP_TOOL_COUNT; i++) {
+  for (int i = 0; i < T_COUNT; i++) {
     JsonObject t = tools.add<JsonObject>();
-    t["name"] = NAME[i];
-    t["description"] = DESC[i];
+    t["name"] = TOOL_NAME[i];
+    t["description"] = TOOL_DESC[i];
     JsonObject sch = t["inputSchema"].to<JsonObject>();
     sch["type"] = "object";
     JsonObject props = sch["properties"].to<JsonObject>();
-    if (i == MCP_BUY) {
+    if (i == T_CARE) opciones(sch, props, "action", CARE_ID, 8, "要做什么");
+    if (i == T_INFO) opciones(sch, props, "kind", INFO_ID, 3, "要查什么");
+    if (i == T_BUY) {
       JsonObject item = props["item"].to<JsonObject>();
       item["type"] = "string";
       JsonArray en = item["enum"].to<JsonArray>();
@@ -64,9 +83,18 @@ void stackchanToolList(JsonArray tools) {
   }
 }
 
-int stackchanFind(const char *name) {
-  for (int i = 0; i < MCP_TOOL_COUNT; i++)
-    if (name && !strcmp(name, NAME[i])) return i;
+static int elegir(const char *v, const char *const *ids, const uint8_t *acts, int n) {
+  for (int i = 0; i < n; i++)
+    if (!strcmp(v, ids[i])) return acts[i];
+  return -1;
+}
+
+int stackchanFind(const char *name, JsonVariantConst args) {
+  if (!name) return -1;
+  if (!strcmp(name, TOOL_NAME[T_CARE])) return elegir(args["action"] | "", CARE_ID, CARE_ACT, 8);
+  if (!strcmp(name, TOOL_NAME[T_INFO])) return elegir(args["kind"] | "", INFO_ID, INFO_ACT, 3);
+  for (int i = 0; i < MCP_TOOL_COUNT; i++)  // status, buy y los nombres de antes
+    if (!strcmp(name, NAME[i])) return i;
   return -1;
 }
 

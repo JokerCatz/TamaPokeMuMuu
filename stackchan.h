@@ -5,8 +5,10 @@
 #include "pet.h"
 
 // Herramientas que ve Stack-chan (xiaozhi, por MCP; la conexion esta en
-// wifisync.cpp). Cada una hace su accion sobre la mascota y devuelve una frase
-// en chino para que el asistente la cuente.
+// wifisync.cpp). Cada accion MCP_* hace algo sobre la mascota y devuelve una
+// frase en chino para que el asistente la cuente. Hacia fuera solo hay 4
+// herramientas (status, care, info, buy): xiaozhi corta la lista si el agente
+// tiene demasiadas y las ultimas en llegar desaparecen.
 enum : uint8_t {
   MCP_STATUS = 0, MCP_FEED, MCP_PLAY, MCP_BATH, MCP_PET, MCP_SLEEP, MCP_WAKE,
   MCP_CANDY, MCP_MEDICINE, MCP_CHESS, MCP_POKEDEX, MCP_BUY, MCP_FARM, MCP_TOOL_COUNT
@@ -22,7 +24,9 @@ struct StackchanCtx {
 };
 
 void stackchanToolList(JsonArray tools);  // para tools/list
-int stackchanFind(const char *name);      // indice MCP_*, -1 si no existe
+// nombre + argumentos de tools/call -> accion MCP_*, -1 si no existe
+// (tambien acepta los nombres de antes, una herramienta por accion)
+int stackchanFind(const char *name, JsonVariantConst args);
 // argumentos de tools/call -> a, b (MCP_BUY: objeto ITEM_* y cantidad)
 void stackchanArgs(uint8_t tool, JsonVariantConst args, uint8_t &a, uint8_t &b);
 void stackchanTool(Pet &pet, uint8_t tool, uint8_t a, uint8_t b, const StackchanCtx &ctx, char *out,

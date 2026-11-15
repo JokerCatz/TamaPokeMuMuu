@@ -1,0 +1,2299 @@
+{
+ "regions": [
+  {
+   "region": "kanto",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Brock",
+     "leader_zh": "小刚",
+     "city_en": "Pewter City",
+     "city_zh": "深灰市",
+     "type": "rock",
+     "badge_en": "Boulder Badge",
+     "badge_zh": "灰色徽章",
+     "team": [
+      74,
+      185,
+      95
+     ],
+     "team_names": [
+      "Geodude",
+      "Sudowoodo",
+      "Onix"
+     ],
+     "source": "anime: Geodude, Onix (gym), Bonsly→Sudowoodo (DP014)"
+    },
+    {
+     "order": 2,
+     "leader_en": "Misty",
+     "leader_zh": "小霞",
+     "city_en": "Cerulean City",
+     "city_zh": "华蓝市",
+     "type": "water",
+     "badge_en": "Cascade Badge",
+     "badge_zh": "蓝色徽章",
+     "team": [
+      54,
+      130,
+      121
+     ],
+     "team_names": [
+      "Psyduck",
+      "Gyarados",
+      "Starmie"
+     ],
+     "source": "anime: Psyduck, Gyarados, Starmie"
+    },
+    {
+     "order": 3,
+     "leader_en": "Lt. Surge",
+     "leader_zh": "马志士",
+     "city_en": "Vermilion City",
+     "city_zh": "枯叶市",
+     "type": "electric",
+     "badge_en": "Thunder Badge",
+     "badge_zh": "橙色徽章",
+     "team": [
+      100,
+      25,
+      26
+     ],
+     "team_names": [
+      "Voltorb",
+      "Pikachu",
+      "Raichu"
+     ],
+     "source": "anime: Raichu only; Voltorb, Pikachu from Red/Green/Blue gym team"
+    },
+    {
+     "order": 4,
+     "leader_en": "Erika",
+     "leader_zh": "莉佳",
+     "city_en": "Celadon City",
+     "city_zh": "玉虹市",
+     "type": "grass",
+     "badge_en": "Rainbow Badge",
+     "badge_zh": "彩虹徽章",
+     "team": [
+      114,
+      70,
+      44
+     ],
+     "team_names": [
+      "Tangela",
+      "Weepinbell",
+      "Gloom"
+     ],
+     "source": "anime: Tangela, Weepinbell, Gloom (EP026 gym battle)"
+    },
+    {
+     "order": 5,
+     "leader_en": "Koga",
+     "leader_zh": "阿桔",
+     "city_en": "Fuchsia City",
+     "city_zh": "浅红市",
+     "type": "poison",
+     "badge_en": "Soul Badge",
+     "badge_zh": "粉红徽章",
+     "team": [
+      42,
+      49,
+      110
+     ],
+     "team_names": [
+      "Golbat",
+      "Venomoth",
+      "Weezing"
+     ],
+     "source": "anime: Golbat, Venonat→Venomoth (EP032); Weezing from Red/Green/Blue gym team (game ace)"
+    },
+    {
+     "order": 6,
+     "leader_en": "Sabrina",
+     "leader_zh": "娜姿",
+     "city_en": "Saffron City",
+     "city_zh": "金黄市",
+     "type": "psychic",
+     "badge_en": "Marsh Badge",
+     "badge_zh": "金色徽章",
+     "team": [
+      93,
+      122,
+      64
+     ],
+     "team_names": [
+      "Haunter",
+      "Mr. Mime",
+      "Kadabra"
+     ],
+     "source": "anime: Abra→Kadabra, Haunter (Ash's, stayed with her); Mr. Mime from Red/Green/Blue gym team"
+    },
+    {
+     "order": 7,
+     "leader_en": "Blaine",
+     "leader_zh": "夏伯",
+     "city_en": "Cinnabar Island",
+     "city_zh": "红莲镇",
+     "type": "fire",
+     "badge_en": "Volcano Badge",
+     "badge_zh": "深红徽章",
+     "team": [
+      38,
+      112,
+      126
+     ],
+     "team_names": [
+      "Ninetales",
+      "Rhydon",
+      "Magmar"
+     ],
+     "source": "anime: Ninetales, Rhydon, Magmar (EP058-059); Rhydon is off-type but anime"
+    },
+    {
+     "order": 8,
+     "leader_en": "Giovanni",
+     "leader_zh": "坂木",
+     "city_en": "Viridian City",
+     "city_zh": "常青市",
+     "type": "ground",
+     "badge_en": "Earth Badge",
+     "badge_zh": "绿色徽章",
+     "team": [
+      53,
+      76,
+      112
+     ],
+     "team_names": [
+      "Persian",
+      "Golem",
+      "Rhydon"
+     ],
+     "source": "anime: Persian (signature), Golem, Rhydon (Viridian Gym EP063); Mewtwo, Kingler, Machamp, Cloyster also in anime but left out; Rhydon is also his Red/Green/Blue ace"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Lorelei",
+     "name_zh": "科拿",
+     "type": "ice",
+     "team": [
+      87,
+      91,
+      124
+     ],
+     "team_names": [
+      "Dewgong",
+      "Cloyster",
+      "Jynx"
+     ],
+     "source": "anime (as Prima, Orange Islands): Slowbro, Dewgong, Cloyster, Jynx; ice ones chosen"
+    },
+    {
+     "name_en": "Bruno",
+     "name_zh": "希巴",
+     "type": "fighting",
+     "team": [
+      95,
+      107,
+      68
+     ],
+     "team_names": [
+      "Onix",
+      "Hitmonchan",
+      "Machamp"
+     ],
+     "source": "anime: Hitmonchan, Onix; Machamp from Red/Green/Blue E4 team (game ace)"
+    },
+    {
+     "name_en": "Agatha",
+     "name_zh": "菊子",
+     "type": "ghost",
+     "team": [
+      42,
+      93,
+      94
+     ],
+     "team_names": [
+      "Golbat",
+      "Haunter",
+      "Gengar"
+     ],
+     "source": "anime: Gengar, Golbat; Haunter from Red/Green/Blue E4 team"
+    },
+    {
+     "name_en": "Lance",
+     "name_zh": "阿渡",
+     "type": "dragon",
+     "team": [
+      130,
+      148,
+      149
+     ],
+     "team_names": [
+      "Gyarados",
+      "Dragonair",
+      "Dragonite"
+     ],
+     "source": "anime: red Gyarados, Dragonite; Dragonair from Red/Green/Blue E4 team (anime Druddigon used in Johto champion entry instead)"
+    }
+   ],
+   "champion": {
+    "name_en": "Blue",
+    "name_zh": "青绿",
+    "type": "mixed",
+    "team": [
+     197,
+     59,
+     9
+    ],
+    "team_names": [
+     "Umbreon",
+     "Arcanine",
+     "Blastoise"
+    ],
+    "source": "anime (as Gary / 小茂): Umbreon, Arcanine, Blastoise (signature)"
+   }
+  },
+  {
+   "region": "johto",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Falkner",
+     "leader_zh": "阿速",
+     "city_en": "Violet City",
+     "city_zh": "桔梗市",
+     "type": "flying",
+     "badge_en": "Zephyr Badge",
+     "badge_zh": "飞翼徽章",
+     "team": [
+      163,
+      85,
+      18
+     ],
+     "team_names": [
+      "Hoothoot",
+      "Dodrio",
+      "Pidgeot"
+     ],
+     "source": "anime: Hoothoot, Dodrio, Pidgeot"
+    },
+    {
+     "order": 2,
+     "leader_en": "Bugsy",
+     "leader_zh": "阿笔",
+     "city_en": "Azalea Town",
+     "city_zh": "桧皮镇",
+     "type": "bug",
+     "badge_en": "Hive Badge",
+     "badge_zh": "昆虫徽章",
+     "team": [
+      167,
+      11,
+      123
+     ],
+     "team_names": [
+      "Spinarak",
+      "Metapod",
+      "Scyther"
+     ],
+     "source": "anime: Spinarak, Metapod, Scyther"
+    },
+    {
+     "order": 3,
+     "leader_en": "Whitney",
+     "leader_zh": "小茜",
+     "city_en": "Goldenrod City",
+     "city_zh": "满金市",
+     "type": "normal",
+     "badge_en": "Plain Badge",
+     "badge_zh": "常规徽章",
+     "team": [
+      35,
+      30,
+      241
+     ],
+     "team_names": [
+      "Clefairy",
+      "Nidorina",
+      "Miltank"
+     ],
+     "source": "anime: Clefairy, Nidorina, Miltank (Nidorina per 52poke anime list; off-type)"
+    },
+    {
+     "order": 4,
+     "leader_en": "Morty",
+     "leader_zh": "松叶",
+     "city_en": "Ecruteak City",
+     "city_zh": "缘朱市",
+     "type": "ghost",
+     "badge_en": "Fog Badge",
+     "badge_zh": "幻影徽章",
+     "team": [
+      92,
+      93,
+      94
+     ],
+     "team_names": [
+      "Gastly",
+      "Haunter",
+      "Gengar"
+     ],
+     "source": "anime: Gastly, Haunter, Gengar"
+    },
+    {
+     "order": 5,
+     "leader_en": "Chuck",
+     "leader_zh": "阿四",
+     "city_en": "Cianwood City",
+     "city_zh": "湛蓝市",
+     "type": "fighting",
+     "badge_en": "Storm Badge",
+     "badge_zh": "打击徽章",
+     "team": [
+      57,
+      67,
+      62
+     ],
+     "team_names": [
+      "Primeape",
+      "Machoke",
+      "Poliwrath"
+     ],
+     "source": "anime: Poliwrath, Machoke; Primeape from Gold/Silver/Crystal & HGSS gym team"
+    },
+    {
+     "order": 6,
+     "leader_en": "Jasmine",
+     "leader_zh": "阿蜜",
+     "city_en": "Olivine City",
+     "city_zh": "浅葱市",
+     "type": "steel",
+     "badge_en": "Mineral Badge",
+     "badge_zh": "钢铁徽章",
+     "team": [
+      181,
+      81,
+      208
+     ],
+     "team_names": [
+      "Ampharos",
+      "Magnemite",
+      "Steelix"
+     ],
+     "source": "anime: Ampharos (Amphy), Magnemite, Steelix"
+    },
+    {
+     "order": 7,
+     "leader_en": "Pryce",
+     "leader_zh": "柳伯",
+     "city_en": "Mahogany Town",
+     "city_zh": "卡吉镇",
+     "type": "ice",
+     "badge_en": "Glacier Badge",
+     "badge_zh": "冰雪徽章",
+     "team": [
+      86,
+      87,
+      221
+     ],
+     "team_names": [
+      "Seel",
+      "Dewgong",
+      "Piloswine"
+     ],
+     "source": "anime: Piloswine, Dewgong (gym also keeps Seel/Dewgong/Cloyster/Lapras); Seel from GSC/HGSS gym team"
+    },
+    {
+     "order": 8,
+     "leader_en": "Clair",
+     "leader_zh": "小椿",
+     "city_en": "Blackthorn City",
+     "city_zh": "烟墨市",
+     "type": "dragon",
+     "badge_en": "Rising Badge",
+     "badge_zh": "升龙徽章",
+     "team": [
+      130,
+      148,
+      230
+     ],
+     "team_names": [
+      "Gyarados",
+      "Dragonair",
+      "Kingdra"
+     ],
+     "source": "anime: Gyarados, Dragonair, Kingdra"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Will",
+     "name_zh": "一树",
+     "type": "psychic",
+     "team": [
+      124,
+      80,
+      178
+     ],
+     "team_names": [
+      "Jynx",
+      "Slowbro",
+      "Xatu"
+     ],
+     "source": "not in TV anime (only GOTCHA!: Xatu); Jynx, Slowbro, Xatu from Gold/Silver/Crystal E4 team"
+    },
+    {
+     "name_en": "Koga",
+     "name_zh": "阿桔",
+     "type": "poison",
+     "team": [
+      49,
+      89,
+      169
+     ],
+     "team_names": [
+      "Venomoth",
+      "Muk",
+      "Crobat"
+     ],
+     "source": "anime: Venomoth (Golbat evolves into his GSC ace Crobat); Muk, Crobat from Gold/Silver/Crystal E4 team"
+    },
+    {
+     "name_en": "Bruno",
+     "name_zh": "希巴",
+     "type": "fighting",
+     "team": [
+      237,
+      107,
+      68
+     ],
+     "team_names": [
+      "Hitmontop",
+      "Hitmonchan",
+      "Machamp"
+     ],
+     "source": "anime: Hitmonchan; Hitmontop, Machamp from Gold/Silver/Crystal E4 team (varied from his Kanto entry)"
+    },
+    {
+     "name_en": "Karen",
+     "name_zh": "梨花",
+     "type": "dark",
+     "team": [
+      197,
+      198,
+      229
+     ],
+     "team_names": [
+      "Umbreon",
+      "Murkrow",
+      "Houndoom"
+     ],
+     "source": "not in TV anime; GOTCHA! animation: Umbreon, Houndoom; Murkrow from Gold/Silver/Crystal E4 team"
+    }
+   ],
+   "champion": {
+    "name_en": "Lance",
+    "name_zh": "阿渡",
+    "type": "dragon",
+    "team": [
+     621,
+     130,
+     149
+    ],
+    "team_names": [
+     "Druddigon",
+     "Gyarados",
+     "Dragonite"
+    ],
+    "source": "anime: Druddigon (Journeys), red Gyarados, Dragonite"
+   }
+  },
+  {
+   "region": "hoenn",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Roxanne",
+     "leader_zh": "杜娟",
+     "city_en": "Rustboro City",
+     "city_zh": "卡那兹市",
+     "type": "rock",
+     "badge_en": "Stone Badge",
+     "badge_zh": "岩石徽章",
+     "team": [
+      74,
+      141,
+      299
+     ],
+     "team_names": [
+      "Geodude",
+      "Kabutops",
+      "Nosepass"
+     ],
+     "source": "anime: Geodude, Nosepass; Kabutops from Emerald rematch team"
+    },
+    {
+     "order": 2,
+     "leader_en": "Brawly",
+     "leader_zh": "藤树",
+     "city_en": "Dewford Town",
+     "city_zh": "武斗镇",
+     "type": "fighting",
+     "badge_en": "Knuckle Badge",
+     "badge_zh": "拳击徽章",
+     "team": [
+      307,
+      67,
+      297
+     ],
+     "team_names": [
+      "Meditite",
+      "Machoke",
+      "Hariyama"
+     ],
+     "source": "anime: Machop→Machoke, Makuhita→Hariyama; Meditite from Emerald/ORAS gym team"
+    },
+    {
+     "order": 3,
+     "leader_en": "Wattson",
+     "leader_zh": "铁旋",
+     "city_en": "Mauville City",
+     "city_zh": "紫堇市",
+     "type": "electric",
+     "badge_en": "Dynamo Badge",
+     "badge_zh": "电力徽章",
+     "team": [
+      100,
+      82,
+      310
+     ],
+     "team_names": [
+      "Voltorb",
+      "Magneton",
+      "Manectric"
+     ],
+     "source": "anime: Magnemite, Voltorb, Magneton, Electrike→Manectric; Manectric is also his Emerald/ORAS ace"
+    },
+    {
+     "order": 4,
+     "leader_en": "Flannery",
+     "leader_zh": "亚莎",
+     "city_en": "Lavaridge Town",
+     "city_zh": "釜炎镇",
+     "type": "fire",
+     "badge_en": "Heat Badge",
+     "badge_zh": "烈焰徽章",
+     "team": [
+      218,
+      219,
+      324
+     ],
+     "team_names": [
+      "Slugma",
+      "Magcargo",
+      "Torkoal"
+     ],
+     "source": "anime: Slugma (Meg), Slugma→Magcargo (Mag), Torkoal"
+    },
+    {
+     "order": 5,
+     "leader_en": "Norman",
+     "leader_zh": "千里",
+     "city_en": "Petalburg City",
+     "city_zh": "橙华市",
+     "type": "normal",
+     "badge_en": "Balance Badge",
+     "badge_zh": "天秤徽章",
+     "team": [
+      287,
+      288,
+      289
+     ],
+     "team_names": [
+      "Slakoth",
+      "Vigoroth",
+      "Slaking"
+     ],
+     "source": "anime: Slakoth, Vigoroth, Slaking"
+    },
+    {
+     "order": 6,
+     "leader_en": "Winona",
+     "leader_zh": "娜琪",
+     "city_en": "Fortree City",
+     "city_zh": "茵郁市",
+     "type": "flying",
+     "badge_en": "Feather Badge",
+     "badge_zh": "白羽徽章",
+     "team": [
+      277,
+      227,
+      334
+     ],
+     "team_names": [
+      "Swellow",
+      "Skarmory",
+      "Altaria"
+     ],
+     "source": "anime: Skarmory, Altaria, Pelipper, Swellow; Altaria is also her game ace"
+    },
+    {
+     "order": 7,
+     "leader_en": "Tate & Liza",
+     "leader_zh": "小枫与小南",
+     "city_en": "Mossdeep City",
+     "city_zh": "绿岭市",
+     "type": "psychic",
+     "badge_en": "Mind Badge",
+     "badge_zh": "心灵徽章",
+     "team": [
+      178,
+      337,
+      338
+     ],
+     "team_names": [
+      "Xatu",
+      "Lunatone",
+      "Solrock"
+     ],
+     "source": "anime: Lunatone (Liza), Solrock (Tate); Xatu from their Black 2/White 2 PWT team"
+    },
+    {
+     "order": 8,
+     "leader_en": "Wallace",
+     "leader_zh": "米可利",
+     "city_en": "Sootopolis City",
+     "city_zh": "琉璃市",
+     "type": "water",
+     "badge_en": "Rain Badge",
+     "badge_zh": "雨滴徽章",
+     "team": [
+      340,
+      364,
+      350
+     ],
+     "team_names": [
+      "Whiscash",
+      "Sealeo",
+      "Milotic"
+     ],
+     "source": "anime: Milotic only; Whiscash, Sealeo from Ruby/Sapphire/ORAS gym team"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Sidney",
+     "name_zh": "花月",
+     "type": "dark",
+     "team": [
+      262,
+      275,
+      359
+     ],
+     "team_names": [
+      "Mightyena",
+      "Shiftry",
+      "Absol"
+     ],
+     "source": "not in TV anime; GOTCHA! animation: Absol; Mightyena, Shiftry from Ruby/Sapphire/ORAS E4 team"
+    },
+    {
+     "name_en": "Phoebe",
+     "name_zh": "芙蓉",
+     "type": "ghost",
+     "team": [
+      302,
+      354,
+      356
+     ],
+     "team_names": [
+      "Sableye",
+      "Banette",
+      "Dusclops"
+     ],
+     "source": "not in TV anime; GOTCHA! animation: Dusclops; Sableye, Banette from Ruby/Sapphire E4 team"
+    },
+    {
+     "name_en": "Glacia",
+     "name_zh": "波妮",
+     "type": "ice",
+     "team": [
+      362,
+      364,
+      365
+     ],
+     "team_names": [
+      "Glalie",
+      "Sealeo",
+      "Walrein"
+     ],
+     "source": "not in TV anime; GOTCHA! animation: Walrein; Glalie, Sealeo from Ruby/Sapphire E4 team"
+    },
+    {
+     "name_en": "Drake",
+     "name_zh": "源治",
+     "type": "dragon",
+     "team": [
+      372,
+      334,
+      373
+     ],
+     "team_names": [
+      "Shelgon",
+      "Altaria",
+      "Salamence"
+     ],
+     "source": "anime: Shelgon, Altaria, Salamence (AG101)"
+    }
+   ],
+   "champion": {
+    "name_en": "Steven",
+    "name_zh": "大吾",
+    "type": "steel",
+    "team": [
+     346,
+     306,
+     376
+    ],
+    "team_names": [
+     "Cradily",
+     "Aggron",
+     "Metagross"
+    ],
+    "source": "anime: Aggron, Cradily (Journeys), Metagross (signature)"
+   }
+  },
+  {
+   "region": "sinnoh",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Roark",
+     "leader_zh": "瓢太",
+     "city_en": "Oreburgh City",
+     "city_zh": "黑金市",
+     "type": "rock",
+     "badge_en": "Coal Badge",
+     "badge_zh": "煤炭徽章",
+     "team": [
+      74,
+      95,
+      409
+     ],
+     "team_names": [
+      "Geodude",
+      "Onix",
+      "Rampardos"
+     ],
+     "source": "anime: Geodude, Onix, Cranidos→Rampardos"
+    },
+    {
+     "order": 2,
+     "leader_en": "Gardenia",
+     "leader_zh": "菜种",
+     "city_en": "Eterna City",
+     "city_zh": "百代市",
+     "type": "grass",
+     "badge_en": "Forest Badge",
+     "badge_zh": "森林徽章",
+     "team": [
+      420,
+      387,
+      407
+     ],
+     "team_names": [
+      "Cherubi",
+      "Turtwig",
+      "Roserade"
+     ],
+     "source": "anime: Cherubi, Turtwig, Roserade"
+    },
+    {
+     "order": 3,
+     "leader_en": "Maylene",
+     "leader_zh": "阿李",
+     "city_en": "Veilstone City",
+     "city_zh": "帷幕市",
+     "type": "fighting",
+     "badge_en": "Cobble Badge",
+     "badge_zh": "铺石徽章",
+     "team": [
+      307,
+      67,
+      448
+     ],
+     "team_names": [
+      "Meditite",
+      "Machoke",
+      "Lucario"
+     ],
+     "source": "anime: Meditite, Machoke, Lucario"
+    },
+    {
+     "order": 4,
+     "leader_en": "Crasher Wake",
+     "leader_zh": "吉宪",
+     "city_en": "Pastoria City",
+     "city_zh": "野原市",
+     "type": "water",
+     "badge_en": "Fen Badge",
+     "badge_zh": "湿地徽章",
+     "team": [
+      130,
+      195,
+      419
+     ],
+     "team_names": [
+      "Gyarados",
+      "Quagsire",
+      "Floatzel"
+     ],
+     "source": "anime: Gyarados, Quagsire, Floatzel"
+    },
+    {
+     "order": 5,
+     "leader_en": "Fantina",
+     "leader_zh": "梅丽莎",
+     "city_en": "Hearthome City",
+     "city_zh": "家缘市",
+     "type": "ghost",
+     "badge_en": "Relic Badge",
+     "badge_zh": "遗迹徽章",
+     "team": [
+      94,
+      426,
+      429
+     ],
+     "team_names": [
+      "Gengar",
+      "Drifblim",
+      "Mismagius"
+     ],
+     "source": "anime: Gengar, Drifloon→Drifblim, Misdreavus→Mismagius"
+    },
+    {
+     "order": 6,
+     "leader_en": "Byron",
+     "leader_zh": "东瓜",
+     "city_en": "Canalave City",
+     "city_zh": "水脉市",
+     "type": "steel",
+     "badge_en": "Mine Badge",
+     "badge_zh": "矿山徽章",
+     "team": [
+      436,
+      208,
+      411
+     ],
+     "team_names": [
+      "Bronzor",
+      "Steelix",
+      "Bastiodon"
+     ],
+     "source": "anime: Bronzor, Steelix, Bastiodon"
+    },
+    {
+     "order": 7,
+     "leader_en": "Candice",
+     "leader_zh": "小菘",
+     "city_en": "Snowpoint City",
+     "city_zh": "雪峰市",
+     "type": "ice",
+     "badge_en": "Icicle Badge",
+     "badge_zh": "冰河徽章",
+     "team": [
+      215,
+      459,
+      460
+     ],
+     "team_names": [
+      "Sneasel",
+      "Snover",
+      "Abomasnow"
+     ],
+     "source": "anime: Sneasel, Snover, Medicham, Abomasnow (ace); ice ones chosen"
+    },
+    {
+     "order": 8,
+     "leader_en": "Volkner",
+     "leader_zh": "电次",
+     "city_en": "Sunyshore City",
+     "city_zh": "滨海市",
+     "type": "electric",
+     "badge_en": "Beacon Badge",
+     "badge_zh": "灯塔徽章",
+     "team": [
+      135,
+      466,
+      405
+     ],
+     "team_names": [
+      "Jolteon",
+      "Electivire",
+      "Luxray"
+     ],
+     "source": "anime: Raichu, Luxray, Electivire, Jolteon, Rotom; Luxray is also his DP ace"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Aaron",
+     "name_zh": "阿柳",
+     "type": "bug",
+     "team": [
+      267,
+      416,
+      452
+     ],
+     "team_names": [
+      "Beautifly",
+      "Vespiquen",
+      "Drapion"
+     ],
+     "source": "anime: Beautifly, Vespiquen, Skorupi, Drapion; Drapion is also his DP ace"
+    },
+    {
+     "name_en": "Bertha",
+     "name_zh": "菊野",
+     "type": "ground",
+     "team": [
+      472,
+      76,
+      450
+     ],
+     "team_names": [
+      "Gliscor",
+      "Golem",
+      "Hippowdon"
+     ],
+     "source": "anime: Gliscor, Golem, Hippowdon"
+    },
+    {
+     "name_en": "Flint",
+     "name_zh": "大叶",
+     "type": "fire",
+     "team": [
+      136,
+      467,
+      392
+     ],
+     "team_names": [
+      "Flareon",
+      "Magmortar",
+      "Infernape"
+     ],
+     "source": "anime: Infernape only; Flareon, Magmortar from Platinum E4 team"
+    },
+    {
+     "name_en": "Lucian",
+     "name_zh": "悟松",
+     "type": "psychic",
+     "team": [
+      65,
+      203,
+      437
+     ],
+     "team_names": [
+      "Alakazam",
+      "Girafarig",
+      "Bronzong"
+     ],
+     "source": "anime: Bronzong, Girafarig; Alakazam from Diamond/Pearl E4 team"
+    }
+   ],
+   "champion": {
+    "name_en": "Cynthia",
+    "name_zh": "竹兰",
+    "type": "mixed",
+    "team": [
+     442,
+     350,
+     445
+    ],
+    "team_names": [
+     "Spiritomb",
+     "Milotic",
+     "Garchomp"
+    ],
+    "source": "anime: Spiritomb, Milotic, Garchomp (signature); also Gastrodon, Roserade, Togekiss, Kommo-o"
+   }
+  },
+  {
+   "region": "unova",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Cilan",
+     "leader_zh": "天桐",
+     "city_en": "Striaton City",
+     "city_zh": "三曜市",
+     "type": "grass",
+     "badge_en": "Trio Badge",
+     "badge_zh": "三元徽章",
+     "team": [
+      618,
+      558,
+      511
+     ],
+     "team_names": [
+      "Stunfisk",
+      "Crustle",
+      "Pansage"
+     ],
+     "source": "anime: Pansage (signature), Dwebble→Crustle, Stunfisk"
+    },
+    {
+     "order": 2,
+     "leader_en": "Lenora",
+     "leader_zh": "芦荟",
+     "city_en": "Nacrene City",
+     "city_zh": "七宝市",
+     "type": "normal",
+     "badge_en": "Basic Badge",
+     "badge_zh": "基础徽章",
+     "team": [
+      507,
+      115,
+      505
+     ],
+     "team_names": [
+      "Herdier",
+      "Kangaskhan",
+      "Watchog"
+     ],
+     "source": "anime: Lillipup→Herdier, Watchog; Kangaskhan from her Black 2/White 2 PWT team"
+    },
+    {
+     "order": 3,
+     "leader_en": "Burgh",
+     "leader_zh": "亚堤",
+     "city_en": "Castelia City",
+     "city_zh": "飞云市",
+     "type": "bug",
+     "badge_en": "Insect Badge",
+     "badge_zh": "甲虫徽章",
+     "team": [
+      557,
+      544,
+      542
+     ],
+     "team_names": [
+      "Dwebble",
+      "Whirlipede",
+      "Leavanny"
+     ],
+     "source": "anime: Dwebble, Whirlipede, Leavanny"
+    },
+    {
+     "order": 4,
+     "leader_en": "Elesa",
+     "leader_zh": "小菊儿",
+     "city_en": "Nimbasa City",
+     "city_zh": "雷文市",
+     "type": "electric",
+     "badge_en": "Bolt Badge",
+     "badge_zh": "伏特徽章",
+     "team": [
+      602,
+      587,
+      523
+     ],
+     "team_names": [
+      "Tynamo",
+      "Emolga",
+      "Zebstrika"
+     ],
+     "source": "anime: Tynamo, Emolga, Zebstrika"
+    },
+    {
+     "order": 5,
+     "leader_en": "Clay",
+     "leader_zh": "菊老大",
+     "city_en": "Driftveil City",
+     "city_zh": "帆巴市",
+     "type": "ground",
+     "badge_en": "Quake Badge",
+     "badge_zh": "震动徽章",
+     "team": [
+      552,
+      536,
+      530
+     ],
+     "team_names": [
+      "Krokorok",
+      "Palpitoad",
+      "Excadrill"
+     ],
+     "source": "anime: Krokorok, Palpitoad, Excadrill"
+    },
+    {
+     "order": 6,
+     "leader_en": "Skyla",
+     "leader_zh": "风露",
+     "city_en": "Mistralton City",
+     "city_zh": "吹寄市",
+     "type": "flying",
+     "badge_en": "Jet Badge",
+     "badge_zh": "喷射徽章",
+     "team": [
+      528,
+      521,
+      581
+     ],
+     "team_names": [
+      "Swoobat",
+      "Unfezant",
+      "Swanna"
+     ],
+     "source": "anime: Swoobat, Unfezant, Swanna"
+    },
+    {
+     "order": 7,
+     "leader_en": "Brycen",
+     "leader_zh": "哈奇库",
+     "city_en": "Icirrus City",
+     "city_zh": "雪花市",
+     "type": "ice",
+     "badge_en": "Freeze Badge",
+     "badge_zh": "冰柱徽章",
+     "team": [
+      583,
+      615,
+      614
+     ],
+     "team_names": [
+      "Vanillish",
+      "Cryogonal",
+      "Beartic"
+     ],
+     "source": "anime: Vanillish, Cryogonal, Beartic"
+    },
+    {
+     "order": 8,
+     "leader_en": "Iris",
+     "leader_zh": "艾莉丝",
+     "city_en": "Opelucid City",
+     "city_zh": "双龙市",
+     "type": "dragon",
+     "badge_en": "Legend Badge",
+     "badge_zh": "传说徽章",
+     "team": [
+      443,
+      149,
+      612
+     ],
+     "team_names": [
+      "Gible",
+      "Dragonite",
+      "Haxorus"
+     ],
+     "source": "anime: Axew→Fraxure→Haxorus (ace), Dragonite, Gible (Journeys); also Excadrill, Emolga (non-dragon, left out)"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Shauntal",
+     "name_zh": "婉龙",
+     "type": "ghost",
+     "team": [
+      563,
+      593,
+      609
+     ],
+     "team_names": [
+      "Cofagrigus",
+      "Jellicent",
+      "Chandelure"
+     ],
+     "source": "not in TV anime; GOTCHA! animation: Chandelure; Cofagrigus, Jellicent from Black/White E4 team"
+    },
+    {
+     "name_en": "Grimsley",
+     "name_zh": "越橘",
+     "type": "dark",
+     "team": [
+      510,
+      553,
+      625
+     ],
+     "team_names": [
+      "Liepard",
+      "Krookodile",
+      "Bisharp"
+     ],
+     "source": "not in TV anime; GOTCHA! animation: Liepard; Krookodile, Bisharp from Black/White E4 team"
+    },
+    {
+     "name_en": "Caitlin",
+     "name_zh": "嘉德丽雅",
+     "type": "psychic",
+     "team": [
+      518,
+      579,
+      576
+     ],
+     "team_names": [
+      "Musharna",
+      "Reuniclus",
+      "Gothitelle"
+     ],
+     "source": "anime: Gothitelle; Musharna, Reuniclus from Black/White E4 team"
+    },
+    {
+     "name_en": "Marshal",
+     "name_zh": "连武",
+     "type": "fighting",
+     "team": [
+      538,
+      539,
+      534
+     ],
+     "team_names": [
+      "Throh",
+      "Sawk",
+      "Conkeldurr"
+     ],
+     "source": "no anime Pokémon (only a GOTCHA! cameo); all from Black/White E4 team"
+    }
+   ],
+   "champion": {
+    "name_en": "Alder",
+    "name_zh": "阿戴克",
+    "type": "mixed",
+    "team": [
+     626,
+     589,
+     637
+    ],
+    "team_names": [
+     "Bouffalant",
+     "Escavalier",
+     "Volcarona"
+    ],
+    "source": "anime: Bouffalant only; Escavalier, Volcarona (ace) from Black/White champion team"
+   }
+  },
+  {
+   "region": "kalos",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Viola",
+     "leader_zh": "紫罗兰",
+     "city_en": "Santalune City",
+     "city_zh": "白檀市",
+     "type": "bug",
+     "badge_en": "Bug Badge",
+     "badge_zh": "虫虫徽章",
+     "team": [
+      283,
+      284,
+      666
+     ],
+     "team_names": [
+      "Surskit",
+      "Masquerain",
+      "Vivillon"
+     ],
+     "source": "anime: Surskit, Vivillon (same as X/Y team); Masquerain is a filler (evolution of her Surskit, not in any official team)"
+    },
+    {
+     "order": 2,
+     "leader_en": "Grant",
+     "leader_zh": "查克洛",
+     "city_en": "Cyllage City",
+     "city_zh": "遥香市",
+     "type": "rock",
+     "badge_en": "Cliff Badge",
+     "badge_zh": "岩壁徽章",
+     "team": [
+      95,
+      698,
+      696
+     ],
+     "team_names": [
+      "Onix",
+      "Amaura",
+      "Tyrunt"
+     ],
+     "source": "anime: Onix, Tyrunt; Amaura from X/Y gym team"
+    },
+    {
+     "order": 3,
+     "leader_en": "Korrina",
+     "leader_zh": "可尔妮",
+     "city_en": "Shalour City",
+     "city_zh": "娑罗市",
+     "type": "fighting",
+     "badge_en": "Rumble Badge",
+     "badge_zh": "战斗徽章",
+     "team": [
+      67,
+      620,
+      448
+     ],
+     "team_names": [
+      "Machoke",
+      "Mienshao",
+      "Lucario"
+     ],
+     "source": "anime: Machoke, Mienfoo→Mienshao, Lucario (Mega)"
+    },
+    {
+     "order": 4,
+     "leader_en": "Ramos",
+     "leader_zh": "福爷",
+     "city_en": "Coumarine City",
+     "city_zh": "比翼市",
+     "type": "grass",
+     "badge_en": "Plant Badge",
+     "badge_zh": "植物徽章",
+     "team": [
+      189,
+      70,
+      673
+     ],
+     "team_names": [
+      "Jumpluff",
+      "Weepinbell",
+      "Gogoat"
+     ],
+     "source": "anime: Jumpluff, Weepinbell, Gogoat"
+    },
+    {
+     "order": 5,
+     "leader_en": "Clemont",
+     "leader_zh": "希特隆",
+     "city_en": "Lumiose City",
+     "city_zh": "密阿雷市",
+     "type": "electric",
+     "badge_en": "Voltage Badge",
+     "badge_zh": "电压徽章",
+     "team": [
+      82,
+      695,
+      405
+     ],
+     "team_names": [
+      "Magneton",
+      "Heliolisk",
+      "Luxray"
+     ],
+     "source": "anime: Magneton, Helioptile→Heliolisk (Lumiose Gym), Shinx→Luxray (his strongest); also Bunnelby→Diggersby, Chespin, Dedenne"
+    },
+    {
+     "order": 6,
+     "leader_en": "Valerie",
+     "leader_zh": "玛绣",
+     "city_en": "Laverre City",
+     "city_zh": "香薰市",
+     "type": "fairy",
+     "badge_en": "Fairy Badge",
+     "badge_zh": "妖精徽章",
+     "team": [
+      303,
+      122,
+      700
+     ],
+     "team_names": [
+      "Mawile",
+      "Mr. Mime",
+      "Sylveon"
+     ],
+     "source": "anime: Spritzee, Sylveon, Mr. Mime, Mawile; picked the three also in her X/Y team"
+    },
+    {
+     "order": 7,
+     "leader_en": "Olympia",
+     "leader_zh": "葛吉花",
+     "city_en": "Anistar City",
+     "city_zh": "百刻市",
+     "type": "psychic",
+     "badge_en": "Psychic Badge",
+     "badge_zh": "超能徽章",
+     "team": [
+      561,
+      199,
+      678
+     ],
+     "team_names": [
+      "Sigilyph",
+      "Slowking",
+      "Meowstic"
+     ],
+     "source": "anime: Meowstic (male and female); Sigilyph, Slowking from X/Y gym team"
+    },
+    {
+     "order": 8,
+     "leader_en": "Wulfric",
+     "leader_zh": "得抚",
+     "city_en": "Snowbelle City",
+     "city_zh": "映雪市",
+     "type": "ice",
+     "badge_en": "Iceberg Badge",
+     "badge_zh": "冰山徽章",
+     "team": [
+      872,
+      713,
+      460
+     ],
+     "team_names": [
+      "Snom",
+      "Avalugg",
+      "Abomasnow"
+     ],
+     "source": "anime: Abomasnow (Mega, ace), Avalugg, Snom (Journeys rematch)"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Malva",
+     "name_zh": "帕琦拉",
+     "type": "fire",
+     "team": [
+      668,
+      663,
+      229
+     ],
+     "team_names": [
+      "Pyroar",
+      "Talonflame",
+      "Houndoom"
+     ],
+     "source": "anime: Houndoom (Mega); Pyroar, Talonflame from X/Y E4 team"
+    },
+    {
+     "name_en": "Siebold",
+     "name_zh": "志米",
+     "type": "water",
+     "team": [
+      693,
+      689,
+      9
+     ],
+     "team_names": [
+      "Clawitzer",
+      "Barbaracle",
+      "Blastoise"
+     ],
+     "source": "anime: Blastoise (Mega); Clawitzer, Barbaracle from X/Y E4 team"
+    },
+    {
+     "name_en": "Wikstrom",
+     "name_zh": "雁铠",
+     "type": "steel",
+     "team": [
+      212,
+      589,
+      681
+     ],
+     "team_names": [
+      "Scizor",
+      "Escavalier",
+      "Aegislash"
+     ],
+     "source": "anime: Aegislash, Escavalier; Scizor from X/Y E4 team"
+    },
+    {
+     "name_en": "Drasna",
+     "name_zh": "朵拉塞娜",
+     "type": "dragon",
+     "team": [
+      691,
+      715,
+      334
+     ],
+     "team_names": [
+      "Dragalge",
+      "Noivern",
+      "Altaria"
+     ],
+     "source": "anime: Altaria (Mega, ace), Noivern, Dragalge, Druddigon"
+    }
+   ],
+   "champion": {
+    "name_en": "Diantha",
+    "name_zh": "卡露妮",
+    "type": "mixed",
+    "team": [
+     699,
+     706,
+     282
+    ],
+    "team_names": [
+     "Aurorus",
+     "Goodra",
+     "Gardevoir"
+    ],
+    "source": "anime (Journeys Masters Eight): Aurorus, Goodra, Gardevoir (Mega, signature)"
+   }
+  },
+  {
+   "region": "alola",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Ilima",
+     "leader_zh": "伊利马",
+     "city_en": "Verdant Cavern",
+     "city_zh": "葱郁洞窟",
+     "type": "normal",
+     "badge_en": "Normalium Z",
+     "badge_zh": "一般Z",
+     "team": [
+      235,
+      115,
+      133
+     ],
+     "team_names": [
+      "Smeargle",
+      "Kangaskhan",
+      "Eevee"
+     ],
+     "source": "anime: Smeargle, Kangaskhan, Eevee (signature)"
+    },
+    {
+     "order": 2,
+     "leader_en": "Hala",
+     "leader_zh": "哈拉",
+     "city_en": "Iki Town",
+     "city_zh": "利利小镇",
+     "type": "fighting",
+     "badge_en": "Fightinium Z",
+     "badge_zh": "格斗Z",
+     "team": [
+      57,
+      740,
+      297
+     ],
+     "team_names": [
+      "Primeape",
+      "Crabominable",
+      "Hariyama"
+     ],
+     "source": "anime: Hariyama (signature), Crabrawler→Crabominable; Primeape from Sun/Moon team"
+    },
+    {
+     "order": 3,
+     "leader_en": "Lana",
+     "leader_zh": "水莲",
+     "city_en": "Brooklet Hill",
+     "city_zh": "潺潺之丘",
+     "type": "water",
+     "badge_en": "Waterium Z",
+     "badge_zh": "水Z",
+     "team": [
+      746,
+      752,
+      730
+     ],
+     "team_names": [
+      "Wishiwashi",
+      "Araquanid",
+      "Primarina"
+     ],
+     "source": "anime: Popplio→Brionne→Primarina; Wishiwashi (SM) and Araquanid (USUM) are her trial's Totem Pokémon"
+    },
+    {
+     "order": 4,
+     "leader_en": "Kiawe",
+     "leader_zh": "卡奇",
+     "city_en": "Wela Volcano Park",
+     "city_zh": "维拉火山公园",
+     "type": "fire",
+     "badge_en": "Firium Z",
+     "badge_zh": "火Z",
+     "team": [
+      105,
+      6,
+      776
+     ],
+     "team_names": [
+      "Marowak",
+      "Charizard",
+      "Turtonator"
+     ],
+     "source": "anime: Alolan Marowak, Charizard, Turtonator (Z-Move partner)"
+    },
+    {
+     "order": 5,
+     "leader_en": "Mallow",
+     "leader_zh": "玛奥",
+     "city_en": "Lush Jungle",
+     "city_zh": "树荫丛林",
+     "type": "grass",
+     "badge_en": "Grassium Z",
+     "badge_zh": "草Z",
+     "team": [
+      765,
+      754,
+      763
+     ],
+     "team_names": [
+      "Oranguru",
+      "Lurantis",
+      "Tsareena"
+     ],
+     "source": "anime: Bounsweet→Steenee→Tsareena; Oranguru is her friend in the anime (not clearly owned); Lurantis is her trial's Totem Pokémon"
+    },
+    {
+     "order": 6,
+     "leader_en": "Sophocles",
+     "leader_zh": "马玛内",
+     "city_en": "Hokulani Observatory",
+     "city_zh": "辉克拉尼天文台",
+     "type": "electric",
+     "badge_en": "Electrium Z",
+     "badge_zh": "电Z",
+     "team": [
+      737,
+      738,
+      777
+     ],
+     "team_names": [
+      "Charjabug",
+      "Vikavolt",
+      "Togedemaru"
+     ],
+     "source": "anime: Togedemaru (partner), Charjabug→Vikavolt; Charjabug kept as a separate slot from his Sun/Moon trial (Totem Vikavolt + Charjabug allies)"
+    },
+    {
+     "order": 7,
+     "leader_en": "Nanu",
+     "leader_zh": "默丹",
+     "city_en": "Malie City",
+     "city_zh": "马利埃静市",
+     "type": "dark",
+     "badge_en": "Darkinium Z",
+     "badge_zh": "恶Z",
+     "team": [
+      302,
+      553,
+      53
+     ],
+     "team_names": [
+      "Sableye",
+      "Krookodile",
+      "Persian"
+     ],
+     "source": "anime: Sableye, Krookodile, Alolan Persian (partner); his Sun/Moon grand trial team is Sableye, Krokorok, Alolan Persian"
+    },
+    {
+     "order": 8,
+     "leader_en": "Hapu",
+     "leader_zh": "哈普乌",
+     "city_en": "Vast Poni Canyon",
+     "city_zh": "波尼大峡谷",
+     "type": "ground",
+     "badge_en": "Groundium Z",
+     "badge_zh": "地面Z",
+     "team": [
+      330,
+      623,
+      750
+     ],
+     "team_names": [
+      "Flygon",
+      "Golurk",
+      "Mudsdale"
+     ],
+     "source": "anime: Golurk, Mudsdale; Flygon from Sun/Moon grand trial team"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Molayne",
+     "name_zh": "马睿因",
+     "type": "steel",
+     "team": [
+      707,
+      462,
+      51
+     ],
+     "team_names": [
+      "Klefki",
+      "Magnezone",
+      "Dugtrio"
+     ],
+     "source": "anime: Magnezone; Klefki, Alolan Dugtrio (ace) from Ultra Sun/Ultra Moon E4 team"
+    },
+    {
+     "name_en": "Olivia",
+     "name_zh": "丽姿",
+     "type": "rock",
+     "team": [
+      76,
+      476,
+      745
+     ],
+     "team_names": [
+      "Golem",
+      "Probopass",
+      "Lycanroc"
+     ],
+     "source": "anime: Probopass, Lycanroc (Midday in anime; Midnight in games); Alolan Golem from Sun/Moon E4 team"
+    },
+    {
+     "name_en": "Acerola",
+     "name_zh": "阿塞萝拉",
+     "type": "ghost",
+     "team": [
+      778,
+      781,
+      770
+     ],
+     "team_names": [
+      "Mimikyu",
+      "Dhelmise",
+      "Palossand"
+     ],
+     "source": "not in TV anime with Pokémon; GOTCHA! animation: Mimikyu; Dhelmise, Palossand (ace) from Sun/Moon E4 team"
+    },
+    {
+     "name_en": "Kahili",
+     "name_zh": "卡希丽",
+     "type": "flying",
+     "team": [
+      227,
+      741,
+      733
+     ],
+     "team_names": [
+      "Skarmory",
+      "Oricorio",
+      "Toucannon"
+     ],
+     "source": "anime: Toucannon; Skarmory, Oricorio from Sun/Moon E4 team"
+    }
+   ],
+   "champion": {
+    "name_en": "Professor Kukui",
+    "name_zh": "库库伊博士",
+    "type": "mixed",
+    "team": [
+     628,
+     395,
+     727
+    ],
+    "team_names": [
+     "Braviary",
+     "Empoleon",
+     "Incineroar"
+    ],
+    "source": "anime: Braviary, Empoleon, Incineroar (as Masked Royal), also Venusaur, Lucario (exhibition match vs Ash); not an official champion — Sun/Moon final League opponent"
+   }
+  },
+  {
+   "region": "galar",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Milo",
+     "leader_zh": "亚洛",
+     "city_en": "Turffield",
+     "city_zh": "草路镇",
+     "type": "grass",
+     "badge_en": "Grass Badge",
+     "badge_zh": "草之徽章",
+     "team": [
+      831,
+      829,
+      830
+     ],
+     "team_names": [
+      "Wooloo",
+      "Gossifleur",
+      "Eldegoss"
+     ],
+     "source": "anime (Twilight Wings web anime): Wooloo, Eldegoss; Gossifleur from Sword/Shield gym team"
+    },
+    {
+     "order": 2,
+     "leader_en": "Nessa",
+     "leader_zh": "露璃娜",
+     "city_en": "Hulbury",
+     "city_zh": "水舟镇",
+     "type": "water",
+     "badge_en": "Water Badge",
+     "badge_zh": "水之徽章",
+     "team": [
+      118,
+      846,
+      834
+     ],
+     "team_names": [
+      "Goldeen",
+      "Arrokuda",
+      "Drednaw"
+     ],
+     "source": "anime (Twilight Wings): Drednaw; Goldeen, Arrokuda from Sword/Shield gym team"
+    },
+    {
+     "order": 3,
+     "leader_en": "Kabu",
+     "leader_zh": "卡芜",
+     "city_en": "Motostoke",
+     "city_zh": "机擎市",
+     "type": "fire",
+     "badge_en": "Fire Badge",
+     "badge_zh": "火之徽章",
+     "team": [
+      38,
+      59,
+      851
+     ],
+     "team_names": [
+      "Ninetales",
+      "Arcanine",
+      "Centiskorch"
+     ],
+     "source": "anime (Horizons ep. 20): Centiskorch; Ninetales, Arcanine from Sword/Shield gym team"
+    },
+    {
+     "order": 4,
+     "leader_en": "Bea",
+     "leader_zh": "彩豆",
+     "city_en": "Stow-on-Side",
+     "city_zh": "溯传镇",
+     "type": "fighting",
+     "badge_en": "Fighting Badge",
+     "badge_zh": "格斗徽章",
+     "team": [
+      67,
+      865,
+      68
+     ],
+     "team_names": [
+      "Machoke",
+      "Sirfetch'd",
+      "Machamp"
+     ],
+     "source": "anime (Twilight Wings): Machop, Machoke, Machamp, Sirfetch'd; Sword-version leader"
+    },
+    {
+     "order": 5,
+     "leader_en": "Opal",
+     "leader_zh": "波普菈",
+     "city_en": "Ballonlea",
+     "city_zh": "舞姿镇",
+     "type": "fairy",
+     "badge_en": "Fairy Badge",
+     "badge_zh": "妖精徽章",
+     "team": [
+      303,
+      468,
+      869
+     ],
+     "team_names": [
+      "Mawile",
+      "Togekiss",
+      "Alcremie"
+     ],
+     "source": "anime (Journeys ep. 82): Alcremie; Mawile, Togekiss from Sword/Shield gym team"
+    },
+    {
+     "order": 6,
+     "leader_en": "Gordie",
+     "leader_zh": "玛瓜",
+     "city_en": "Circhester",
+     "city_zh": "战竞镇",
+     "type": "rock",
+     "badge_en": "Rock Badge",
+     "badge_zh": "岩石徽章",
+     "team": [
+      213,
+      838,
+      839
+     ],
+     "team_names": [
+      "Shuckle",
+      "Carkol",
+      "Coalossal"
+     ],
+     "source": "anime (Twilight Wings + EXPANSION special): Shuckle, Carkol, Coalossal; Sword-version leader"
+    },
+    {
+     "order": 7,
+     "leader_en": "Piers",
+     "leader_zh": "聂梓",
+     "city_en": "Spikemuth",
+     "city_zh": "尖钉镇",
+     "type": "dark",
+     "badge_en": "Dark Badge",
+     "badge_zh": "恶之徽章",
+     "team": [
+      812,
+      849,
+      862
+     ],
+     "team_names": [
+      "Rillaboom",
+      "Toxtricity",
+      "Obstagoon"
+     ],
+     "source": "anime (Journeys ep. 99, his band): Rillaboom, Toxtricity, Obstagoon; only Obstagoon is dark type"
+    },
+    {
+     "order": 8,
+     "leader_en": "Raihan",
+     "leader_zh": "奇巴纳",
+     "city_en": "Hammerlocke",
+     "city_zh": "拳关市",
+     "type": "dragon",
+     "badge_en": "Dragon Badge",
+     "badge_zh": "龙之徽章",
+     "team": [
+      330,
+      706,
+      884
+     ],
+     "team_names": [
+      "Flygon",
+      "Goodra",
+      "Duraludon"
+     ],
+     "source": "anime (Journeys / Twilight Wings): Flygon, Goodra, Duraludon (partner)"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Marnie",
+     "name_zh": "玛俐",
+     "type": "dark",
+     "team": [
+      510,
+      877,
+      861
+     ],
+     "team_names": [
+      "Liepard",
+      "Morpeko",
+      "Grimmsnarl"
+     ],
+     "source": "Champion Cup semifinal opponent (Galar has no E4). anime: Morpeko, Grimmsnarl (ace); Liepard from Sword/Shield team"
+    },
+    {
+     "name_en": "Hop",
+     "name_zh": "赫普",
+     "type": "normal",
+     "team": [
+      845,
+      143,
+      832
+     ],
+     "team_names": [
+      "Cramorant",
+      "Snorlax",
+      "Dubwool"
+     ],
+     "source": "Champion Cup semifinal opponent; not a type specialist (normal chosen for Wooloo/Dubwool). anime: Wooloo→Dubwool, Cramorant (Twilight Wings); Snorlax from Sword/Shield team"
+    },
+    {
+     "name_en": "Bede",
+     "name_zh": "彼特",
+     "type": "fairy",
+     "team": [
+      859,
+      78,
+      282
+     ],
+     "team_names": [
+      "Impidimp",
+      "Rapidash",
+      "Gardevoir"
+     ],
+     "source": "Champion Cup finals opponent. anime (Twilight Wings + EXPANSION): Impidimp, Galarian Rapidash, Gardevoir; his game ace Hatterene not in anime"
+    },
+    {
+     "name_en": "Allister",
+     "name_zh": "欧尼奥",
+     "type": "ghost",
+     "team": [
+      778,
+      864,
+      94
+     ],
+     "team_names": [
+      "Gastly",
+      "Haunter",
+      "Gengar"
+     ],
+     "source": "game (Sword/Shield Champion Cup): Mimikyu, Cursola, Gengar - el del anime repetia el de Morty"
+    }
+   ],
+   "champion": {
+    "name_en": "Leon",
+    "name_zh": "丹帝",
+    "type": "mixed",
+    "team": [
+     887,
+     815,
+     6
+    ],
+    "team_names": [
+     "Dragapult",
+     "Cinderace",
+     "Charizard"
+    ],
+    "source": "anime (Journeys): Dragapult, Cinderace, Charizard (partner); also Rillaboom, Inteleon, Mr. Rime, Eternatus"
+   }
+  },
+  {
+   "region": "paldea",
+   "gyms": [
+    {
+     "order": 1,
+     "leader_en": "Katy",
+     "leader_zh": "阿枫",
+     "city_en": "Cortondo",
+     "city_zh": "圆模镇",
+     "type": "bug",
+     "badge_en": "Gym Badge (Bug)",
+     "badge_zh": "道馆徽章（虫）",
+     "team": [
+      917,
+      920,
+      217
+     ],
+     "team_names": [
+      "Tarountula",
+      "Lokix",
+      "Ursaring"
+     ],
+     "source": "anime (Horizons): Teddiursa→Ursaring, Lokix; Tarountula from Scarlet/Violet gym team (her game ace is a Tera-Bug Teddiursa)"
+    },
+    {
+     "order": 2,
+     "leader_en": "Brassius",
+     "leader_zh": "寇沙",
+     "city_en": "Artazon",
+     "city_zh": "深钵镇",
+     "type": "grass",
+     "badge_en": "Gym Badge (Grass)",
+     "badge_zh": "道馆徽章（草）",
+     "team": [
+      548,
+      928,
+      185
+     ],
+     "team_names": [
+      "Petilil",
+      "Smoliv",
+      "Sudowoodo"
+     ],
+     "source": "anime (Horizons): Smoliv, Sudowoodo (Tera Grass); Petilil from Scarlet/Violet gym team"
+    },
+    {
+     "order": 3,
+     "leader_en": "Iono",
+     "leader_zh": "奇树",
+     "city_en": "Levincia",
+     "city_zh": "酿光市",
+     "type": "electric",
+     "badge_en": "Gym Badge (Electric)",
+     "badge_zh": "道馆徽章（电）",
+     "team": [
+      940,
+      404,
+      939
+     ],
+     "team_names": [
+      "Wattrel",
+      "Luxio",
+      "Bellibolt"
+     ],
+     "source": "anime (Horizons): Bellibolt (partner); Wattrel, Luxio from Scarlet/Violet gym team (game ace is a Tera-Electric Mismagius)"
+    },
+    {
+     "order": 4,
+     "leader_en": "Kofu",
+     "leader_zh": "海岱",
+     "city_en": "Cascarrafa",
+     "city_zh": "玻瓶市",
+     "type": "water",
+     "badge_en": "Gym Badge (Water)",
+     "badge_zh": "道馆徽章（水）",
+     "team": [
+      961,
+      976,
+      740
+     ],
+     "team_names": [
+      "Wugtrio",
+      "Veluza",
+      "Crabominable"
+     ],
+     "source": "anime (Horizons ep. 55): Wugtrio; Veluza, Crabominable (Tera Water ace) from Scarlet/Violet gym team"
+    },
+    {
+     "order": 5,
+     "leader_en": "Larry",
+     "leader_zh": "青木",
+     "city_en": "Medali",
+     "city_zh": "锦汇镇",
+     "type": "normal",
+     "badge_en": "Gym Badge (Normal)",
+     "badge_zh": "道馆徽章（一般）",
+     "team": [
+      820,
+      982,
+      398
+     ],
+     "team_names": [
+      "Greedent",
+      "Dudunsparce",
+      "Staraptor"
+     ],
+     "source": "anime (Horizons): Greedent, Dudunsparce, Staraptor; Dudunsparce and Staraptor are also in his gym team"
+    },
+    {
+     "order": 6,
+     "leader_en": "Ryme",
+     "leader_zh": "莱姆",
+     "city_en": "Montenevera",
+     "city_zh": "冰柜镇",
+     "type": "ghost",
+     "badge_en": "Gym Badge (Ghost)",
+     "badge_zh": "道馆徽章（幽灵）",
+     "team": [
+      778,
+      972,
+      849
+     ],
+     "team_names": [
+      "Mimikyu",
+      "Houndstone",
+      "Toxtricity"
+     ],
+     "source": "anime (Horizons): Houndstone, Toxtricity (Tera Ghost ace); Mimikyu from Scarlet/Violet gym team"
+    },
+    {
+     "order": 7,
+     "leader_en": "Tulip",
+     "leader_zh": "莉普",
+     "city_en": "Alfornada",
+     "city_zh": "焙固镇",
+     "type": "psychic",
+     "badge_en": "Gym Badge (Psychic)",
+     "badge_zh": "道馆徽章（超能力）",
+     "team": [
+      282,
+      956,
+      671
+     ],
+     "team_names": [
+      "Gardevoir",
+      "Espathra",
+      "Florges"
+     ],
+     "source": "anime (Horizons ep. 55): Espathra; Gardevoir, Florges (Tera Psychic ace) from Scarlet/Violet gym team"
+    },
+    {
+     "order": 8,
+     "leader_en": "Grusha",
+     "leader_zh": "古鲁夏",
+     "city_en": "Glaseado Mountain",
+     "city_zh": "霜抹山",
+     "type": "ice",
+     "badge_en": "Gym Badge (Ice)",
+     "badge_zh": "道馆徽章（冰）",
+     "team": [
+      974,
+      975,
+      334
+     ],
+     "team_names": [
+      "Cetoddle",
+      "Cetitan",
+      "Altaria"
+     ],
+     "source": "anime (Horizons ep. 63): Cetoddle, Cetitan, Altaria (Tera Ice, also his game ace)"
+    }
+   ],
+   "elite_four": [
+    {
+     "name_en": "Rika",
+     "name_zh": "辛俐",
+     "type": "ground",
+     "team": [
+      340,
+      51,
+      980
+     ],
+     "team_names": [
+      "Whiscash",
+      "Dugtrio",
+      "Clodsire"
+     ],
+     "source": "anime (Horizons): Clodsire (partner), Dugtrio; Whiscash from Scarlet/Violet E4 team"
+    },
+    {
+     "name_en": "Poppy",
+     "name_zh": "波琵",
+     "type": "steel",
+     "team": [
+      462,
+      879,
+      959
+     ],
+     "team_names": [
+      "Magnezone",
+      "Copperajah",
+      "Tinkaton"
+     ],
+     "source": "anime (Horizons ep. 55): Copperajah, Tinkaton; Magnezone from Scarlet/Violet E4 team"
+    },
+    {
+     "name_en": "Larry",
+     "name_zh": "青木",
+     "type": "flying",
+     "team": [
+      741,
+      398,
+      973
+     ],
+     "team_names": [
+      "Oricorio",
+      "Staraptor",
+      "Flamigo"
+     ],
+     "source": "anime (Horizons): Oricorio, Staraptor, Flamigo — all also in his E4 team; same person as gym 5 (canon)"
+    },
+    {
+     "name_en": "Hassel",
+     "name_zh": "八朔",
+     "type": "dragon",
+     "team": [
+      443,
+      840,
+      998
+     ],
+     "team_names": [
+      "Gible",
+      "Applin",
+      "Baxcalibur"
+     ],
+     "source": "anime (Horizons): Gible, Applin, Baxcalibur (partner)"
+    }
+   ],
+   "champion": {
+    "name_en": "Geeta",
+    "name_zh": "也慈",
+    "type": "mixed",
+    "team": [
+     969,
+     983,
+     970
+    ],
+    "team_names": [
+     "Glimmet",
+     "Kingambit",
+     "Glimmora"
+    ],
+    "source": "anime (Horizons ep. 79): Glimmet x2, Glimmora (partner); Kingambit from Scarlet/Violet champion team"
+   }
+  }
+ ]
+}

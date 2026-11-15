@@ -22,6 +22,11 @@
 #include "species.h"
 #include "dex.h"
 #include "pet.h"
+#include "mega.h"
+#include "sport.h"
+#include "gym.h"
+#include "gyms.h"   // lideres, medallas y equipos (tools/gen_gyms.py)
+#include "fun.h"    // ocio: actividades segun el tipo
 #include "sdmon.h"
 #include "rtcbat.h"
 #include "i18n.h"
@@ -35,6 +40,7 @@
 #include "shake.h"
 #include "steps.h"
 #include "stackchan.h"
+#include "phonesteps.h"
 #include "holiday.h"
 #include "memoir.h"
 #include "backup.h"
@@ -66,6 +72,7 @@ PmdMon pmd;         // sprite PMD multi-accion (pantalla principal)
 PmdMon evoPmd;      // forma anterior, solo durante el parpadeo de evolucion
 int16_t monFor = -2;
 bool monShinyFor = false;
+bool monMegaFor = false;
 
 // comportamiento del bicho en pantalla
 struct {
@@ -148,6 +155,11 @@ Btn buttons[4] = {
 #define BTN_HALF 26  // boton de 52x52
 #define BTN_HIT 36   // radio tactil (un poco mas generoso)
 #define FEED_X 134    // selector de comida: 3 casillas de 66 px (baya, chuche, medicina)
+#define FEED_Y 288    // y encima, si hay, otra fila con pescado y frutas (lo del ocio)
+#define FEED_H 72
+#define FEED_Y2 (FEED_Y - FEED_H - 6)
+#define STATUS_Y 22   // fila de arriba: racha, temperatura, bateria y puntos (centrada; mas abajo cabe mas)
+int16_t gPtsX0 = 258, gPtsX1 = 330;  // donde quedaron los puntos (tocarlos abre la tienda)
 
 // grietas del huevo (pixeles 'k' sobre el sprite)
 static const uint8_t CRACK1[][2] = { {15,8},{16,9},{15,10} };
@@ -238,6 +250,22 @@ void toast(const char *m) { toastMsg = m; toastUntil = millis() + 2500; }
 
 // granja (compañeros guardados en la SD)
 bool farmOpen = false;
+bool hubOpen = false;    // a la izquierda de la principal: granja y pruebas deportivas
+bool chOpen = false;     // torneo y pruebas de los gimnasios (sports.ino)
+bool gymsOpen = false;   // gimnasios (gyms.ino)
+bool funOpen = false;    // ocio: huerto, pesca, mina, expedicion (fun.ino)
+uint32_t grassFxUntil = 0;  // consola GRASSFX: la mata de la hierba se ve un rato (solo se ve)
+PmdMon rivalPmd[2];      // torneo: los rivales; gimnasio: el del jugador (si no es el compañero) y el del lider
+// las pruebas (sport.h): nombre, que cuenta, tipos con ventaja y color (torneo y gimnasios)
+static const StrId EV_NAME[EV_COUNT] = { S_EV_SPRINT, S_EV_HURDLES, S_EV_SWIM, S_EV_LONGJUMP, S_EV_HIGHJUMP,
+                                         S_EV_LIFT, S_EV_CLIMB, S_EV_DIVE, S_EV_SKATE, S_EV_TORCH, S_EV_TRAIL };
+static const StrId EV_HOW[EV_COUNT] = { S_HOW_SPRINT, S_HOW_HURDLES, S_HOW_SWIM, S_HOW_LONGJUMP, S_HOW_HIGHJUMP,
+                                        S_HOW_LIFT, S_HOW_CLIMB, S_HOW_DIVE, S_HOW_SKATE, S_HOW_TORCH, S_HOW_TRAIL };
+static const StrId EV_BONUS[EV_COUNT] = { S_BONUS_SPRINT, S_BONUS_HURDLES, S_BONUS_SWIM, S_BONUS_LONGJUMP,
+                                          S_BONUS_HIGHJUMP, S_BONUS_LIFT, S_BONUS_CLIMB, S_BONUS_DIVE,
+                                          S_BONUS_SKATE, S_BONUS_TORCH, S_BONUS_TRAIL };
+static const uint16_t EV_COL[EV_COUNT] = { 0xC2A8, 0xEB44, 0x2C7B, 0xC4E9, 0x8B9A,
+                                           0x7BEF, 0x9407, 0x4C98, 0x4DB8, 0xEA87, 0x5A6E };
 bool farmDirty = false;
 int farmPage = 0;
 int farmDetail = -1;  // indice en la granja en vista detalle, -1 = rejilla
@@ -294,10 +322,20 @@ char harvestMsg[48];
 // nombre de cada objeto de la tienda (orden de ITEM_*)
 static const StrId ITEM_NAME[ITEM_COUNT] = {
   S_ITEM_CANDY, S_ITEM_MEDICINE, S_ITEM_POTION_STR, S_ITEM_POTION_SPD, S_ITEM_SHINY_CHARM,
-  S_ITEM_EGG_COMMON, S_ITEM_EGG_RARE, S_ITEM_EGG_LEGEND, S_ITEM_POTION_EVO,
+  S_ITEM_EGG_COMMON, S_ITEM_EGG_RARE, S_ITEM_EGG_LEGEND, S_ITEM_POTION_EVO, S_ITEM_MEGA_STONE,
+  S_ITEM_FRUIT_STA, S_ITEM_FRUIT_RES, S_ITEM_FRUIT_VIT, S_ITEM_FRUIT_GOLD, S_ITEM_FISH, S_ITEM_PEARL, S_ITEM_SHARD,
+  S_ITEM_EGG_WATER, S_ITEM_EGG_FOSSIL,
 };
 
 // ---------- compartido entre pestañas (las .ino se unen por orden alfabetico) ----------
+// selector de comida, fila de arriba: pescado y frutas que haya en la mochila
+static int feedExtras(uint8_t out[5]) {
+  static const uint8_t ITEMS[5] = { ITEM_FISH, ITEM_FRUIT_STA, ITEM_FRUIT_RES, ITEM_FRUIT_VIT, ITEM_FRUIT_GOLD };
+  int n = 0;
+  for (uint8_t it : ITEMS)
+    if (pet.bag[it]) out[n++] = it;
+  return n;
+}
 #define C565(r, g, b) ((uint16_t)((((r) >> 3) << 11) | (((g) >> 2) << 5) | ((b) >> 3)))
 #define HORIZON 232  // linea donde el cielo se encuentra con el suelo
 #define C_GOLD C565(0xf0, 0xc0, 0x30)
@@ -429,20 +467,22 @@ void setup() {
 
 // carga/descarga el sprite de SD cuando cambia la especie
 void ensureMon() {
-  if (pet.speciesId == monFor && monShinyFor == pet.shiny && !sdDirty) return;
+  if (pet.speciesId == monFor && monShinyFor == pet.shiny && monMegaFor == pet.isMega() && !sdDirty) return;
   // los ficheros recien recibidos pueden incluir un thumbs.bin nuevo, que se
   // cargaba solo en setup(): sin esto no se veia en la galeria hasta reiniciar
   if (sdDirty) { thumbs.unload(); thumbs.load(); sdEpoch++; }
   sdDirty = false;
   monFor = pet.speciesId;
   monShinyFor = pet.shiny;
+  monMegaFor = pet.isMega();
   mon.unload();
   pmd.unload();
   beh.x = beh.targetX = 233;
   beh.mode = 0;
   beh.until = 0;
   if (pet.speciesId >= 1 && pet.speciesId <= DEX_COUNT) {
-    pmd.load(pet.speciesId, pet.shiny);          // principal: PMD
+    if (monMegaFor) pmd.load(pet.speciesId, pet.shiny, true);  // megaevolucionado (mega.h)
+    if (!pmd.loaded) pmd.load(pet.speciesId, pet.shiny);       // principal: PMD
     if (!pmd.loaded) mon.load(pet.speciesId, pet.shiny);  // respaldo: B/N
   }
 }
@@ -631,6 +671,26 @@ void loop() {
     bubbleText = T(S_SAY_SELFMED);
     bubbleUntil = now + 4000;
     sfxPlay(SFX_EAT);
+  }
+  // megaevoluciono (piedra) o volvio a su forma (paso el dia)
+  bool megaOn;
+  if (pet.takeMegaChange(megaOn)) {
+    bubbleText = T(megaOn ? S_SAY_MEGA : S_SAY_MEGA_END);
+    bubbleUntil = now + 4000;
+    showEmote(megaOn ? EMO_EXCLAIM : EMO_DOTS, 2000);
+  }
+  // pasos de hoy que manda el movil (Atajo de iPhone): cuentan los que pasen de los de la placa
+  uint32_t movil;
+  if (phoneStepsTake(movil)) {
+    pet.phoneSteps(movil);
+    Serial.printf("pasos del movil: %lu, hoy %lu\n", (unsigned long)movil, (unsigned long)pet.stepsToday);
+  }
+  // diez mil pasos hoy: premio (se ve al encender la pantalla si estaba apagada)
+  if (!screenOff && pet.takeStepBonus()) {
+    bubbleText = T(S_SAY_STEP_BONUS);
+    bubbleUntil = now + 5000;
+    sfxPlay(SFX_MEDAL);
+    showEmote(EMO_HEART, 2000);
   }
 
   // region nueva abierta (se registraron todas las de huevo de la anterior)

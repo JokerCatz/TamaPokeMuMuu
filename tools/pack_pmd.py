@@ -18,6 +18,7 @@ Acciones: 0 Idle, 1 WalkL, 2 WalkR, 3 Sleep, 4 Eat, 5 Hurt, 6 Attack,
   python3 tools/pack_pmd.py             # los 151, normal + shiny
   python3 tools/pack_pmd.py 7 25        # dex concretos
   python3 tools/pack_pmd.py normal 1 4  # solo normales
+  python3 tools/pack_pmd.py mega        # megaevoluciones de mega.h -> /mons/mNNN.bin, msNNN.bin
 """
 import os
 import struct
@@ -89,9 +90,13 @@ def load_animdata(folder):
     return anims
 
 
-def pack(dexnum, shiny=False):
-    sub = '/0000/0001' if shiny else ''
-    folder = os.path.join(CACHE, f'{dexnum:04d}{"s" if shiny else ""}')
+def pack(dexnum, shiny=False, form=None):
+    # form: subcarpeta de una forma (las mega); su shiny cuelga de ella (form/0001)
+    if form:
+        sub = f'/{form}' + ('/0001' if shiny else '')
+    else:
+        sub = '/0000/0001' if shiny else ''
+    folder = os.path.join(CACHE, f'{dexnum:04d}{"m" + form if form else ""}{"s" if shiny else ""}')
     base = f'{BASE}/{dexnum:04d}{sub}'
     if not fetch(f'{base}/AnimData.xml', os.path.join(folder, 'AnimData.xml')):
         raise RuntimeError('sin AnimData.xml')
@@ -134,7 +139,8 @@ def pack(dexnum, shiny=False):
         raise RuntimeError('sin Idle')
 
     os.makedirs(OUT, exist_ok=True)
-    path = os.path.join(OUT, f'p{"s" if shiny else ""}{dexnum:03d}.bin')
+    nombre = f'{"m" if form else "p"}{"s" if shiny else ""}{dexnum:03d}.bin'
+    path = os.path.join(OUT, nombre)
     with open(path, 'wb') as f:
         f.write(b'TPK2')
         f.write(struct.pack('<BH', len(packed), len(pal)))
@@ -145,12 +151,31 @@ def pack(dexnum, shiny=False):
             f.write(struct.pack(f'<{nf}H', *ms))
             f.write(data)
     kb = os.path.getsize(path) / 1024
-    print(f"  -> p{'s' if shiny else ''}{dexnum:03d}.bin: {len(packed)} acciones, "
+    print(f"  -> {nombre}: {len(packed)} acciones, "
           f"{len(pal)} colores, {kb:.0f} KB")
+
+
+def mega_forms():
+    """(dex, form) de la tabla de mega.h, para no tener la lista dos veces"""
+    import re
+    h = open(os.path.join(os.path.dirname(__file__), '..', 'mega.h'), encoding='utf-8').read()
+    return [(int(d), f) for d, f in re.findall(r'\{\s*(\d+),\s*"(\d{4})"', h)]
 
 
 if __name__ == '__main__':
     args = sys.argv[1:]
+    if 'mega' in args:
+        fallos = []
+        for n, form in mega_forms():
+            for sh in (False, True):
+                try:
+                    print(f"#{n:03d} mega {form}{' shiny' if sh else ''}")
+                    pack(n, sh, form)
+                except Exception as e:
+                    print(f"  FALLO: {e}")
+                    fallos.append((n, sh))
+        print(f"FALLOS: {fallos}" if fallos else "TODAS EMPAQUETADAS")
+        sys.exit(0)
     solo_normal = 'normal' in args
     nums = [int(a) for a in args if a.isdigit()] or list(range(1, 152))
     fallos = []

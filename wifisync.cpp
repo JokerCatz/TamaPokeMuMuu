@@ -13,6 +13,7 @@
 #include "config.h"
 #include "i18n.h"  // gLang: la pagina del portal sale en el idioma de la placa
 #include "wifipick.h"
+#include "phonesteps.h"  // pasos del movil (servidor en la red de casa)
 
 static WebServer *server = nullptr;
 static DNSServer *dns = nullptr;
@@ -188,6 +189,7 @@ void wifiPortalStart() {
   netLock();  // espera a que la tarea de red suelte la radio
   portalOn = true;
   mcpStop();
+  phoneStepsStop();  // el portal usa el puerto 80
   WiFi.disconnect(true);
   netUnlock();
   portalCleanup();
@@ -225,9 +227,9 @@ void wifiPortalStop() {
 
 static volatile bool usbPower = false;
 void netSetUsb(bool usb) { usbPower = usb; }
-// con USB y punto MCP, la radio se queda encendida (Stack-chan puede hablar
-// en cualquier momento); con bateria solo se conecta un momento
-static bool keepOnline() { return usbPower && mcpConfigured(); }
+// con USB la radio se queda encendida: Stack-chan (si hay punto MCP) puede hablar en
+// cualquier momento y el movil puede mandar los pasos; con bateria solo se conecta un momento
+static bool keepOnline() { return usbPower; }
 
 static int8_t redBuena = -1;  // hueco de la ultima red con la que se conecto (en RAM)
 
@@ -596,10 +598,10 @@ static void mcpMensaje(const uint8_t *txt, size_t len) {
     stackchanToolList(out["result"]["tools"].to<JsonArray>());
   } else if (!strcmp(method, "tools/call")) {
     const char *name = in["params"]["name"] | "";
-    int tool = stackchanFind(name);
+    int tool = stackchanFind(name, in["params"]["arguments"]);
     if (tool < 0) {
       out["error"]["code"] = -32602;
-      out["error"]["message"] = "unknown tool";
+      out["error"]["message"] = "unknown tool or action";
     } else {
       uint8_t a, b;
       stackchanArgs((uint8_t)tool, in["params"]["arguments"], a, b);
@@ -683,14 +685,17 @@ static void netTask(void *) {
     if (keep) {
       if (WiFi.status() != WL_CONNECTED && (int32_t)(now - nextJoin) >= 0) {
         mcpStop();
+        phoneStepsStop();
         if (!conectar()) nextJoin = now + 60000;  // la red no esta: otro intento en 1 min
       }
       if (WiFi.status() == WL_CONNECTED) {
         if (!ws) mcpStart();
         if (ws) ws->loop();
+        phoneStepsLoop();
       }
-    } else if (ws) {  // sin USB (o sin punto MCP): se apaga la radio
+    } else if (ws || phoneStepsOn()) {  // sin USB: se apaga la radio
       mcpStop();
+      phoneStepsStop();
       WiFi.disconnect(true);
       WiFi.mode(WIFI_OFF);
     }
@@ -710,7 +715,7 @@ static void netTask(void *) {
       nextWx = millis() + (ok ? (usbPower ? WX_EVERY_MS : WX_EVERY_BATT_MS) : 15UL * 60 * 1000);
     }
     netUnlock();
-    vTaskDelay(pdMS_TO_TICKS(ws ? 10 : 2000));  // sin xiaozhi no hay prisa: despertar menos
+    vTaskDelay(pdMS_TO_TICKS(ws || phoneStepsOn() ? 10 : 2000));  // sin nada que atender no hay prisa
   }
 }
 

@@ -68,10 +68,13 @@ potions → the next morning the pet cheers about yesterday's games.**
 |---|---|---|
 | Species | Gen 1 (151) | Gen 1-9 (1025), one Pokédex page per region |
 | Languages | 8 | English + Simplified Chinese |
-| Growing up | +1 level per hour, evolution by level, battle stats, ball minigame | evolution by age, natures, sickness, abilities, no battles or minigame |
+| Growing up | +1 level per hour, evolution by level, battle stats, ball minigame | evolution by age, a day of Mega Evolution, natures, sickness, abilities, no battles |
+| Tournament | — | eleven events against two random Pokémon (track, pool, jumps, weights, climbing, diving, skating, torch run, trail run), played by stats and type, no fighting |
+| Gyms | — | 8 gyms per region (72), 3-on-3 team events against the leaders and their anime Pokémon, badges, Elite Four and Champion |
+| Fun | — | orchard, fishing, mining and treasure hunts by type; cost chess points, give fruits that raise training, eggs and Mega Stone shards |
 | On its own | — | behaviour planner, speech bubbles, self-care when plugged in |
 | Collection | Pokédex gallery, streak, bond, medals | adds farm, album, stats page, accessories |
-| Points | — | chess.com games, steps, region rewards → shop |
+| Points | — | chess.com games, steps (also from an iPhone), region rewards → shop |
 | World | biome and time-of-day backgrounds | real weather, sunrise/sunset, seasons, holidays, region landscapes |
 | Extras | battery, dimming, web installer | adds standby clock, NTP time, daily SD backup, optional Stack-chan control |
 
@@ -166,7 +169,7 @@ From the main screen:
 | Gesture | Opens |
 |---|---|
 | swipe **right** | Pokédex: one cover per region, swipe on to the next region, tap a cover to open its grid (up/down for pages, tap a Pokémon for details) |
-| swipe **left** | farm (album button at the bottom) |
+| swipe **left** | activities: the farm (album button at the bottom), the tournament, the gyms and fun |
 | swipe **up** | the pet's card: profile, abilities, medals (swipe left/right for pages) |
 | swipe **down** | settings: clock, temperature unit (°C/°F), sound, Wi-Fi, language, restore backup, stats, screen brightness (three levels), sync chess now |
 | tap the **points** at the top | shop (items, eggs, accessories) |
@@ -234,7 +237,8 @@ You start with 10 points. Basic care is free.
   changing the username, only records your current marks.
 - **Steps** from the accelerometer, also with the screen off (not while the
   board is switched off with a long press): 1 point per 1000 steps (5 a day at
-  most).
+  most), and 10 more the day you reach 10,000. An iPhone can send its own count
+  (see [Steps from an iPhone](#steps-from-an-iphone)); the higher of the two counts.
 - Completing a region's Pokédex: 200 points, a crown and a shiny legendary egg
   from that region.
 - A small daily farm harvest after 07:00.
@@ -245,13 +249,24 @@ You start with 10 points. Basic care is free.
 | Medicine | 3 |
 | Stamina potion / vitality potion | 5 each |
 | Evolution potion | 100 |
+| Mega Stone (also from a tournament gold, one a day) | 150 |
 | Shiny charm | 50 |
 | Common / rare / legendary egg | 10 / 30 / 100 |
 | Accessories (bow, flower, cap, witch hat, top hat, crown) | 15-80 |
 
-Eggs can only be opened when you have no partner.
+Eggs can only be opened when you have no partner. Swipe left in the shop for the
+bag, then the **harvest** (what you get from [Fun](#fun)), then accessories.
 
 <table><tr><td align="center"><img src="docs/screenshots/en/shop.png" width="220" alt="Shop"><br>Shop</td><td align="center"><img src="docs/screenshots/en/bag.png" width="220" alt="Bag"><br>Bag</td><td align="center"><img src="docs/screenshots/en/accessories.png" width="220" alt="Accessories"><br>Accessories</td></tr></table>
+
+### Surprises in the grass
+
+Now and then a tuft of grass rustles on the ground of the main screen: tap it to
+find what's hidden there. One a day (two candies, a medicine, a potion or a
+common egg), one a week from Monday (a rare egg, a shiny charm or both potions,
+with blue sparkles) and one a month (a legendary egg, a Mega Stone or an
+evolution potion, with gold sparkles). The most valuable one shows first. They
+never give points.
 
 ### Pokédex, farm and album
 
@@ -270,6 +285,110 @@ Eggs can only be opened when you have no partner.
 <table><tr><td align="center"><img src="docs/screenshots/en/dex_cover.png" width="220" alt="Region cover"><br>Region cover</td><td align="center"><img src="docs/screenshots/en/dex_locked.png" width="220" alt="Locked region"><br>Locked region</td><td align="center"><img src="docs/screenshots/en/dex_grid.png" width="220" alt="Region grid"><br>Region grid</td></tr></table>
 
 <table><tr><td align="center"><img src="docs/screenshots/en/dex_detail.png" width="220" alt="Pokédex entry"><br>Pokédex entry</td><td align="center"><img src="docs/screenshots/en/farm.png" width="220" alt="Farm"><br>Farm</td><td align="center"><img src="docs/screenshots/en/album.png" width="220" alt="Album"><br>Album</td></tr></table>
+
+### Tournament
+
+Swipe left from the main screen and tap **Tournament**, then pick one of the eleven events. Your
+companion competes against two Pokémon drawn at random, each at the event's own
+venue. Nobody taps and nobody fights: it plays out by itself.
+
+Who does well depends on what each Pokémon is: its species' stats (each event
+weighs them its own way), its genes and training, its evolution stage, Mega
+Evolution (+15%) and its type. Rivals get random genes and training, and every
+event has a bit of luck, so the strongest doesn't always win.
+
+| Event | What counts | Type bonus | Venue |
+|---|---|---|---|
+| 100m dash | speed | Electric +15%, Fighting +10% (Rock, Steel -10%) | running track with stands |
+| Hurdles | speed and spring | Fighting +15%, Bug +10% (Rock, Steel -10%) | track with hurdles |
+| 50m swim | speed and stamina | Water +25%, Ice +10% (Fire, Rock -15%) | pool with lane ropes |
+| Long jump | power and speed | Fighting, Flying +15% (Rock, Steel -10%) | run-up, board and sand pit |
+| High jump | power | Flying +25%, Psychic +15% (Rock, Steel -15%) | bar and mat |
+| Weights | power and steadiness | Fighting +20%, Steel, Rock +15% (Flying, Fairy, Bug -10%) | stage with spotlights |
+| Climbing | power and agility | Rock +20%, Ground +15%, Bug +10% (Water, Steel -10%) | climbing wall |
+| Diving | technique | Water +20%, Psychic, Flying, Fairy +10% (Fire, Rock -15%) | platform and pool |
+| Skating | speed | Ice +25%, Fairy +10% (Fire -15%) | ice rink |
+| Torch run | stamina | Fire +25%, Dragon +10% (Water, Ice -10%) | city road |
+| Trail run | a bit of everything | Dark, Ghost +15%, Poison, Grass +10% (Steel, Rock -10%) | forest trail with logs |
+
+A gold medal cheers it up and, the first one each day, gives a **Mega Stone**.
+Competing tires it a little; it can't take part asleep, sick or very tired.
+
+### Gyms
+
+Swipe left from the main screen and tap **Gyms**. Every region has 8 gyms (72 in
+all) with the leaders and badges from the games, and three Pokémon each leader
+used in the anime. It's still sport, not battles: each gym picks the three
+events that suit its type best, and it's a 3-on-3 team contest.
+
+- Your team is your companion plus two Pokémon you pick from the farm (you need
+  at least two there). Before starting you can swap who does which event; the
+  leader puts each of theirs where they do best.
+- Each event is one against one: win two of the three and the badge is yours.
+- Gyms open with their region and go in order: you need the badge of the one
+  before. One try per gym per day.
+- Each gym is harder than the last: the leaders' Pokémon get better genes and
+  more training.
+- Badges 2, 4 and 6 of a region also give a rare egg, badge 8 a legendary egg.
+- With all 8 badges the region's **League** opens: the Elite Four and then the
+  Champion, one after the other (one try a day). The first win gives a
+  legendary egg and a Shiny Charm.
+
+The gym list is also the badge case: swipe left/right to change region.
+
+### Fun
+
+Swipe left from the main screen and tap **Fun**. There are four activities and
+every type has one. Your companion goes if it's the right type (awake, healthy
+and not too tired); otherwise you pick one of the right type from the farm, so
+collecting different types pays off.
+
+| Activity | Types | Cost | How | What you get |
+|---|---|---|---|---|
+| Orchard | Grass, Bug, Ground, Poison, Fairy | 8 per plot | 3 plots in real time: plant, water once (ripe in 12 h, 24 h if not watered), harvest | 2-3 fruits |
+| Fishing | Water, Ice, Dragon | 5 | cast, then tap when the float dips | fish, pearls, now and then a water-type egg |
+| Mining | Rock, Steel, Fighting, Fire | 10 | tap the rock until it breaks | Mega Stone shards (10 make a stone), sometimes a fossil egg |
+| Treasure | Normal, Flying, Electric, Psychic, Ghost, Dark | 8 | it sets off for an hour, then you collect | candy, medicine, potions, an accessory, rarely a shiny charm |
+
+Fun **costs points and never gives any**: points still come from chess. Chess
+also brings luck the same day: if you played, one more thing from every
+activity; if you won, the rare finds are twice as likely.
+
+- **Fruits** raise training: stamina fruit, resistance fruit and vitality fruit
+  +3 each, the gold fruit +3 to all three and full joy. Up to 3 a day per
+  Pokémon raise anything (after that they're just a snack). Training helps in
+  the tournament and the gyms, and farm Pokémon can eat fruits too (tap one at
+  the top of their page in the farm), since gym teammates use their own training.
+- **Fish** fills it up, a **pearl** makes it very happy. Fish and fruits are also in the
+  **Feed** menu (a second row, when you have some).
+- While the companion is out on a treasure hunt, the main screen shows a sign
+  with the minutes left.
+
+### Mega Evolution
+
+Use a **Mega Stone** from the bag: the 41 species that have Mega sprites in PMD
+SpriteCollab (Charizard X, Mewtwo Y, Gengar, Lucario, Rayquaza...) Mega Evolve
+for 24 hours, then change back. The stone isn't used up if your companion has
+no Mega form. The sprites are `mons/mNNN.bin` on the SD (`tools/pack_pmd.py mega`).
+
+### Steps from an iPhone
+
+The board can take the day's steps from the iPhone's Health app (handy when the
+board stays at home). It has to be plugged in and on the home Wi-Fi; the phone on
+the same network. The code is on the stats page (settings → stats → "Phone
+steps code").
+
+In the **Shortcuts** app: Automation → New Automation → **Time of Day** (for
+example 9:00 PM, daily) → Run Immediately, with these actions:
+
+1. **Find Health Samples** where Type is **Steps** and Start Date is **Today**.
+2. **Calculate Statistics**: **Sum** of the Health Samples.
+3. **Get Contents of URL**: `http://tamapoke.local/steps?n=` + the Sum + `&k=` + your code.
+
+The first time iOS asks to allow local network access: allow it. Health data is
+locked while the phone is locked, so pick a time when it's usually in use (or
+run the shortcut by hand). The board keeps the higher of the phone's count and
+its own, so nothing is counted twice.
 
 ### World and power
 
