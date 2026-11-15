@@ -111,6 +111,9 @@ void funPractice(int act) {
   }
   hubOpen = funOpen = true;
   fnPractice = true;
+  memset(prPlot, 0, sizeof(prPlot));  // cada practica empieza de cero (huerto vacio, nadie fuera)
+  prWet = 0;
+  prQuest = 0;
   fnAct = act;
   countWho();
   listCands(act);
@@ -375,10 +378,10 @@ static void funPickTap(int16_t x, int16_t y) {
 // ---------- huerto ----------
 
 #define GD_Y 236
-#define GD_W 86
+#define GD_W 96  // "HARVEST" y "WATERED" (7 letras) caben a tamaño 2
 #define GD_H 66
 #define GD_BTN (GD_Y + GD_H + 30)
-static int plotX(int p) { return CX - 129 + p * 92; }
+static int plotX(int p) { return CX - 148 + p * 100; }
 
 static void drawPlot(int p, uint32_t now) {
   int x = plotX(p), y = GD_Y, cx = x + GD_W / 2;

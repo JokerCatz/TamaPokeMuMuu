@@ -10,3 +10,8 @@ bool backupInfo(uint32_t &wallEpoch);  // ¿hay copia? y de cuando
 // vuelca la copia en la NVS (borra antes esos espacios). Despues hay que
 // reiniciar sin guardar nada mas (la mascota en RAM es la de antes).
 bool backupRestore();
+
+// el compañero que habia cuando se hizo la copia, como ficha de la granja (sin tocar la
+// partida actual): para recuperar a uno que se fue (despedida sin querer). now: hora local
+struct PetRec;
+bool backupPetRec(PetRec &r, uint32_t now);

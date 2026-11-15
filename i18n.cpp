@@ -11,7 +11,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
   {
     "Evolving!", "Yum yum!", "It likes it!", "It's hungry!", "Needs a bath!",
     "Worn out...", "Feeling sad...", "A bit chubby...", "It's SHINY!!", "It's happy",
-    "THANKS! Farewell", "It ran away...", "Bye! Waving goodbye...",
+    "THANKS! See you at the farm", "It ran away...", "Bye! Waving goodbye...",
     "EGG", "Legendary egg!?", "Rare egg!", "Tap the egg...", "It moves!", "Almost there!",
     "POKEDEX %u/1025",
     "%s%s Lv.%u",
@@ -28,8 +28,8 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "Ready to evolve!", "All needs >=40 to evolve",
     "Evolves in %ud %uh", "Slip-ups: %u",
     "SND ON", "SND OFF",
-    "EVOLVE!", "%s wants to tell you...", "%s feels abandoned...",
-    "Evolve?", "Keep form", "Say goodbye?", "Goodbye", "Stay together",
+    "EVOLVE!", "%s wants to retire", "%s feels abandoned...",
+    "Evolve?", "Keep form", "Retire to the farm?", "To the farm", "Stay together",
     "Choose your starter",
     "No sprites", "Load them onto the SD",
 
@@ -61,7 +61,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "Loves the rain!", "Hates the rain...", "Snow! Yay!", "Brr... so cold", "Lovely sunshine!",
     "STEPS TODAY %lu",
     "ALBUM", "ALBUM %d", "No memories yet",
-    "Farewell", "Ran away", "Released", "To the farm",
+    "Retired to the farm", "Ran away", "Released", "To the farm",
     "Easygoing", "Glutton", "Playful", "Tidy", "Lazy",
     "Good morning!", "Getting sleepy...", "I want a berry...", "Bath time?", "Play with me!",
     "So tired...", "You won %u games!", "Good games yesterday!", "I love you, %s!", "Hi!",
@@ -131,6 +131,9 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "or train with fruits", "Badges", "League titles", "Fun finds",
     "%u h", "%u min",
     "Buy for %u pts?", "Spend %u pts?",
+    "POINTS  %ld", "This week", "Chess +%u (won %u)", "Steps +%u  Hockey +%u  Other +%u", "Shop -%u  Fun -%u",
+    "Last week: +%u  -%u", "Most points came from chess!", "Play chess to earn more", "LAST WEEK", "Chess +%u, spent %u",
+    "HOCKEY", "%u min today, +%u pts", "%u min today (max reached)",
   },
   // ---------------- ZH ----------------
   // Chino simplificado. Los especificadores van en el orden de la fila
@@ -139,7 +142,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
   {
     "正在进化！", "好吃！", "它很喜欢！", "肚子饿了！", "该洗澡了！",
     "累坏了...", "好难过...", "有点胖了...", "是异色！！", "心情很好",
-    "谢谢！再见", "它离家出走了...", "拜拜！挥手告别...",
+    "谢谢！农场见", "它离家出走了...", "拜拜！挥手告别...",
 
     "蛋", "传说之蛋！？", "稀有的蛋！", "摸摸蛋...", "动了！", "快孵出来了！",
 
@@ -173,9 +176,9 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
 
     "声音开", "声音关",
 
-    "进化！", "%s有话想说...", "%s觉得被冷落了...",
+    "进化！", "%s想去农场养老了", "%s觉得被冷落了...",
 
-    "要进化吗？", "保持原样", "要告别吗？", "再见", "继续在一起",
+    "要进化吗？", "保持原样", "要送它去农场养老吗？", "去农场养老", "继续在一起",
 
     "选择你的初始宝可梦",
 
@@ -215,7 +218,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
 
     "回忆录", "回忆录 %d", "还没有回忆",
 
-    "告别", "离家出走", "放生", "进了农场",
+    "去农场养老了", "离家出走", "放生", "进了农场",
 
     "性格：乖巧", "性格：贪吃", "性格：爱玩", "性格：爱干净", "性格：懒洋洋",
 
@@ -298,6 +301,9 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "或者吃果子练训练值", "徽章总数", "联盟冠军", "趣玩收获",
     "%u 小时", "%u 分钟",
     "花 %u 分购买？", "花 %u 分？",
+    "积分本  %ld分", "本周", "下棋 +%u（赢 %u 盘）", "走路 +%u  冰球 +%u  其他 +%u", "商店 -%u  趣玩 -%u",
+    "上周：赚 %u  花 %u", "积分大多来自下棋，加油！", "多下几盘棋，积分会更多", "上周积分", "下棋赚 %u 分，花了 %u 分",
+    "冰球练习", "今天 %u 分钟，+%u 分", "今天 %u 分钟，今天的分已拿满",
   },
 };
 

@@ -11,4 +11,7 @@ void phoneStepsLoop();     // tarea de red, conectada: arranca el servidor si ha
 void phoneStepsStop();     // tarea de red: al desconectar o abrir el portal
 bool phoneStepsOn();
 bool phoneStepsTake(uint32_t &n);  // bucle principal: los pasos que llegaron (una vez)
+// Practica de hockey (SuperDeker): otro Atajo pregunta los minutos y llama a
+// http://tamapoke.local/hockey?min=MINUTOS&k=CODIGO (el mismo codigo). Se van sumando
+bool phoneHockeyTake(uint16_t &min);  // bucle principal: los minutos que llegaron desde la ultima vez
 uint16_t phoneStepsCode();         // el codigo (se crea al azar la primera vez, NVS "phone")

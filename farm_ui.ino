@@ -35,6 +35,18 @@ void drawAskBox(const char *l1, const char *l2) {
 }
 int askTap(int16_t x, int16_t y) { return (x >= 118 && x <= 218 && y >= 252 && y <= 304) ? 1 : 0; }
 
+// despedida (al final de su ciclo): se va a vivir a la granja, no desaparece. Antes se iba del
+// todo y un toque sin querer a "despedirse" lo perdia. Si no se puede guardar, no se despide
+void farewellToFarm() {
+  if (pet.isEgg() || pet.ceremony) return;
+  if (!farmReady()) { toast(T(S_NEED_SD)); return; }
+  PetRec r;
+  pet.exportRec(r);
+  r.farDeclinedAge = r.ageMinutes + 1440;  // si vuelve a salir, no lo pide enseguida
+  if (!farmPut(pet, r)) { toast(T(S_NEED_SD)); return; }
+  pet.startFarewell();
+}
+
 // RECOGER: guarda al compañero tal cual en la granja y se despide hacia alla
 void collectCurrent() {
   if (pet.isEgg() || pet.ceremony) return;
@@ -207,6 +219,8 @@ void farmSwipe(int dir) {
 #define FF_Y 128
 static PetRec farmRec;        // la ficha (SD) del que se esta viendo: tipo y capacidades
 static bool farmRecOk = false;
+static PetRec farmUndo;       // la ficha de antes de la ultima fruta (consola FARMUNDO, pruebas)
+static bool farmUndoOk = false;
 static int fruitRowX(int k) { return CX - 96 + k * 64; }
 static bool hasStatFruit() {
   for (int k = 0; k < 4; k++)
@@ -221,6 +235,8 @@ static void feedFarmFruit(int idx, uint8_t item) {
   if (r.fruitDay8 != hoy) { r.fruitDay8 = hoy; r.fruitCnt = 0; }
   if (r.fruitCnt >= FRUITS_PER_DAY) { toast(T(S_FRUIT_FULL)); return; }
   if (!fruitRaise(item, r.trAtk, r.trDef, r.trSpe)) { toast(T(S_MAXED)); return; }
+  farmUndo = farmRec;  // como estaba (farmRec: leida al abrir la ficha)
+  farmUndoOk = farmRecOk;
   r.fruitCnt++;
   if (!farmPut(pet, r)) return;
   farmRec = r;
@@ -267,6 +283,15 @@ void farmTap(int16_t x, int16_t y) {
   farmDetail = idx;
   galleryPmd.load(farmAt(idx).speciesId, farmAt(idx).shiny);
   farmRecOk = farmPeek(farmAt(idx).speciesId, farmRec);
+}
+
+// consola FARMUNDO: deja como estaba al ultimo de la granja al que se le dio una fruta
+bool farmUndoFruit() {
+  if (!farmUndoOk) return false;
+  farmUndoOk = false;
+  if (!farmPut(pet, farmUndo)) return false;
+  farmRec = farmUndo;
+  return true;
 }
 
 void renderFarm() {

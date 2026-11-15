@@ -2152,6 +2152,82 @@ TEST(fun, se_guarda_el_ocio) {
   CHECK(!b.questAway());
 }
 
+// ---------------------------------------------------------------- libro de puntos
+TEST(points, el_libro_apunta_de_donde_vienen_y_en_que_se_gastan) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;  // sabado (5: lunes es 0)
+  p.points = 0;
+  p.earn(11, PT_CHESS);
+  p.earn(5, PT_STEPS);
+  p.addPoints(3);              // consola, region, granja...: "otros"
+  CHECK_EQ((int)p.points, 19);
+  CHECK(p.buy(ITEM_CANDY));    // 2
+  CHECK(p.spend(5));           // ocio
+  CHECK_EQ((int)p.ptNow.cat[PT_CHESS], 11);
+  CHECK_EQ((int)p.ptNow.cat[PT_STEPS], 5);
+  CHECK_EQ((int)p.ptNow.cat[PT_OTHER], 3);
+  CHECK_EQ((int)p.ptNow.cat[PT_SHOP], 2);
+  CHECK_EQ((int)p.ptNow.cat[PT_FUN], 5);
+  CHECK_EQ((int)p.ptNow.dayIn[5], 19);
+  CHECK_EQ((int)p.ptNow.dayOut[5], 7);
+  CHECK_EQ((int)p.ptNow.dayIn[4], 0);
+  p.chessPtsTotal += 11;
+  p.chessMedals(2, false);
+  CHECK_EQ((int)p.ptNow.wins, 2);
+}
+
+TEST(points, hockey_un_punto_cada_5_minutos_y_tope_diario) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  p.points = 0;
+  CHECK_EQ((int)p.hockey(4), 0);    // aun no llega a 5
+  CHECK_EQ((int)p.hockey(8), 2);    // 12 minutos: 2
+  CHECK_EQ((int)p.hockey(20), 4);   // 32: 6, el tope
+  CHECK_EQ((int)p.hockey(30), 0);   // ya tiene los 6 de hoy
+  CHECK_EQ((int)p.points, 6);
+  CHECK_EQ((int)p.ptNow.cat[PT_HOCKEY], 6);
+  CHECK_EQ((int)p.ptNow.cat[PT_OTHER], 0);
+  p.lastSeenEpoch += 86400;         // otro dia: vuelve a contar
+  CHECK_EQ((int)p.hockey(10), 2);
+  p.rename("X");  // guarda
+  Pet b;
+  b.begin();
+  b.lastSeenEpoch = p.lastSeenEpoch;
+  CHECK_EQ((int)b.hockeyMin, 10);
+  CHECK_EQ((int)b.hockey(10), 2);   // sigue sumando desde los 10 guardados
+}
+
+TEST(points, la_semana_siguiente_trae_el_resumen) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  p.earn(20, PT_CHESS);
+  CHECK(!p.ptReport);
+  p.lastSeenEpoch += 86400;   // domingo: la misma semana
+  p.earn(5, PT_STEPS);
+  CHECK_EQ((int)p.ptNow.cat[PT_CHESS], 20);
+  CHECK(!p.ptReport);
+  p.lastSeenEpoch += 86400;   // lunes: semana nueva
+  p.ptRoll();
+  CHECK(p.ptReport);
+  CHECK_EQ((int)p.ptLast.cat[PT_CHESS], 20);
+  CHECK_EQ((int)p.ptLast.cat[PT_STEPS], 5);
+  CHECK_EQ((int)p.ptNow.cat[PT_CHESS], 0);
+  p.rename("X");  // guarda
+  Pet b;
+  b.begin();
+  b.lastSeenEpoch = p.lastSeenEpoch;
+  CHECK(b.ptReport);
+  CHECK_EQ((int)b.ptLast.cat[PT_CHESS], 20);
+  p.ptReport = false;
+  p.lastSeenEpoch += 15 * 86400;  // dos semanas sin nada: no hay resumen de una semana vacia
+  p.ptRoll();
+  CHECK(!p.ptReport);
+  CHECK_EQ((int)p.ptLast.cat[PT_CHESS], 0);
+}
+
 // ---------------------------------------------------------------- album
 TEST(memoir, cada_final_deja_una_pagina) {
   Pet p;

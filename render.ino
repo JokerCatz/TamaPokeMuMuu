@@ -371,19 +371,31 @@ static void drawStatusRow() {
   gPtsX1 = x + wp;
 }
 
+// texto con un borde alrededor (para leerse encima del paisaje: luna, nubes, hojas que caen)
+static void printOutlined(const char *s, int x, int y, uint16_t col, uint16_t borde, int g) {
+  gfx->setTextColor(borde);
+  for (int dy = -g; dy <= g; dy += g)
+    for (int dx = -g; dx <= g; dx += g)
+      if (dx || dy) {
+        setCur(x + dx, y + dy);
+        printT(s);
+      }
+  gfx->setTextColor(col);
+  setCur(x, y);
+  printT(s);
+}
+
 void drawHeader(const char *name, uint16_t nameColor, const char *msg) {
   drawStatusRow();
-  gfx->setTextColor(nameColor);
-  // arriba la pantalla redonda solo deja ~290 px: un nombre largo (MEGA ..., apodos) baja a 2
+  // arriba la pantalla redonda solo deja ~290 px: un nombre largo (MEGA ..., apodos) baja a 2.
+  // Con borde: un nombre ingles largo pasaba por encima de la luna y no se leia
+  uint16_t borde = gNight ? UI_BG_NIGHT : UI_WHITE;
   setSize(3);
   int ts = textW(name, 3) <= 290 ? 3 : 2;
   setSize(ts);
-  setCur(centerX(name, ts), ts == 3 ? 52 : 58);
-  printT(name);
-  gfx->setTextColor(inkColor());
+  printOutlined(name, centerX(name, ts), ts == 3 ? 52 : 58, nameColor, borde, 2);
   setSize(2);
-  setCur(centerX(msg, 2), 90);
-  printT(msg);
+  printOutlined(msg, centerX(msg, 2), 90, inkColor(), borde, 1);
   uint8_t luck = pet.isEgg() ? LUCK_NONE : pet.chessLuck();
   if (luck) drawClover(centerX(msg, 2) - (msg[0] ? 18 : 0), 98, luck == LUCK_WON);  // hoy se jugo al ajedrez
 }

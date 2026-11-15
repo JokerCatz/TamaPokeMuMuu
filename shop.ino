@@ -130,9 +130,9 @@ void closeShop() { shopOpen = false; }
 
 void shopSwipe(int dir) {
   if (shopAsk >= 0) { shopAsk = -1; shopDirty = true; return; }  // deslizar cancela la compra
-  int np = shopPage - dir;  // a la izquierda: tienda -> mochila -> cosecha (ocio) -> complementos
+  int np = shopPage - dir;  // a la izquierda: tienda -> mochila -> cosecha (ocio) -> complementos -> libro
   if (np < 0) { closeShop(); return; }
-  if (np > 3) np = 3;
+  if (np > 4) np = 4;
   if (np != shopPage) { shopPage = np; shopDirty = true; }
 }
 
@@ -209,7 +209,12 @@ void shopTap(int16_t x, int16_t y) {
     }
     return;
   }
-  if (y < 72) { closeShop(); return; }  // cabecera = salir
+  if (y < 72) {  // cabecera: los puntos (a la derecha, en la tienda) abren el libro; lo demas, salir
+    if (shopPage == 0 && x > CX) { shopPage = 4; shopDirty = true; }
+    else closeShop();
+    return;
+  }
+  if (shopPage == 4) return;  // el libro solo se mira
   if (x < SHOP_X0 || y < SHOP_Y0) return;
   int c = (x - SHOP_X0) / SHOP_W, r = (y - SHOP_Y0) / SHOP_H;
   if (c > 1 || r > 4) return;
@@ -247,6 +252,57 @@ void shopTap(int16_t x, int16_t y) {
   shopDirty = true;
 }
 
+// libro de puntos: esta semana dia a dia (ganados en verde, gastados en naranja), de donde
+// vienen y en que se van, la semana pasada y un empujon al ajedrez
+static void renderBook() {
+  pet.ptRoll();  // por si cambio de semana sin apuntar nada
+  const PtsWeek &w = pet.ptNow;
+  gfx->setTextColor(UI_HINT);
+  setSize(2);
+  setCur(centerX(T(S_THIS_WEEK), 2), 84);
+  printT(T(S_THIS_WEEK));
+  int mx = 10;
+  for (int d = 0; d < 7; d++) {
+    if (w.dayIn[d] > mx) mx = w.dayIn[d];
+    if (w.dayOut[d] > mx) mx = w.dayOut[d];
+  }
+  const int x0 = CX - 147, base = 196, hmax = 86;
+  uint8_t hoy = ptWeekday(pet.dayNow());
+  for (int d = 0; d < 7; d++) {
+    int gx = x0 + d * 42, hi = w.dayIn[d] * hmax / mx, ho = w.dayOut[d] * hmax / mx;
+    if (hi) gfx->fillRect(gx + 8, base - hi, 12, hi, UI_BAR_OK);
+    if (ho) gfx->fillRect(gx + 22, base - ho, 12, ho, UI_BAR_WARN);
+    const char *l = T((StrId)(S_WD_0 + (d + 1) % 7));  // d = 0 es el lunes; S_WD_0 es el domingo
+    gfx->setTextColor(d == hoy ? UI_INK : UI_HINT);
+    setCur(gx + 21 - textW(l, 2) / 2, base + 6);
+    printT(l);
+  }
+  gfx->drawFastHLine(x0 + 4, base, 42 * 7 - 8, UI_INK);
+  char l[48];
+  gfx->setTextColor(C565(0x3c, 0x8a, 0x4c));
+  snprintf(l, sizeof(l), T(S_BOOK_CHESS_FMT), w.cat[PT_CHESS], w.wins);
+  setCur(centerX(l, 2), 230);
+  printT(l);
+  snprintf(l, sizeof(l), T(S_BOOK_IN_FMT), w.cat[PT_STEPS], w.cat[PT_HOCKEY], w.cat[PT_OTHER]);
+  setCur(centerX(l, 2), 256);
+  printT(l);
+  gfx->setTextColor(C565(0xb0, 0x60, 0x10));
+  snprintf(l, sizeof(l), T(S_BOOK_OUT_FMT), w.cat[PT_SHOP], w.cat[PT_FUN]);
+  setCur(centerX(l, 2), 282);
+  printT(l);
+  const PtsWeek &p = pet.ptLast;
+  unsigned in = p.cat[PT_CHESS] + p.cat[PT_STEPS] + p.cat[PT_HOCKEY] + p.cat[PT_OTHER], out = p.cat[PT_SHOP] + p.cat[PT_FUN];
+  gfx->setTextColor(UI_HINT);
+  snprintf(l, sizeof(l), T(S_BOOK_LAST_FMT), in, out);
+  setCur(centerX(l, 2), 308);
+  printT(l);
+  unsigned gan = w.cat[PT_CHESS] + w.cat[PT_STEPS] + w.cat[PT_HOCKEY] + w.cat[PT_OTHER];
+  const char *m = T(w.cat[PT_CHESS] && w.cat[PT_CHESS] * 2 >= gan ? S_BOOK_CHESS_TOP : S_BOOK_MORE_CHESS);
+  gfx->setTextColor(UI_INK);
+  setCur(centerX(m, 2), 342);
+  printT(m);
+}
+
 void renderShop() {
   bool avisando = toastMsg && timeLeft(toastUntil);
   if (!shopDirty && !avisando) return;
@@ -255,6 +311,7 @@ void renderShop() {
   gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
   char head[32];
   if (shopPage == 0) snprintf(head, sizeof(head), T(S_SHOP_FMT), (long)pet.points);
+  else if (shopPage == 4) snprintf(head, sizeof(head), T(S_BOOK_FMT), (long)pet.points);
   else snprintf(head, sizeof(head), "%s", T(shopPage == 1 ? S_BAG : shopPage == 2 ? S_REAP : S_ACCESSORIES));
   gfx->setTextColor(UI_INK);
   setSize(3);
@@ -309,10 +366,11 @@ void renderShop() {
     setCur(x + SHOP_W - 8 - textW(own, 2), y + 37);
     printT(own);
   }
-  // paginas: tienda / mochila / cosecha / complementos
-  for (int i = 0; i < 4; i++) {
-    if (i == shopPage) gfx->fillCircle(CX - 30 + i * 20, 394, 5, UI_INK);
-    else gfx->drawCircle(CX - 30 + i * 20, 394, 4, UI_INK);
+  if (shopPage == 4) renderBook();
+  // paginas: tienda / mochila / cosecha / complementos / libro
+  for (int i = 0; i < 5; i++) {
+    if (i == shopPage) gfx->fillCircle(CX - 40 + i * 20, 394, 5, UI_INK);
+    else gfx->drawCircle(CX - 40 + i * 20, 394, 4, UI_INK);
   }
   if (shopAsk >= 0) {  // ¿comprar?
     char l2[40];

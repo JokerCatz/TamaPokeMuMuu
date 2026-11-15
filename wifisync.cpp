@@ -434,7 +434,7 @@ static bool chessSyncLocked(Pet &pet, ChessReport &rep) {
   chessSaveReport(rep, pared / 86400);
   if (rep.total() > 0) {
     pet.chessPtsTotal += rep.total();
-    pet.addPoints(rep.total());
+    pet.earn(rep.total(), PT_CHESS);  // al libro de puntos como ajedrez
   }
   pet.chessMedals(rep.wins, rep.newBestRapid || rep.newBestDaily || rep.hundreds ||
                                 rep.newTactics || rep.newRush);

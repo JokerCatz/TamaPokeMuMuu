@@ -322,6 +322,45 @@ void handleSerial() {
     if (n >= 0 && n < EV_COUNT) sportsPractice(n);
     else if (chOpen) sportsSwipe(1);
     Serial.println("DONE");
+  } else if (line.startsWith("LUCK ")) {  // LUCK 0/1/2: hoy "sin / jugo / gano" al ajedrez; LUCK -1 deja lo de antes
+    static uint16_t d0, w0;
+    static bool guardado = false;
+    int n = line.substring(5).toInt();
+    if (n < 0) {
+      if (guardado) { pet.chessDay = d0; pet.chessWinDay = w0; guardado = false; }
+    } else {
+      if (!guardado) { d0 = pet.chessDay; w0 = pet.chessWinDay; guardado = true; }
+      pet.chessDay = n >= 1 ? pet.dayNow() : 0;
+      pet.chessWinDay = n >= 2 ? pet.dayNow() : 0;
+    }
+    Serial.printf("suerte=%u\n", pet.chessLuck());
+    Serial.println("DONE");
+  } else if (line.startsWith("BKFARM")) {  // BKFARM: quien hay en la copia de la SD; BKFARM 1: a la granja
+    PetRec r;
+    if (!backupPetRec(r, pet.lastSeenEpoch)) {
+      Serial.println("copia: no se puede leer");
+    } else {
+      Serial.printf("copia: dex=%d nv=%u edad=%lu min genes=%u/%u/%u tr=%u/%u/%u vinculo=%u medallas=0x%X shiny=%u apodo=%s\n",
+                    r.speciesId, levelOfAge(r.ageMinutes), (unsigned long)r.ageMinutes, r.geneAtk, r.geneDef,
+                    r.geneSpe, r.trAtk, r.trDef, r.trSpe, r.bond, r.medals, r.shiny, r.nick);
+      if (line.endsWith(" 1")) {
+        bool ya = pet.speciesId == r.speciesId;
+        for (int i = 0; i < farmCount() && !ya; i++) ya = farmAt(i).speciesId == r.speciesId;
+        if (ya) Serial.println("ya hay uno de esa especie (companero o granja): no se toca nada");
+        else Serial.printf("a la granja: %s\n", farmPut(pet, r) ? "ok" : "ERROR");
+      }
+    }
+    Serial.println("DONE");
+  } else if (line == "HKCLEAR") {  // borra los minutos de hockey de hoy (pruebas; los puntos ya dados no)
+    pet.hockeyMin = 0;
+    pet.hockeyPts = 0;
+    Serial.println("DONE");
+  } else if (line == "WEEKFX") {  // el cartel del resumen de la semana, otra vez (pruebas)
+    pet.ptReport = true;
+    Serial.println("DONE");
+  } else if (line == "FARMUNDO") {  // deshace la ultima fruta dada a uno de la granja (pruebas)
+    Serial.printf("granja deshecha=%d\n", farmUndoFruit());
+    Serial.println("DONE");
   } else if (line.startsWith("GRASSFX ")) {  // GRASSFX s: la mata de la hierba se ve s segundos (solo se ve)
     grassFxUntil = millis() + line.substring(8).toInt() * 1000UL;
     Serial.println("DONE");
@@ -469,7 +508,7 @@ void handleSerial() {
     Serial.printf("streak=%u bond=%u medals=0x%X\n", pet.streak, pet.bond, pet.medals);
     Serial.println("DONE");
   } else if (line == "BYE") {
-    pet.startFarewell();
+    farewellToFarm();
     Serial.println("DONE");
   } else if (line == "RUN") {
     pet.startRunaway();

@@ -1,5 +1,6 @@
 #include "backup.h"
 #include "sdmon.h"
+#include "pet.h"
 #include <Arduino.h>
 #include <FS.h>
 #include <SD_MMC.h>
@@ -113,6 +114,48 @@ bool backupInfo(uint32_t &wallEpoch) {
   if (!openBackup(f, wallEpoch, count)) return false;
   f.close();
   return count > 0;
+}
+
+bool backupPetRec(PetRec &r, uint32_t now) {
+  File f;
+  uint32_t epoch;
+  uint16_t count;
+  if (!openBackup(f, epoch, count) || count == 0) return false;
+  memset(&r, 0, sizeof(r));
+  r.ver = PET_REC_VER;
+  r.speciesId = -1;
+  static uint8_t buf[1024];
+  bool ok = true;
+  for (uint16_t i = 0; i < count && ok; i++) {
+    uint8_t ns, type, kl;
+    char key[16];
+    uint16_t len;
+    ok = get(f, &ns, 1) && get(f, &type, 1) && get(f, &kl, 1) && kl < sizeof(key) && get(f, key, kl) &&
+         get(f, &len, 2) && len <= sizeof(buf) && get(f, buf, len);
+    if (!ok || ns != 0) continue;  // solo "tamapoke"
+    key[kl] = 0;
+    uint8_t u8 = buf[0];
+    uint16_t u16 = len >= 2 ? (uint16_t)(buf[0] | buf[1] << 8) : 0;
+    uint32_t u32 = len >= 4 ? (uint32_t)(buf[0] | buf[1] << 8 | buf[2] << 16 | (uint32_t)buf[3] << 24) : 0;
+    struct { const char *k; uint8_t *p; } U8[] = {
+      { "shy", &r.shiny }, { "full", &r.fullness }, { "joy", &r.joy }, { "ene", &r.energy }, { "hyg", &r.hygiene },
+      { "poop", &r.poops }, { "wgt", &r.weight }, { "gatk", &r.geneAtk }, { "gdef", &r.geneDef },
+      { "gspe", &r.geneSpe }, { "tatk", &r.trAtk }, { "tdef", &r.trDef }, { "tspe", &r.trSpe },
+      { "mist", &r.careMistakes }, { "bond", &r.bond }, { "sick", &r.sick }, { "nat", &r.nature },
+      { "evoc", &r.evoCount }, { "evob", &r.evoBoost } };
+    for (auto &m : U8)
+      if (!strcmp(key, m.k)) *m.p = u8;
+    if (!strcmp(key, "dexn")) r.speciesId = (int16_t)u16;
+    else if (!strcmp(key, "sickm")) r.sickMinutes = u16;
+    else if (!strcmp(key, "medal")) r.medals = u16 & ~MED_RETIRED;
+    else if (!strcmp(key, "age")) r.ageMinutes = u32;
+    else if (!strcmp(key, "born")) r.bornEpoch = u32;
+    else if (!strcmp(key, "nick")) strncpy(r.nick, (const char *)buf, sizeof(r.nick) - 1);
+  }
+  f.close();
+  r.farmEpoch = now;                       // desde ahora crece en la granja
+  r.farDeclinedAge = r.ageMinutes + 1440;  // como si dijera "quedate": no vuelve a pedirlo en un dia
+  return ok && r.speciesId >= 1;
 }
 
 bool backupRestore() {

@@ -353,7 +353,7 @@ void onTap(int16_t x, int16_t y) {
       if (b1) { int16_t old = pet.speciesId; pet.evolve(); evoPmd.load(old, pet.shiny); }
       else if (b2) pet.declineEvolve();
     } else if (choiceKind == 2) {          // despedida
-      if (b1) pet.startFarewell();
+      if (b1) farewellToFarm();  // se va a la granja (farm_ui.ino)
       else if (b2) pet.declineFarewell();
     }
     choiceKind = 0;

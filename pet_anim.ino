@@ -144,19 +144,17 @@ uint8_t pmdFrameAt(const PmdAct &a, uint32_t t, bool loop) {
   return i;
 }
 
-// lo que media Mewtwo quieto a x2 (56 px): por debajo, el sprite sale diminuto
-#define PMD_SMALL_PX 56
+#define PMD_TARGET_PX 136  // alto (px) al que se escala el bicho quieto (escala entera, de 2 a maxS)
 
 // dibuja una accion anclada por la base (centro-x, suelo) y devuelve su escala
 // dibuja una accion de un PmdMon concreto (m); drawPmdAct usa el global pmd
 void drawPmdActM(PmdMon &m, uint8_t actId, int cx, int groundY, uint32_t t, bool loop, bool sil, uint8_t maxS) {
   const PmdAct &a = m.acts[actId];
   if (!a.frames) return;
-  uint8_t sBase = m.acts[PMD_IDLE].h ? 170 / m.acts[PMD_IDLE].h : 5;
+  // la escala sale del alto del bicho quieto (sin el margen del lienzo): con el lienzo, los de
+  // mucho margen (Mewtwo, Snorlax, Fearow...) salian pequeños. Se busca PMD_TARGET_PX de alto
+  uint8_t sBase = m.idleH ? PMD_TARGET_PX / m.idleH : (m.acts[PMD_IDLE].h ? 170 / m.acts[PMD_IDLE].h : 5);
   if (sBase < 2) sBase = 2;
-  // lienzos con mucho margen (Mewtwo, Snorlax, Fearow...): el bicho quieto salia
-  // mas pequeño que los demas; si no pasa de PMD_SMALL_PX de alto, una escala mas
-  if (m.idleH && m.idleH * sBase <= PMD_SMALL_PX) sBase++;
   if (sBase > maxS) sBase = maxS;
   uint8_t s = sBase;
   while (s > 2 && a.h * s > 250) s--;  // acciones con frame grande (ataque)

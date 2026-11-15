@@ -98,6 +98,21 @@ static inline uint8_t eggItem(uint8_t kind) {
 #define SHARDS_PER_STONE 10
 enum : uint8_t { LUCK_NONE = 0, LUCK_PLAYED, LUCK_WON };
 enum : uint8_t { FRUIT_UP = 0, FRUIT_FULL, FRUIT_MAXED, FRUIT_NO };  // lo que hizo comerse una fruta
+// libro de puntos: de donde vienen (ajedrez, pasos, hockey, lo demas: region, granja) y en
+// que se gastan (tienda y complementos, ocio), por semanas de lunes a domingo
+enum : uint8_t { PT_CHESS = 0, PT_STEPS, PT_HOCKEY, PT_OTHER, PT_SHOP, PT_FUN, PT_KINDS };
+// practica de hockey (SuperDeker): un Atajo del movil manda los minutos (phonesteps.h).
+// Un punto cada HOCKEY_MIN_PER_PT minutos del dia, como mucho HOCKEY_PTS_MAX al dia
+#define HOCKEY_MIN_PER_PT 5
+#define HOCKEY_PTS_MAX 6
+struct PtsWeek {
+  uint16_t week;                   // (dia + 3) / 7: semanas que empiezan en lunes
+  uint16_t dayIn[7], dayOut[7];    // por dia (0 = lunes): ganados y gastados
+  uint16_t cat[PT_KINDS];          // por origen / destino
+  uint16_t wins;                   // partidas de ajedrez ganadas
+};
+static inline uint16_t ptWeekOf(uint32_t day) { return (uint16_t)((day + 3) / 7); }
+static inline uint8_t ptWeekday(uint32_t day) { return (uint8_t)((day + 3) % 7); }  // 0 = lunes
 #define POTION_GAIN 5      // cada pocion de fuerza/velocidad
 // Capacidades (no hay combates): cada una de 0 a 100 y cada una cuida algo.
 //   aguante (trAtk, pocion de fuerza): la energia baja hasta un 50% mas despacio
@@ -268,6 +283,10 @@ public:
   uint16_t chessDay = 0, chessWinDay = 0;  // dia (today()) en que se jugo / se gano al ajedrez
   uint32_t chessSeen = 0;                  // chessPtsTotal ya visto (si sube, se jugo)
   uint32_t funFinds = 0;                   // cosas sacadas del ocio, de siempre (estadisticas)
+  PtsWeek ptNow = {}, ptLast = {};         // libro de puntos: esta semana y la anterior
+  uint16_t hockeyDay = 0, hockeyMin = 0;   // hockey: dia y minutos de hoy
+  uint8_t hockeyPts = 0;                   // y los puntos ya dados hoy por ellos
+  bool ptReport = false;                   // hay resumen de la semana pasada por enseñar
   // para la animacion: que comio la ultima vez (FOOD_*) y cuantas veces ha jugado
   uint8_t lastFood = 0;
   uint16_t playSeq = 0;
@@ -352,7 +371,10 @@ public:
   // true si trajeron algo
   bool farmHarvest(int farmCount, uint8_t &pts, uint8_t &item);
   static bool isNightMinute(int m) { return m >= NIGHT_SLEEP_MIN || m < NIGHT_WAKE_MIN; }
-  void addPoints(int32_t n);
+  void addPoints(int32_t n);              // puntos de otra cosa (consola...): al libro como PT_OTHER
+  void earn(int32_t n, uint8_t src);      // gana puntos y lo apunta en el libro (PT_CHESS, PT_STEPS...)
+  void ptRoll();                          // cambia de semana en el libro si toca
+  uint8_t hockey(uint16_t min);           // minutos de practica de hockey: los puntos que da ahora
   // sincronizacion de ajedrez: medallas para el compañero que estaba presente
   void chessMedals(uint16_t wins, bool record);
   // ocio (fun.ino / fun.h)

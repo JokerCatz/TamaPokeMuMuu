@@ -171,6 +171,10 @@ enum StrId : uint16_t {  // mas de 256 textos
   S_ST_CHAMP, S_ST_FUN,
   S_HOURS_FMT, S_MINS_FMT,  // huerto: lo que le falta a cada parcela (corto, para que quepa)
   S_BUY_FOR_FMT, S_SPEND_Q_FMT,  // confirmar antes de gastar puntos (tienda, ocio)
+  // libro de puntos (ultima pagina de la tienda) y resumen de la semana
+  S_BOOK_FMT, S_THIS_WEEK, S_BOOK_CHESS_FMT, S_BOOK_IN_FMT, S_BOOK_OUT_FMT,
+  S_BOOK_LAST_FMT, S_BOOK_CHESS_TOP, S_BOOK_MORE_CHESS, S_WEEK_BANNER, S_WEEK_SUM_FMT,
+  S_HOCKEY_BANNER, S_HOCKEY_FMT, S_HOCKEY_MAX_FMT,  // practica de hockey desde el movil
   STR_COUNT
 };
 

@@ -50,7 +50,8 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.18"
+// version de esta fork: la fecha en que se publica (la base es la v1.18 de socquique)
+#define FW_VERSION "2026.11.15"
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
   LCD_CS, LCD_SCLK, LCD_SDIO0, LCD_SDIO1, LCD_SDIO2, LCD_SDIO3);
@@ -314,11 +315,12 @@ int8_t faceUpSign = -1;   // signo de z con la pantalla hacia arriba (se aprende
 bool faceDownOff = false; // la pantalla la apago ponerla boca abajo
 #define TILT_SIGN 1       // si al inclinar va hacia el lado alto, cambiar a -1
 // celebraciones: subir de nivel y cosecha de la granja
-uint32_t levelUpUntil = 0, harvestUntil = 0;
+uint32_t levelUpUntil = 0, harvestUntil = 0, hockeyUntil = 0;
 uint16_t levelUpShow = 0;
 uint32_t unlockUntil = 0;  // region recien abierta (cartel)
 uint8_t unlockShow = 0;
 char harvestMsg[48];
+char hockeyMsg[64];  // cartel de la practica de hockey: minutos de hoy y puntos
 // nombre de cada objeto de la tienda (orden de ITEM_*)
 static const StrId ITEM_NAME[ITEM_COUNT] = {
   S_ITEM_CANDY, S_ITEM_MEDICINE, S_ITEM_POTION_STR, S_ITEM_POTION_SPD, S_ITEM_SHINY_CHARM,
@@ -681,6 +683,17 @@ void loop() {
   }
   // pasos de hoy que manda el movil (Atajo de iPhone): cuentan los que pasen de los de la placa
   uint32_t movil;
+  uint16_t hk;
+  if (phoneHockeyTake(hk)) {  // minutos de hockey (Atajo del movil)
+    uint8_t pts = pet.hockey(hk);
+    if (!pts && pet.hockeyPts >= HOCKEY_PTS_MAX)  // ya tenia los de hoy
+      snprintf(hockeyMsg, sizeof(hockeyMsg), T(S_HOCKEY_MAX_FMT), pet.hockeyMin);
+    else
+      snprintf(hockeyMsg, sizeof(hockeyMsg), T(S_HOCKEY_FMT), pet.hockeyMin, pts);
+    hockeyUntil = now + 8000;
+    if (pts) sfxPlay(SFX_MEDAL);
+    Serial.printf("hockey: +%u min, hoy %u min, +%u puntos\n", hk, pet.hockeyMin, pts);
+  }
   if (phoneStepsTake(movil)) {
     pet.phoneSteps(movil);
     Serial.printf("pasos del movil: %lu, hoy %lu\n", (unsigned long)movil, (unsigned long)pet.stepsToday);

@@ -74,7 +74,7 @@ potions → the next morning the pet cheers about yesterday's games.**
 | Fun | — | orchard, fishing, mining and treasure hunts by type; cost chess points, give fruits that raise training, eggs and Mega Stone shards |
 | On its own | — | behaviour planner, speech bubbles, self-care when plugged in |
 | Collection | Pokédex gallery, streak, bond, medals | adds farm, album, stats page, accessories |
-| Points | — | chess.com games, steps (also from an iPhone), region rewards → shop |
+| Points | — | chess.com games, steps (also from an iPhone), hockey practice, region rewards → shop and fun |
 | World | biome and time-of-day backgrounds | real weather, sunrise/sunset, seasons, holidays, region landscapes |
 | Extras | battery, dimming, web installer | adds standby clock, NTP time, daily SD backup, optional Stack-chan control |
 
@@ -187,6 +187,8 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
 
 <table><tr><td align="center"><img src="docs/screenshots/en/stats.png" width="220" alt="Stats"><br>Stats</td><td align="center"><img src="docs/screenshots/en/standby.png" width="220" alt="Standby clock"><br>Standby clock</td></tr></table>
 
+<table><tr><td align="center"><img src="docs/screenshots/en/activities.png" width="220" alt="Activities (swipe left)"><br>Activities (swipe left)</td></tr></table>
+
 ### Care
 
 - Four needs from 0 to 100: food, joy, energy and hygiene. They drop every
@@ -215,8 +217,9 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
   second at 5 days. Each care mistake delays it by 2 hours and all needs must
   be at 40 or more. When it's ready, a button lets you evolve or keep the
   current form. An **evolution potion** (100 points) lets it evolve now.
-- In its final form it says goodbye after **7 days** (you can choose to stay
-  together for a while). It then goes to the album, and you open a new egg.
+- In its final form, after **7 days** it asks to retire (you can choose to stay
+  together for a while). It then moves to the **farm**, where you can take it
+  back any time; the album keeps the page, and you open a new egg.
 - **Abilities** (0-100, no battles): stamina (stamina potion) slows energy loss
   by up to 50%, vitality (vitality potion) slows joy loss by up to 50%, and
   resistance grows by 1 for every 3 hours of good care and cuts the chance of
@@ -255,9 +258,18 @@ You start with 10 points. Basic care is free.
 | Accessories (bow, flower, cap, witch hat, top hat, crown) | 15-80 |
 
 Eggs can only be opened when you have no partner. Swipe left in the shop for the
-bag, then the **harvest** (what you get from [Fun](#fun)), then accessories.
+bag, then the **harvest** (what you get from [Fun](#fun)), then accessories, then the points book.
+
+Buying asks first (YES / NO), and so does anything in [Fun](#fun) that costs points.
+
+The **points book** is the last page of the shop (or tap the points at the top of the shop): this week
+day by day, points earned (green) and spent (orange), where they came from (chess, steps, other) and
+where they went (shop, fun), and last week. Every Monday the main screen shows a short summary of
+last week.
 
 <table><tr><td align="center"><img src="docs/screenshots/en/shop.png" width="220" alt="Shop"><br>Shop</td><td align="center"><img src="docs/screenshots/en/bag.png" width="220" alt="Bag"><br>Bag</td><td align="center"><img src="docs/screenshots/en/accessories.png" width="220" alt="Accessories"><br>Accessories</td></tr></table>
+
+<table><tr><td align="center"><img src="docs/screenshots/en/shop_confirm.png" width="220" alt="Confirm before buying"><br>Confirm before buying</td></tr></table>
 
 ### Surprises in the grass
 
@@ -267,6 +279,8 @@ common egg), one a week from Monday (a rare egg, a shiny charm or both potions,
 with blue sparkles) and one a month (a legendary egg, a Mega Stone or an
 evolution potion, with gold sparkles). The most valuable one shows first. They
 never give points.
+
+<table><tr><td align="center"><img src="docs/screenshots/en/grass.png" width="220" alt="A rustling clump of grass"><br>A rustling clump of grass</td></tr></table>
 
 ### Pokédex, farm and album
 
@@ -314,6 +328,8 @@ event has a bit of luck, so the strongest doesn't always win.
 A gold medal cheers it up and, the first one each day, gives a **Mega Stone**.
 Competing tires it a little; it can't take part asleep, sick or very tired.
 
+<table><tr><td align="center"><img src="docs/screenshots/en/tournament_menu.png" width="220" alt="Tournament"><br>Tournament</td><td align="center"><img src="docs/screenshots/en/tournament_race.png" width="220" alt="Torch run"><br>Torch run</td><td align="center"><img src="docs/screenshots/en/tournament_podium.png" width="220" alt="Podium"><br>Podium</td></tr></table>
+
 ### Gyms
 
 Swipe left from the main screen and tap **Gyms**. Every region has 8 gyms (72 in
@@ -335,6 +351,8 @@ events that suit its type best, and it's a 3-on-3 team contest.
   legendary egg and a Shiny Charm.
 
 The gym list is also the badge case: swipe left/right to change region.
+
+<table><tr><td align="center"><img src="docs/screenshots/en/gyms_list.png" width="220" alt="Gyms and badges"><br>Gyms and badges</td><td align="center"><img src="docs/screenshots/en/gyms_detail.png" width="220" alt="A gym"><br>A gym</td><td align="center"><img src="docs/screenshots/en/gyms_lineup.png" width="220" alt="Lineup"><br>Lineup</td></tr></table>
 
 ### Fun
 
@@ -364,6 +382,8 @@ activity; if you won, the rare finds are twice as likely.
 - While the companion is out on a treasure hunt, the main screen shows a sign
   with the minutes left.
 
+<table><tr><td align="center"><img src="docs/screenshots/en/fun_list.png" width="220" alt="Fun"><br>Fun</td><td align="center"><img src="docs/screenshots/en/fun_orchard.png" width="220" alt="Orchard"><br>Orchard</td><td align="center"><img src="docs/screenshots/en/fun_fishing.png" width="220" alt="Fishing"><br>Fishing</td></tr></table>
+
 ### Mega Evolution
 
 Use a **Mega Stone** from the bag: the 41 species that have Mega sprites in PMD
@@ -389,6 +409,21 @@ The first time iOS asks to allow local network access: allow it. Health data is
 locked while the phone is locked, so pick a time when it's usually in use (or
 run the shortcut by hand). The board keeps the higher of the phone's count and
 its own, so nothing is counted twice.
+
+### Hockey practice from an iPhone
+
+A second shortcut sends minutes of hockey practice (on a SuperDeker or anything
+else): **1 point every 5 minutes, up to 6 a day**. Several sessions in a day add up,
+the main screen shows today's minutes and points, and the points book has a
+"hockey" line. Keep it on a parent's phone so the points stay honest.
+
+In the **Shortcuts** app, a new shortcut with:
+
+1. **Ask for Input**: type **Number**, prompt "Minutes of hockey practice?".
+2. **Get Contents of URL**: `http://tamapoke.local/hockey?min=` + Provided Input + `&k=` + your code (the same one as for steps).
+3. **Show Result** (optional): the board answers `{"ok":true,"min":15}`.
+
+Same conditions as the steps: board plugged in, phone on the home Wi-Fi.
 
 ### World and power
 

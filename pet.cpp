@@ -4,6 +4,10 @@
 #include "audio.h"
 #include "mega.h"
 #include "fun.h"
+
+// libro de puntos (abajo, con el ocio)
+static void ptAdd(uint16_t &v, int32_t n);
+static void ptLog(Pet &p, uint8_t src, int32_t n);
 #include <string.h>
 #include <time.h>
 
@@ -398,7 +402,7 @@ void Pet::checkRegionOf(int16_t dex) {
       if (!isRegistered(d) && DEX_TBL[d].rarity != R_NONE) return;
     regionDone |= (1 << r);
     regionEggs |= (1 << r);
-    points += REGION_REWARD_PTS;
+    earn(REGION_REWARD_PTS, PT_OTHER);
     regionJustDone = r + 1;
     regionUntil = millis() + 6000;
     sfxPlay(SFX_MEDAL);
@@ -568,7 +572,7 @@ void Pet::addSteps(uint32_t n) {
   if (stepsToday >= STEP_BONUS_AT) ganados += STEP_BONUS_PTS;
   if (ganados > stepPts) {
     if (stepPts <= STEP_PTS_MAX && ganados > STEP_PTS_MAX) stepBonus = true;
-    points += ganados - stepPts;
+    earn(ganados - stepPts, PT_STEPS);
     stepPts = (uint8_t)ganados;
   }
   if (!stepJoy && stepsToday >= STEP_JOY_AT && !isEgg() && ceremony == CER_NONE) {
@@ -972,6 +976,8 @@ void Pet::chessMedals(uint16_t wins, bool record) {
     chessDay = dayNow();
   }
   if (wins) chessWinDay = dayNow();
+  ptRoll();
+  ptAdd(ptNow.wins, wins);
   pendingSave = true;
   if (ceremony != CER_NONE) return;
   checkMedals((wins ? MED_CHESS : 0) | (record ? MED_RECORD : 0));
@@ -987,6 +993,7 @@ uint8_t Pet::chessLuck() const {
 bool Pet::spend(uint16_t pts) {
   if (points < pts) return false;
   points -= pts;
+  ptLog(*this, PT_FUN, pts);
   pendingSave = true;
   return true;
 }
@@ -1057,6 +1064,7 @@ void Pet::funDone() {
 bool Pet::buy(uint8_t item) {
   if (item >= SHOP_ITEMS || points < ITEM_PRICE[item] || bag[item] >= 999) return false;
   points -= ITEM_PRICE[item];
+  ptLog(*this, PT_SHOP, ITEM_PRICE[item]);
   bag[item]++;
   save();
   return true;
@@ -1080,7 +1088,60 @@ bool Pet::hatchEgg(uint8_t kind) {
   return true;
 }
 
+// ---------- libro de puntos ----------
+
+void Pet::ptRoll() {
+  uint16_t w = ptWeekOf(today());
+  if (ptNow.week == w) return;
+  bool hubo = false;
+  for (int k = 0; k < PT_KINDS; k++) hubo |= ptNow.cat[k] != 0;
+  if (ptNow.week && ptNow.week + 1 == w && hubo) {  // la semana pasada: para el resumen
+    ptLast = ptNow;
+    ptReport = true;
+  } else {
+    ptLast = PtsWeek{};
+    ptLast.week = w - 1;
+  }
+  ptNow = PtsWeek{};
+  ptNow.week = w;
+  pendingSave = true;
+}
+
+static void ptAdd(uint16_t &v, int32_t n) { v = v + n > 65535 ? 65535 : v + n; }
+
+// apunta n puntos de un origen (PT_CHESS..PT_OTHER) o destino (PT_SHOP, PT_FUN)
+static void ptLog(Pet &p, uint8_t src, int32_t n) {
+  if (n <= 0 || src >= PT_KINDS) return;
+  p.ptRoll();
+  uint8_t wd = ptWeekday(p.dayNow());
+  ptAdd(src < PT_SHOP ? p.ptNow.dayIn[wd] : p.ptNow.dayOut[wd], n);
+  ptAdd(p.ptNow.cat[src], n);
+}
+
+void Pet::earn(int32_t n, uint8_t src) {
+  points += n;
+  if (points < 0) points = 0;
+  ptLog(*this, src, n);
+  pendingSave = true;
+}
+
+uint8_t Pet::hockey(uint16_t min) {
+  if (!min) return 0;
+  uint16_t hoy = dayNow();
+  if (hockeyDay != hoy) { hockeyDay = hoy; hockeyMin = 0; hockeyPts = 0; }
+  hockeyMin = hockeyMin + min > 999 ? 999 : hockeyMin + min;
+  uint16_t total = hockeyMin / HOCKEY_MIN_PER_PT;
+  if (total > HOCKEY_PTS_MAX) total = HOCKEY_PTS_MAX;
+  uint8_t nuevo = total > hockeyPts ? total - hockeyPts : 0;
+  hockeyPts = (uint8_t)total;
+  if (nuevo) earn(nuevo, PT_HOCKEY);
+  if (!isEgg() && !vacant && ceremony == CER_NONE) joy = clamp100(joy + 5);  // le alegra que hagas deporte
+  pendingSave = true;
+  return nuevo;
+}
+
 void Pet::addPoints(int32_t n) {
+  ptLog(*this, PT_OTHER, n);
   points += n;
   if (points < 0) points = 0;
   save();
@@ -1169,6 +1230,7 @@ void Pet::nightCheck(int m, bool idle) {
 bool Pet::buyAccessory(uint8_t a) {
   if (a >= ACC_COUNT || (accOwned & (1 << a)) || points < ACC_PRICE[a]) return false;
   points -= ACC_PRICE[a];
+  ptLog(*this, PT_SHOP, ACC_PRICE[a]);
   accOwned |= (1 << a);
   accWorn = a + 1;  // recien comprado: puesto
   save();
@@ -1272,7 +1334,7 @@ bool Pet::farmHarvest(int farmCount, uint8_t &pts, uint8_t &item) {
     if (r < 15) item = ITEM_CANDY;
     else if (r < 20) item = ITEM_MEDICINE;
   }
-  points += pts;
+  earn(pts, PT_OTHER);
   if (item != 0xFF && bag[item] < 999) bag[item]++;
   save();
   return pts || item != 0xFF;
@@ -1341,6 +1403,12 @@ void Pet::save() {
   prefs.putUShort("chwin", chessWinDay);
   prefs.putUInt("chseen", chessSeen);
   prefs.putUInt("funf", funFinds);
+  prefs.putBytes("ptwk", &ptNow, sizeof(ptNow));  // (ptnow/ptlast: el de antes, sin hockey)
+  prefs.putBytes("ptwl", &ptLast, sizeof(ptLast));
+  prefs.putUShort("hkday", hockeyDay);
+  prefs.putUShort("hkmin", hockeyMin);
+  prefs.putUChar("hkpts", hockeyPts);
+  prefs.putBool("ptrep", ptReport);
   prefs.putUShort("sickm", sickMinutes);
   prefs.putUChar("wgt", weight);
   prefs.putUChar("gatk", geneAtk);
@@ -1421,6 +1489,12 @@ void Pet::load() {
   chessWinDay = prefs.getUShort("chwin", 0);
   chessSeen = prefs.getUInt("chseen", chessPtsTotal);  // lo de antes no cuenta como de hoy
   funFinds = prefs.getUInt("funf", 0);
+  prefs.getBytes("ptwk", &ptNow, sizeof(ptNow));
+  prefs.getBytes("ptwl", &ptLast, sizeof(ptLast));
+  hockeyDay = prefs.getUShort("hkday", 0);
+  hockeyMin = prefs.getUShort("hkmin", 0);
+  hockeyPts = prefs.getUChar("hkpts", 0);
+  ptReport = prefs.getBool("ptrep", false);
   sickMinutes = prefs.getUShort("sickm", 0);
   weight = prefs.getUChar("wgt", 0);
   geneAtk = prefs.getUChar("gatk", 0);

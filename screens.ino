@@ -177,7 +177,7 @@ void renderClock() {
   printT(T(S_CLOCK_CANCEL));
 
   // version del firmware (discreta, abajo del todo)
-  char ver[20];
+  char ver[32];  // "TamaPoke v2026.11.15": con 20 se cortaba la ultima cifra
   snprintf(ver, sizeof(ver), "TamaPoke v%s", FW_VERSION);
   setSize(1);
   setCur(centerX(ver, 1), 422);
@@ -335,9 +335,14 @@ void drawCelebration() {
   // cortaba a mitad de un caracter de 3 bytes.
   char buf[32];
   char reg[40];
+  char wk[64];
+  static uint32_t weekUntil = 0;
   if (timeLeft(unlockUntil) && unlockShow < REGION_COUNT) {  // region nueva
     l1 = T(S_REGION_UNLOCK);
     l2 = T((StrId)(S_REGION_1 + unlockShow));
+  } else if (timeLeft(hockeyUntil)) {  // practica de hockey (Atajo del movil)
+    l1 = T(S_HOCKEY_BANNER);
+    l2 = hockeyMsg;
   } else if (timeLeft(harvestUntil)) {  // cosecha de la granja
     l1 = T(S_HARVEST);
     l2 = harvestMsg;
@@ -354,6 +359,16 @@ void drawCelebration() {
     snprintf(buf, sizeof(buf), T(S_STREAK_DAYS_FMT), pet.streak);
     l1 = T(S_GREAT);
     l2 = buf;
+  } else if (timeLeft(weekUntil) || pet.ptReport) {  // resumen de la semana pasada (libro de puntos)
+    if (pet.ptReport) {
+      weekUntil = millis() + 9000;
+      pet.ptReport = false;
+      pet.markDirty();
+    }
+    const PtsWeek &w = pet.ptLast;
+    snprintf(wk, sizeof(wk), T(S_WEEK_SUM_FMT), w.cat[PT_CHESS], w.cat[PT_SHOP] + w.cat[PT_FUN]);
+    l1 = T(S_WEEK_BANNER);
+    l2 = wk;
   }
   if (!l1) return;
   gfx->fillRoundRect(73, 150, 320, 96, 16, UI_BAR_WARN);

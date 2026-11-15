@@ -65,7 +65,7 @@ AMOLED 触摸屏）上。本项目分叉自
 | 趣玩 | — | 按属性果园、钓鱼、挖矿、寻宝；花下棋赚的积分，收获加训练值的果子、蛋和Mega石碎片 |
 | 自主行为 | — | 自己安排行动、冒对话气泡，插电没人管时会自己照顾自己 |
 | 收集 | 图鉴、连续照顾天数、亲密度、奖章 | 另加农场、相册、统计页、装饰品 |
-| 积分 | — | chess.com 下棋、走路步数（也可以从 iPhone 同步）、集齐地区奖励，在商店里用 |
+| 积分 | — | chess.com 下棋、走路步数（也可以从 iPhone 同步）、冰球练习、集齐地区奖励，在商店和趣玩里用 |
 | 环境 | 地形和昼夜背景 | 真实天气、日出日落、季节、节日、地区风景 |
 | 其他 | 电池管理、屏幕变暗、网页刷机 | 另加待机时钟、联网校时、SD 卡每日备份，可选 Stack-chan 控制 |
 
@@ -165,6 +165,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 
 <table><tr><td align="center"><img src="docs/screenshots/zh/stats.png" width="220" alt="统计"><br>统计</td><td align="center"><img src="docs/screenshots/zh/standby.png" width="220" alt="待机时钟"><br>待机时钟</td></tr></table>
 
+<table><tr><td align="center"><img src="docs/screenshots/zh/activities.png" width="220" alt="活动（向左滑）"><br>活动（向左滑）</td></tr></table>
+
 ### 照顾
 
 - 四项需求，每项 0 到 100：饱食、心情、精力、清洁。醒着时每分钟下降，睡着时慢很多。
@@ -187,8 +189,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 - 进化看**天数**，所有进化链都一样：第一次在第 3 天，第二次在第 5 天。每次照顾失误推迟
   2 小时，而且四项需求都要在 40 以上。时间到了会出现按钮，可以选择进化，也可以保持现在的
   样子。**进化药水**（100 积分）能让它马上进化。
-- 最终形态满 **7 天**后它会道别（你可以选择再陪它一段时间）。道别后它会进入相册，你可以
-  开一个新蛋。
+- 最终形态满 **7 天**后它会想去农场养老（你可以选择再陪它一段时间）。之后它会住进**农场**，
+  随时可以换回来；回忆录里会留一页，然后你可以开一个新蛋。
 - **能力**（0-100，没有对战）：体力（体力药剂）让精力最多慢一半下降；活力（活力药剂）让
   心情最多慢一半下降；抵抗力在连续好好照顾时每 3 小时加 1，最多让生病的几率降低 60%。
 
@@ -221,9 +223,15 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 | 普通蛋 / 稀有蛋 / 传说蛋 | 10 / 30 / 100 |
 | 装饰品（蝴蝶结、小花、棒球帽、巫师帽、礼帽、皇冠） | 15-80 |
 
-只有在没有搭档时才能开蛋。在商店里继续向左滑依次是背包、**收获**（[趣玩](#趣玩)得到的东西）和饰品。
+只有在没有搭档时才能开蛋。在商店里继续向左滑依次是背包、**收获**（[趣玩](#趣玩)得到的东西）、饰品，最后是积分本。
 
 <table><tr><td align="center"><img src="docs/screenshots/zh/shop.png" width="220" alt="商店"><br>商店</td><td align="center"><img src="docs/screenshots/zh/bag.png" width="220" alt="背包"><br>背包</td><td align="center"><img src="docs/screenshots/zh/accessories.png" width="220" alt="装饰品"><br>装饰品</td></tr></table>
+
+买东西会先问一下（是 / 否），[趣玩](#趣玩)里要花积分的动作也一样。
+
+**积分本**在商店的最后一页（也可以点商店顶部的积分）：本周每天赚了（绿）和花了（橙）多少，从哪来（下棋、走路、其他）、花在哪（商店、趣玩），还有上周的对比。每周一主屏会弹出上周积分小结。
+
+<table><tr><td align="center"><img src="docs/screenshots/zh/shop_confirm.png" width="220" alt="买之前先确认"><br>买之前先确认</td></tr></table>
 
 ### 草丛彩蛋
 
@@ -231,6 +239,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 一瓶药剂或一个普通蛋），每周一个（从周一算起；稀有蛋、异色符或两种药剂各一瓶，草丛闪蓝光），
 每月一个（传说蛋、Mega石或进化药水，草丛闪金光）。同时有好几个时，先出最值钱的那个。
 彩蛋不送积分。
+
+<table><tr><td align="center"><img src="docs/screenshots/zh/grass.png" width="220" alt="晃动的草丛"><br>晃动的草丛</td></tr></table>
 
 ### 图鉴、农场和相册
 
@@ -271,6 +281,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 拿到金牌伙伴会很开心，每天第一块金牌还送一颗**Mega石**。比赛会消耗一点精力；
 睡觉、生病或太累时不能参加。
 
+<table><tr><td align="center"><img src="docs/screenshots/zh/tournament_menu.png" width="220" alt="锦标赛"><br>锦标赛</td><td align="center"><img src="docs/screenshots/zh/tournament_race.png" width="220" alt="火炬长跑"><br>火炬长跑</td><td align="center"><img src="docs/screenshots/zh/tournament_podium.png" width="220" alt="领奖台"><br>领奖台</td></tr></table>
+
 ### 道馆
 
 在主屏幕向左滑，点**道馆**。每个地区 8 个道馆（一共 72 个），馆主和徽章都用原作的，每位
@@ -287,6 +299,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
   第一次夺冠送传说蛋和异色符。
 
 道馆列表也是徽章盒：左右滑换地区。
+
+<table><tr><td align="center"><img src="docs/screenshots/zh/gyms_list.png" width="220" alt="道馆和徽章"><br>道馆和徽章</td><td align="center"><img src="docs/screenshots/zh/gyms_detail.png" width="220" alt="一个道馆"><br>一个道馆</td><td align="center"><img src="docs/screenshots/zh/gyms_lineup.png" width="220" alt="排阵容"><br>排阵容</td></tr></table>
 
 ### 趣玩
 
@@ -309,6 +323,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 - **鱼**能吃得很饱，**珍珠**让它特别开心。有鱼和果子时，主屏的**喂食**菜单会多一排，可以直接喂。
 - 伙伴出门寻宝时，主屏幕上会挂一块牌子，写着还要多少分钟回来。
 
+<table><tr><td align="center"><img src="docs/screenshots/zh/fun_list.png" width="220" alt="趣玩"><br>趣玩</td><td align="center"><img src="docs/screenshots/zh/fun_orchard.png" width="220" alt="果园"><br>果园</td><td align="center"><img src="docs/screenshots/zh/fun_fishing.png" width="220" alt="钓鱼"><br>钓鱼</td></tr></table>
+
 ### 超级进化
 
 在背包里用一颗**Mega石**：PMD SpriteCollab 里有超级进化素材的 41 种宝可梦（喷火龙 X、
@@ -329,6 +345,20 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 
 第一次运行时 iOS 会问是否允许访问本地网络，选允许。手机锁屏时读不到健康数据，所以选一个
 手机平时在用的时间（也可以手动点一下运行）。板子取手机和自己计步中较多的那个，不会重复算。
+
+### 从 iPhone 记录冰球练习
+
+再做一个快捷指令，练完冰球（SuperDeker 或别的都行）报一下练了几分钟：**每 5 分钟 1 分，每天最多 6 分**。
+一天练几次会累计，主屏会显示今天练了多少分钟、得了几分，积分本里也有「冰球」一项。快捷指令放在
+家长的手机上，积分才可靠。
+
+在「快捷指令」App 里新建一个快捷指令，加上这些操作：
+
+1. **请求输入**：类型选**数字**，提示写「练了几分钟冰球？」。
+2. **获取 URL 内容**：`http://tamapoke.local/hockey?min=` + 提供的输入 + `&k=` + 你的配对码（和步数用同一个）。
+3. **显示结果**（可选）：板子会回复 `{"ok":true,"min":15}`。
+
+条件和同步步数一样：板子插着电，手机连着家里的 Wi-Fi。
 
 ### 环境和电源
 
