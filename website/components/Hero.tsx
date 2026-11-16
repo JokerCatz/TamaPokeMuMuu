@@ -46,10 +46,14 @@ function HatchEgg() {
   return (
     <div className="flex w-full flex-col items-center gap-5">
       <div className="case aspect-square w-full max-w-[400px]">
-        <div className={`screen ${cracking ? "anim-flash" : ""}`} style={{ background: "linear-gradient(#a8d8ff 0 58%, #8fd07a 58% 63%, #6fb85c 63% 100%)" }}>
-          {/* clouds */}
+        <div className={`screen ${cracking ? "anim-flash" : ""}`} style={{ background: "linear-gradient(#8fd0ff, #dff2ff 60%)" }}>
+          {/* sun, clouds, hills and the grass */}
+          <div className="pointer-events-none absolute left-[74%] top-[24%] h-[11%] w-[11%] rounded-full border-2 border-ink bg-[#ffd65a]" />
           <div className="pointer-events-none absolute left-0 top-[14%] h-6 w-20 rounded-full bg-white/80" style={{ animation: "drift 26s linear infinite" }} />
           <div className="pointer-events-none absolute left-0 top-[26%] h-4 w-14 rounded-full bg-white/70" style={{ animation: "drift 34s linear infinite", animationDelay: "-12s" }} />
+          <div className="pointer-events-none absolute -left-[12%] top-[43%] h-[34%] w-[62%] rounded-[50%] bg-[#9ad88a]" />
+          <div className="pointer-events-none absolute -right-[16%] top-[46%] h-[34%] w-[72%] rounded-[50%] bg-[#86cc76]" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 top-[58%]" style={{ background: "linear-gradient(#8fd07a 0 12%, #6fb85c 12% 100%)" }} />
           {!baby && (
             <button
               type="button"
@@ -71,7 +75,7 @@ function HatchEgg() {
               <p className="absolute left-1/2 top-[13%] -translate-x-1/2 whitespace-nowrap rounded-xl border-2 border-ink bg-white px-3 py-1 text-sm font-bold anim-pop">
                 {t("hatch_hi", { n: s[lang] })}
               </p>
-              <div className="absolute inset-x-0 top-[30%] flex h-[36%] items-end justify-center anim-pop">
+              <div className="absolute inset-x-0 top-[36%] flex h-[36%] items-end justify-center anim-pop">
                 <Sprite id={s.id} anim="idle" scale={5} label={s[lang]} />
               </div>
             </>

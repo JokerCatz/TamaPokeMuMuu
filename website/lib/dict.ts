@@ -24,10 +24,8 @@ const en = {
   hatch_again: "Hatch again",
   hatch_note: "Your friend follows you down the page.",
 
-  meet_kicker: "02 · Meet TamaPoke with Chess",
-  meet_title: "A pet you can hold.",
-  meet_lead: "TamaPoke runs on a Waveshare ESP32-S3 board with a 466×466 round AMOLED touch screen. Drag to turn it, tap the screen to see more.",
-  meet_tap: "Tap the screen",
+  story_kicker: "02 · A day with TamaPoke",
+  story_tap: "Tap the screen for more",
   meet_specs: "1.75\" round AMOLED · touch · Wi-Fi · motion sensor · battery and SD card",
   meet_model: "3D model: the printed case of the original project, a remix of “Pokeball” by yoyothechicken (CC BY-NC-SA)",
 
@@ -127,10 +125,8 @@ const zh: typeof en = {
   hatch_again: "再孵一只",
   hatch_note: "孵出来的伙伴会陪你往下看。",
 
-  meet_kicker: "02 · 认识 TamaPoke with Chess",
-  meet_title: "一只能握在手里的宠物。",
-  meet_lead: "TamaPoke 运行在 Waveshare ESP32-S3 板子上，屏幕是 466×466 的圆形 AMOLED 触摸屏。拖动可以转动它，点屏幕看更多画面。",
-  meet_tap: "点一下屏幕",
+  story_kicker: "02 · 和 TamaPoke 过一天",
+  story_tap: "点屏幕看下一张",
   meet_specs: "1.75 寸圆形 AMOLED · 触摸 · Wi-Fi · 体感 · 电池和 SD 卡",
   meet_model: "3D 模型：原项目的打印外壳，改编自 yoyothechicken 的「Pokeball」（CC BY-NC-SA）",
 
@@ -230,8 +226,72 @@ export const REGIONS = [
   { id: "paldea", en: "Paldea", zh: "帕底亚", a: 906, b: 1025 },
 ] as const;
 
-// screenshots shown on the 3D board (docs/screenshots/<lang>/<name>.png)
-export const DEVICE_SHOTS = [
-  "care_feed", "card", "tournament_race", "gyms_detail", "fun_orchard",
-  "dex_cover", "friends_play", "scene_christmas", "standby",
+// The scroll story: a day with the board, from dawn to night. The 3D board turns to
+// each chapter's pose and shows its screenshots (docs/screenshots/<lang>/<name>.png);
+// sky = [top, bottom, ground] of the backdrop at that hour.
+export const STORY = [
+  {
+    id: "meet", time: "",
+    shots: ["grass", "card", "activities"],
+    sky: ["#9fc9f0", "#ffe3c9", "#7cc06a"],
+    en: { title: "A pet you can hold.", text: "TamaPoke with Chess runs on a Waveshare ESP32-S3 board with a 466×466 round AMOLED touch screen, inside a printed Poké Ball case. Scroll on to spend a day with it." },
+    zh: { title: "一只能握在手里的宠物。", text: "TamaPoke with Chess 运行在 Waveshare ESP32-S3 板子上，466×466 的圆形 AMOLED 触摸屏装在打印的精灵球外壳里。往下滚，陪它过一天。" },
+  },
+  {
+    id: "care", time: "07:00",
+    shots: ["care_feed", "care_bath", "care_pat"],
+    sky: ["#8fd0ff", "#dff2ff", "#6fb85c"],
+    en: { title: "Good morning.", text: "It wakes up at seven. Four needs to look after: food, joy, energy and hygiene. Feed it, play, give it a bath, pat its head. Basic care is always free." },
+    zh: { title: "早上好。", text: "早上七点它自己醒来。要照顾四项需求：饱食、心情、精力、清洁。喂它、陪它玩、给它洗澡、摸摸它的头。基本照顾永远免费。" },
+  },
+  {
+    id: "tournament", time: "10:00",
+    shots: ["tournament_menu", "tournament_race", "tournament_podium"],
+    sky: ["#6bbcff", "#c9e9ff", "#6fb85c"],
+    en: { title: "Sports, not fights.", text: "Eleven tournament events against two random Pokémon: track, pool, jumps, weights, climbing, diving, skating… Stats and type decide who wins. A gold medal brings a Mega Stone." },
+    zh: { title: "比运动，不打架。", text: "锦标赛有 11 个项目，对手是随机的两只宝可梦：跑道、泳池、跳跃、举重、攀岩、跳水、滑冰……名次由能力和属性决定。拿到金牌能得一颗Mega石。" },
+  },
+  {
+    id: "gyms", time: "14:00",
+    shots: ["gyms_list", "gyms_detail", "gyms_lineup"],
+    sky: ["#7ec6f7", "#fff0c8", "#72b45a"],
+    en: { title: "Take on the gyms as a team.", text: "72 gyms in nine regions. Bring two Pokémon from your farm for 3-on-3 team events, win badges, then face the Elite Four and the Champion." },
+    zh: { title: "组队挑战道馆。", text: "九个地区共 72 个道馆。带上农场里的两只宝可梦，三对三团体比赛，赢徽章，最后挑战四天王和冠军。" },
+  },
+  {
+    id: "fun", time: "16:30",
+    shots: ["fun_list", "fun_orchard", "fun_fishing"],
+    sky: ["#f08a5d", "#ffd28f", "#5f9a52"],
+    en: { title: "An afternoon outdoors.", text: "Orchard, fishing, mining and treasure hunts, picked by your Pokémon's type. They cost chess points and bring back fruits that raise training, eggs and Mega Stone shards." },
+    zh: { title: "下午出去玩。", text: "果园、钓鱼、挖矿、寻宝，按宝可梦的属性选玩法。要花下棋赚的积分，带回能加训练值的果子、蛋和Mega石碎片。" },
+  },
+  {
+    id: "night", time: "23:00",
+    shots: ["sleep", "scene_snow_night", "scene_christmas", "standby"],
+    sky: ["#141828", "#2a3160", "#1d3a2e"],
+    en: { title: "Good night.", text: "At eleven it falls asleep on its own. Real weather, sunrise and sunset, seasons and holidays change the scene, and plugged in the board becomes a bedside clock." },
+    zh: { title: "晚安。", text: "晚上十一点它会自己睡着。真实的天气、日出日落、季节和节日都会改变画面；插着电时，它就是一个床头时钟。" },
+  },
 ] as const;
+
+export const SHOT_CAPS: Record<string, { en: string; zh: string }> = {
+  grass: { en: "Main screen", zh: "主屏幕" },
+  card: { en: "Pet card", zh: "宠物卡片" },
+  activities: { en: "Activities", zh: "活动" },
+  care_feed: { en: "Feeding", zh: "喂食" },
+  care_bath: { en: "Bath", zh: "洗澡" },
+  care_pat: { en: "Head pat", zh: "摸摸头" },
+  tournament_menu: { en: "Tournament", zh: "锦标赛" },
+  tournament_race: { en: "Torch run", zh: "火炬长跑" },
+  tournament_podium: { en: "Podium", zh: "领奖台" },
+  gyms_list: { en: "Gyms and badges", zh: "道馆和徽章" },
+  gyms_detail: { en: "A gym", zh: "一个道馆" },
+  gyms_lineup: { en: "Lineup", zh: "排阵容" },
+  fun_list: { en: "Fun", zh: "趣玩" },
+  fun_orchard: { en: "Orchard", zh: "果园" },
+  fun_fishing: { en: "Fishing", zh: "钓鱼" },
+  sleep: { en: "Asleep at night", zh: "夜里睡着了" },
+  scene_snow_night: { en: "Snowy night", zh: "雪夜" },
+  scene_christmas: { en: "Christmas", zh: "圣诞节" },
+  standby: { en: "Standby clock", zh: "待机时钟" },
+};

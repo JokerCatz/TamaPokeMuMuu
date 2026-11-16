@@ -125,13 +125,15 @@ for name, direction in (("front", (0, -1, 0.15)), ("three_quarter", (0.8, -1, 0.
     bpy.ops.render.render(write_still=True)
 
 if "export" in ARGS:
-    # lighter meshes for the web, smooth curves with sharp edges kept (fewer split vertices)
-    for ob, ratio in ((shell, 0.35), (lid, 0.22)):
-        m = ob.modifiers.new("dec", "DECIMATE")
-        m.ratio = ratio
+    # smooth curves with the sharp edges kept. The red shell keeps every triangle
+    # (collapsing it left blotches around the opening); the plain white dome is thinned.
+    m = lid.modifiers.new("dec", "DECIMATE")
+    m.ratio = 0.4
     for ob in (shell, lid, band, b_in, b_out):
         ob.data.shade_smooth()
-        ob.data.set_sharp_from_angle(angle=math.radians(35))
+        ob.data.set_sharp_from_angle(angle=math.radians(30))
+        w = ob.modifiers.new("wn", "WEIGHTED_NORMAL")
+        w.keep_sharp = True
     for ob in (shell, lid, band, b_in, b_out, glass, screen):
         ob.select_set(True)
     # turn the whole thing so the screen faces Blender -Y (glTF +Z, towards the web camera)

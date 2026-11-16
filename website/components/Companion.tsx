@@ -79,6 +79,7 @@ export default function Companion() {
   const { lang, starter, candy, setCandy } = useSite();
   const [pet, dispatch] = useReducer(reduce, START);
   const [anim, setAnim] = useState<string | null>(null);
+  const [fx, setFx] = useState<{ id: number; kind: Act["type"] } | null>(null); // what floats up after an action
   const [visible, setVisible] = useState(false);
   const root = useRef<HTMLElement>(null);
   const animTimer = useRef(0);
@@ -109,6 +110,7 @@ export default function Companion() {
       setCandy((c) => c - 1);
     }
     dispatch({ type } as Act);
+    if (type !== "sleep") setFx((f) => ({ id: (f?.id ?? 0) + 1, kind: type }));
     if (type === "feed" || type === "candy") show("eat", 1800);
     if (type === "play") show("hop", 1600);
     if (type === "bath") show("nod", 1400);
@@ -180,6 +182,26 @@ export default function Companion() {
               <div className="absolute inset-x-0 bottom-[6%] flex items-end justify-center">
                 <Sprite id={starter} anim={spriteAnim} scale={4} label={s[lang]} />
               </div>
+              {fx && (
+                <div key={fx.id} className="pointer-events-none absolute inset-x-0 bottom-[52%] flex justify-center gap-2">
+                  {(fx.kind === "bath" || fx.kind === "play" ? [0, 1, 2] : [0]).map((i) =>
+                    fx.kind === "bath" ? (
+                      <span key={i} className="anim-rise-s h-4 w-4 rounded-full border-2 border-white bg-white/40" style={{ animationDelay: `${i * 0.12}s` }} />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={i}
+                        src={asset(fx.kind === "play" ? "/img/heart.png" : fx.kind === "candy" ? "/img/icon_candy.png" : "/img/icon_food.png")}
+                        alt=""
+                        width={26}
+                        height={26}
+                        className="anim-rise-s pixelated"
+                        style={{ animationDelay: `${i * 0.12}s` }}
+                      />
+                    ),
+                  )}
+                </div>
+              )}
               <div className="absolute bottom-[7%] right-[16%] flex gap-1">
                 {Array.from({ length: pet.poops }, (_, i) => (
                   // eslint-disable-next-line @next/next/no-img-element

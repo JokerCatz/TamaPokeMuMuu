@@ -2,7 +2,7 @@
 
 // A one-move chess puzzle: checkmate earns the same 10 points a won game gives
 // on the board, and the points buy a candy for the friend in the care demo.
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Chess, type Square } from "chess.js";
 import gsap from "gsap";
 import { asset } from "@/lib/asset";
@@ -19,13 +19,33 @@ const FILES = "abcdefgh";
 
 export default function ChessDemo() {
   const t = useT();
-  const { setCandy } = useSite();
+  const { candy, setCandy } = useSite();
   const [pi, setPi] = useState(0);
   const [fen, setFen] = useState(PUZZLES[0]);
   const [sel, setSel] = useState<Square | null>(null);
   const [msg, setMsg] = useState<"" | "wrong" | "win" | "bought">("");
   const [points, setPoints] = useState(0);
+  const [shown, setShown] = useState(0); // the number on the coin, counting up to the points
+  const [burst, setBurst] = useState(0);
+  const [last, setLast] = useState<[Square, Square] | null>(null);
   const coin = useRef<HTMLDivElement>(null);
+  const shownRef = useRef(0);
+
+  useEffect(() => {
+    const o = { v: shownRef.current };
+    const tw = gsap.to(o, {
+      v: points,
+      duration: 0.5,
+      ease: "power1.out",
+      onUpdate: () => {
+        shownRef.current = Math.round(o.v);
+        setShown(shownRef.current);
+      },
+    });
+    return () => {
+      tw.kill();
+    };
+  }, [points]);
 
   const game = useMemo(() => new Chess(fen), [fen]);
   const board = game.board();
@@ -44,6 +64,8 @@ export default function ChessDemo() {
       setFen(g.fen());
       if (g.isCheckmate()) {
         setMsg("win");
+        setLast([sel, sq]);
+        setBurst((b) => b + 1);
         setPoints((p) => p + 10);
         if (coin.current) gsap.fromTo(coin.current, { scale: 0.6, rotate: -20 }, { scale: 1, rotate: 0, duration: 0.6, ease: "back.out(3)" });
       } else {
@@ -63,6 +85,7 @@ export default function ChessDemo() {
     setPi(n);
     setFen(PUZZLES[n]);
     setSel(null);
+    setLast(null);
     setMsg("");
   };
 
@@ -83,10 +106,15 @@ export default function ChessDemo() {
           <div className="mt-8 flex flex-wrap items-center gap-5">
             <div
               ref={coin}
-              className="flex h-28 w-28 flex-col items-center justify-center rounded-full border-[3px] border-ink shadow-[0_5px_0_var(--color-ink)]"
+              className="relative flex h-28 w-28 flex-col items-center justify-center rounded-full border-[3px] border-ink shadow-[0_5px_0_var(--color-ink)]"
               style={{ background: "radial-gradient(circle at 35% 30%, #ffd77a, #e8a23c 70%)" }}
             >
-              <span className="font-pixel text-3xl leading-none">{points}</span>
+              {burst > 0 && msg === "win" && (
+                <span key={burst} className="anim-rise font-pixel pointer-events-none absolute -top-3 left-1/2 text-2xl">
+                  +10
+                </span>
+              )}
+              <span className="font-pixel text-3xl leading-none">{shown}</span>
               <span className="kicker mt-1">{t("chess_points")}</span>
             </div>
             <div className="flex flex-col gap-3">
@@ -95,9 +123,17 @@ export default function ChessDemo() {
                 <img src={asset("/img/icon_candy.png")} alt="" width={28} height={28} className="pixelated" />
                 {t("chess_buy")}
               </button>
-              <button type="button" className="btn btn-sm self-start" onClick={nextPuzzle}>
-                {t("chess_reset")}
-              </button>
+              <div className="flex items-center gap-3">
+                <button type="button" className="btn btn-sm" onClick={nextPuzzle}>
+                  {t("chess_reset")}
+                </button>
+                {candy > 0 && (
+                  <span key={candy} className="anim-pop flex items-center gap-1 font-bold">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={asset("/img/icon_candy.png")} alt="" width={24} height={24} className="pixelated" />× {candy}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <p className="mt-6 max-w-xl text-sm text-ink2">{t("chess_more")}</p>
@@ -119,7 +155,7 @@ export default function ChessDemo() {
                     onClick={() => click(sq)}
                     aria-label={sq + (cell ? ` ${cell.color === "w" ? "white" : "black"} ${cell.type}` : "")}
                     className="relative flex aspect-square items-center justify-center text-[min(8vw,38px)] leading-none"
-                    style={{ background: isSel ? "#f6d365" : dark ? "#7fa650" : "#eeeed2" }}
+                    style={{ background: isSel ? "#f6d365" : last?.includes(sq) ? (dark ? "#c8c04a" : "#f3ee8c") : dark ? "#7fa650" : "#eeeed2" }}
                   >
                     {cell && (
                       <span
