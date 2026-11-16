@@ -10,11 +10,13 @@ import PixelEdge from "@/components/PixelEdge";
 import Regions from "@/components/Regions";
 import Reveal from "@/components/Reveal";
 import Story from "@/components/Story";
+import Tournament from "@/components/Tournament";
 
 const CREAM = "var(--color-cream)";
 const GREEN = "var(--color-cgreen)";
 const BLUE = "var(--color-cblue)";
 const YELLOW = "var(--color-cyellow)";
+const PINK = "var(--color-cpink)";
 
 export default function Home() {
   return (
@@ -25,11 +27,13 @@ export default function Home() {
         <Story />
         <PixelEdge from={CREAM} to={GREEN} />
         <ChessDemo />
-        <PixelEdge from={GREEN} to={BLUE} />
-        <Regions />
-        <PixelEdge from={BLUE} to={YELLOW} />
+        <PixelEdge from={GREEN} to={YELLOW} />
         <Companion />
-        <PixelEdge from={YELLOW} to="var(--color-night)" />
+        <PixelEdge from={YELLOW} to={PINK} />
+        <Tournament />
+        <PixelEdge from={PINK} to={BLUE} />
+        <Regions />
+        <PixelEdge from={BLUE} to="var(--color-night)" />
         <Friends />
         <PixelEdge from="var(--color-night2)" to={CREAM} />
         <Build />
