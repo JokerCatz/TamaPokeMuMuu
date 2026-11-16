@@ -12,8 +12,9 @@
 #define BK_PATH "/backup.bin"
 #define BK_TMP "/backup.tmp"
 #define BK_VER 1
-static const char *const NS[] = { "tamapoke", "chess", "fest" };
-#define NS_COUNT 3
+// "link": numero de jugador y amigos de "见面" (al final: las copias viejas siguen valiendo)
+static const char *const NS[] = { "tamapoke", "chess", "fest", "link" };
+#define NS_COUNT 4
 
 static bool put(File &f, const void *d, size_t n) { return f.write((const uint8_t *)d, n) == n; }
 static bool get(File &f, void *d, size_t n) { return f.read((uint8_t *)d, n) == (int)n; }

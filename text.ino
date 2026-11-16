@@ -134,7 +134,7 @@ void printT(const char *s) {
 // mientras su "clave" no cambie no se repintan ni se vuelcan por QSPI.
 static bool staticScreen() {
   if (pet.awaitingStarter()) return true;
-  if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || shopOpen) return false;  // gestionan su propio repintado
+  if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || linkOpen || shopOpen) return false;  // gestionan su propio repintado
   if (kbOpen || clockOpen) return true;
   return cardOpen && cardPage != 0;  // la pagina 0 tiene el retrato animado
 }

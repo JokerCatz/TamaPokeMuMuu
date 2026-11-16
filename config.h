@@ -14,6 +14,12 @@
 #endif
 static_assert(sizeof(OWNER_NAME) <= 17, "OWNER_NAME: 16 bytes como mucho (cabe en los bocadillos)");
 
+// nombre en la red de casa: http://MDNS_HOST.local (pasos y hockey desde el movil). Si otra placa
+// esta en la misma red, cada una necesita el suyo (si no, el movil puede hablar con la otra)
+#ifndef MDNS_HOST
+#define MDNS_HOST "tamapoke"
+#endif
+
 #ifndef CHESS_USER
 #define CHESS_USER ""  // usuario de chess.com por defecto; manda el del portal Wi-Fi (vacio = solo el del portal)
 #endif

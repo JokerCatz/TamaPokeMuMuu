@@ -20,6 +20,7 @@ static DNSServer *dns = nullptr;
 static bool guardado = false;
 static uint32_t portalHasta = 0;
 static volatile bool portalOn = false;
+static volatile bool linkOn = false;  // la pagina "见面" tiene la radio (link.cpp)
 #define PORTAL_MS (5UL * 60 * 1000)  // el punto de acceso se cierra solo a los 5 min
 
 // la radio es de uno solo: la tarea de red, la sincronizacion del ajedrez y el
@@ -222,6 +223,20 @@ void wifiPortalStop() {
   portalOn = false;
   wxNow = true;  // red nueva (o la misma): tiempo al momento
 }
+
+// la pagina "见面" (ESP-NOW, link.cpp) necesita la radio en un canal fijo: como el portal,
+// se para lo de casa (Stack-chan, el servidor del movil) y se desconecta. La tarea de red no
+// vuelve a conectar hasta netRadioGive
+void netRadioTake() {
+  netLock();
+  linkOn = true;
+  mcpStop();
+  phoneStepsStop();
+  WiFi.disconnect(true);
+  netUnlock();
+}
+
+void netRadioGive() { linkOn = false; }  // link.cpp ya apago el Wi-Fi: la tarea vuelve a conectar sola
 
 // ---------- conexion ----------
 
@@ -675,7 +690,7 @@ static void mcpStop() {
 static void netTask(void *) {
   uint32_t nextWx = 0, nextJoin = 0;
   for (;;) {
-    if (portalOn || !wifiHasCreds()) {
+    if (portalOn || linkOn || !wifiHasCreds()) {
       vTaskDelay(pdMS_TO_TICKS(2000));
       continue;
     }

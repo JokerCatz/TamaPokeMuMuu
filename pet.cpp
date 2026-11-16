@@ -1164,6 +1164,27 @@ void Pet::becomeVacant() {
   save();
 }
 
+void Pet::addFriendDex(const uint8_t *bits, size_t n) {
+  if (n > sizeof(dexFriend)) n = sizeof(dexFriend);
+  bool nuevo = false;
+  for (size_t i = 0; i < n; i++) {
+    uint8_t b = bits[i];
+    if (i == PET_DEX_BYTES - 1 && PET_DEX_MAX % 8) b &= (uint8_t)((1 << (PET_DEX_MAX % 8)) - 1);  // nada mas alla de la 1025
+    if (b & ~dexFriend[i]) nuevo = true;
+    dexFriend[i] |= b;
+  }
+  if (nuevo) pendingSave = true;
+}
+
+void Pet::friendPlay() {
+  if (ceremony != CER_NONE || isEgg() || vacant) return;
+  joy = clamp100(joy + 15);
+  heartUntil = millis() + HEART_MS;
+  addBond(3);
+  registerCare();
+  pendingSave = true;
+}
+
 void Pet::sportsDone(bool won) {
   if (ceremony != CER_NONE || isEgg() || vacant) return;
   energy = clamp100(energy - 6);
@@ -1421,6 +1442,7 @@ void Pet::save() {
   prefs.putBool("eshy", eggShiny);
   prefs.putBool("stpk", starterPick);
   prefs.putBytes("dexsh", dexShinyReg, sizeof(dexShinyReg));
+  prefs.putBytes("dexfr", dexFriend, sizeof(dexFriend));
   prefs.putUInt("age", ageMinutes);
   prefs.putShort("dexn", speciesId);
   prefs.putShort("eggT2", eggTarget);
@@ -1512,6 +1534,7 @@ void Pet::load() {
   eggShiny = prefs.getBool("eshy", false);
   starterPick = prefs.getBool("stpk", false);
   prefs.getBytes("dexsh", dexShinyReg, sizeof(dexShinyReg));
+  prefs.getBytes("dexfr", dexFriend, sizeof(dexFriend));
   ageMinutes = prefs.getUInt("age", 0);
   if (prefs.isKey("dexn")) {
     speciesId = prefs.getShort("dexn", -1);

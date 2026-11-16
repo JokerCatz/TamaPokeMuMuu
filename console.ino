@@ -83,7 +83,7 @@ void handleShake(uint32_t now) {
   }
   orientation(gy, gz, now);
   if (!ev || screenOff || pet.awaitingStarter() || pet.ceremony) return;
-  if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || shopOpen || cardOpen || kbOpen || clockOpen || wifiPortalActive()) return;
+  if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || linkOpen || shopOpen || cardOpen || kbOpen || clockOpen || wifiPortalActive()) return;
   wakeUI();
   if (pet.isEgg()) {
     if (!pet.vacant && (ev & SHAKE_SOFT)) {
@@ -385,6 +385,12 @@ void handleSerial() {
     pet.megaUntil = s > 0 && pet.lastSeenEpoch ? pet.lastSeenEpoch + s : 0;
     Serial.printf("mega=%d hasta=%lu\n", pet.isMega(), (unsigned long)pet.megaUntil);
     Serial.println("DONE");
+  } else if (line.startsWith("FRIENDTEST")) {  // FRIENDTEST 1/0: juegos con un amigo sin efectos (solo RAM)
+    friendSetTest(line.substring(10).toInt() != 0);
+    Serial.printf("friendtest=%d\n", friendTestMode());
+    Serial.println("DONE");
+  } else if (line.startsWith("LINK")) {  // "见面" sin la pagina (pruebas con dos placas; ver link.h)
+    consoleLink(line.substring(4));
   } else if (line == "VISIT") {  // que venga ya alguien de la granja (pruebas)
     nextVisit = millis();
     Serial.println("DONE");
@@ -552,4 +558,49 @@ void handleSerial() {
                   pet.totalMedals, pet.nick);
     Serial.println("DONE");
   }
+}
+
+// LINK ON [min] / OFF / INFO / PAIRTEST / PING n [bytes] / BIG n / VER [a.b] / FORGET i|ALL / PAGE
+// PAIRTEST y VER solo cambian la RAM; FORGET si borra amigos guardados (solo para limpiar)
+void consoleLink(String a) {
+  a.trim();
+  if (a.startsWith("ON")) {
+    int min = a.substring(2).toInt();
+    bool ok = linkStart((uint32_t)(min > 0 ? min : 10) * 60000UL);
+    Serial.println(ok ? "link: ON" : "link: no se pudo");
+  } else if (a == "OFF") {
+    if (linkOpen) closeLink();
+    else linkStop();
+  } else if (a == "INFO") {
+    linkInfo();
+  } else if (a == "PAIRTEST") {
+    Serial.println(linkPairTest() ? "link: emparejando (solo RAM)..." : "link: no hay ninguna placa nueva cerca");
+  } else if (a.startsWith("PING") || a.startsWith("BIG")) {
+    bool big = a.startsWith("BIG");
+    a = a.substring(big ? 3 : 4);
+    a.trim();
+    int n = a.toInt(), sp = a.indexOf(' ');
+    int len = big ? LINK_BODY_MAX : sp > 0 ? a.substring(sp + 1).toInt() : LINK_PING_MIN;
+    if (linkPingTest(n > 0 ? n : 20, len)) return;  // el resultado (y DONE) sale al acabar
+    Serial.println("link: no hay ningun amigo que conteste cerca");
+  } else if (a.startsWith("VER")) {
+    a = a.substring(3);
+    a.trim();
+    int dot = a.indexOf('.');
+    if (a.length() && dot > 0) linkSetVersion(a.substring(0, dot).toInt(), a.substring(dot + 1).toInt());
+    else linkSetVersion(LINK_VER_MAJOR, LINK_VER_MINOR);
+    linkInfo();
+  } else if (a.startsWith("FORGET")) {
+    a = a.substring(6);
+    a.trim();
+    if (!linkActive()) Serial.println("link: primero LINK ON (los amigos se leen al abrir)");
+    else if (a == "ALL") while (linkFriendCount()) linkForget(0);
+    else if (a.length()) Serial.println(linkForget(a.toInt()) ? "link: olvidado" : "link: no existe");
+  } else if (a == "PAGE") {
+    if (linkOpen) closeLink();
+    else { hubOpen = true; openLink(); }
+  } else {
+    Serial.println("LINK ON [min] | OFF | INFO | PAIRTEST | PING n [bytes] | BIG n | VER [a.b] | FORGET i|ALL | PAGE");
+  }
+  Serial.println("DONE");
 }

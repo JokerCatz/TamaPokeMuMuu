@@ -57,13 +57,14 @@ void collectCurrent() {
 }
 
 // ---------- actividades: la pagina a la izquierda de la principal ----------
-// cuatro filas: granja, torneo, gimnasios y ocio
+// cinco filas: granja, torneo, gimnasios, ocio y "见面" (la quinta acaba en y=384, aun dentro
+// del circulo: alli se puede dibujar de x=54 a 412)
 #define HUB_ROW_X 63
 #define HUB_ROW_W 340
-#define HUB_ROW_H 66
-#define HUB_ROW_Y0 88
-#define HUB_ROW_STEP 74
-enum { HUB_FARM, HUB_SPORTS, HUB_GYMS, HUB_FUN, HUB_ROWS };
+#define HUB_ROW_H 56
+#define HUB_ROW_Y0 80
+#define HUB_ROW_STEP 62
+enum { HUB_FARM, HUB_SPORTS, HUB_GYMS, HUB_FUN, HUB_LINK, HUB_ROWS };
 
 void openHub() {
   if (pet.ceremony) return;
@@ -85,13 +86,13 @@ static void hubRow(int row, uint16_t fill, const char *const *icon, bool on, con
   int y = HUB_ROW_Y0 + row * HUB_ROW_STEP;
   gfx->fillRoundRect(HUB_ROW_X, y, HUB_ROW_W, HUB_ROW_H, 18, on ? fill : UI_TRACK);
   gfx->drawRoundRect(HUB_ROW_X, y, HUB_ROW_W, HUB_ROW_H, 18, UI_INK);
-  drawMap(icon, 16, HUB_ROW_X + 14, y + 9, 3, !on);
+  drawMap(icon, 16, HUB_ROW_X + 14, y + 4, 3, !on);
   gfx->setTextColor(UI_INK);
   setSize(3);
-  setCur(HUB_ROW_X + 76, y + 8);
+  setCur(HUB_ROW_X + 76, y + 5);
   printT(title);
   setSize(2);
-  setCur(HUB_ROW_X + 76, y + 42);
+  setCur(HUB_ROW_X + 76, y + 34);
   printT(sub);
 }
 
@@ -111,6 +112,7 @@ void renderHub() {
   snprintf(b, sizeof(b), T(S_BADGES_TOTAL_FMT), (unsigned)pet.totalBadges());
   hubRow(HUB_GYMS, 0xAEFF, SPR_ICON_GYM, true, T(S_GYMS), b);  // la lista sirve tambien de vitrina
   hubRow(HUB_FUN, C565(0xf8, 0xd0, 0xc8), SPR_ICON_FUN, true, T(S_HUB_FUN), T(S_HUB_FUN_HINT));
+  hubRow(HUB_LINK, C565(0xd8, 0xd8, 0xf8), SPR_ICON_LINK, true, T(S_HUB_LINK), T(S_HUB_LINK_HINT));
   gfx->setTextColor(UI_HINT);
   setSize(2);
   setCur(centerX(T(S_SWIPE_R_BACK), 2), 392);
@@ -134,9 +136,12 @@ void hubTap(int16_t x, int16_t y) {
   } else if (row == HUB_GYMS) {
     sfxPlay(SFX_TAP);
     openGyms();
-  } else {
+  } else if (row == HUB_FUN) {
     sfxPlay(SFX_TAP);
     openFun();
+  } else {
+    sfxPlay(SFX_TAP);
+    openLink();
   }
 }
 

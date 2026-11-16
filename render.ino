@@ -45,6 +45,10 @@ bool render() {
     renderFun();
     return true;
   }
+  if (linkOpen) {
+    renderLink();
+    return true;
+  }
   if (hubOpen) {
     renderHub();
     return true;

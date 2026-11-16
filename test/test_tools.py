@@ -264,6 +264,14 @@ class TestBuffersDeTexto(unittest.TestCase):
         'S_GOT_BADGE_FMT': ('medalla_gym',),
         'S_ALSO_GOT_FMT': ('objeto',),
         'S_GOOD_AT_FMT': ('prueba', 'prueba'),  # las dos pruebas del torneo en que destaca
+        'S_LINK_ASK_FMT': ('nombre_o_dueño',),  # "见面": el compañero de otra placa, o el dueño si es amigo
+        'S_LINK_DONE_FMT': ('dueño',),           # el nombre que manda la otra placa (LINK_NAME = 16)
+        'S_FR_GIFT_IN_FMT': ('dueño',),          # juegos con un amigo (friend_play.ino)
+        'S_FR_GIFT_IN2_FMT': ('objeto',),
+        'S_FR_GIFT_GOT_FMT': ('objeto',),
+        'S_FR_RACE_IN_FMT': ('dueño',),
+        'S_FR_GYM_IN_FMT': ('dueño',),
+        'S_FR_GO_Q_FMT': ('prueba_o_lider',),    # la prueba de la carrera o el lider del gimnasio
     }
     CIFRAS = {'u': 5, 'd': 5, 'lu': 10}
     ESPEC = re.compile(r'%0?\d*(lu|u|d|s)')
@@ -341,6 +349,11 @@ class TestBuffersDeTexto(unittest.TestCase):
                 total += max(self.NOMBRE[lang], self.APODO)
             elif arg == 'dueño':  # OWNER_NAME (config.h, con su tope)
                 total += self.DUENO
+            elif arg == 'nombre_o_dueño':
+                total += max(self.NOMBRE[lang], self.DUENO)
+            elif arg == 'prueba_o_lider':
+                total += max(max(self.bytes_literal(v[li]) for k, v in self.LIT.items() if k.startswith('S_EV_')),
+                             self.GYM[('lider', lang)])
             elif arg == 'region':
                 total += max(self.bytes_literal(self.LIT[f'S_REGION_{k}'][li]) for k in range(1, 10))
             elif arg in ('lider', 'medalla_gym'):

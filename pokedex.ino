@@ -7,6 +7,14 @@
 #define GAL_Y 84
 #define GAL_CELL 80
 
+// marca de "lo crio un amigo" ("见面"): un corazoncito rosa en la esquina de la casilla
+void drawFriendMark(int cx, int cy) {
+  const uint16_t c = C565(0xf0, 0x70, 0x98);
+  gfx->fillCircle(cx - 4, cy - 2, 5, c);
+  gfx->fillCircle(cx + 4, cy - 2, 5, c);
+  gfx->fillTriangle(cx - 9, cy, cx + 9, cy, cx, cy + 10, c);
+}
+
 // dibuja una miniatura centrada en su celda; sil=true la pinta en tinta
 void drawThumb(const uint8_t *b, int x, int y, int s, bool sil) { drawThumbIn(b, x, y, s, sil, GAL_CELL); }
 
@@ -112,6 +120,7 @@ void renderGallery() {
       const uint8_t *t = thumbs.get(dex);
       if (t) {
         drawThumb(t, x, y, 2, !galleryShowAll && !pet.isRegistered(dex));
+        if (!galleryShowAll && !pet.isRegistered(dex) && pet.isFriendSeen(dex)) drawFriendMark(x + 64, y + 12);
         if (pet.isShinyRegistered(dex)) {
           gfx->setTextColor(UI_BAR_WARN);
           setSize(2);

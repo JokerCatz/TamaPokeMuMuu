@@ -672,6 +672,26 @@ ICON_GYM = [
     "................",
 ]
 
+# 见面: dos corazones que se hablan (dos placas que se hacen amigas)
+ICON_LINK = [
+    "................",
+    "................",
+    "..kk.kk.........",
+    ".kwpkppk........",
+    ".kpppppk..b.....",
+    "..kpppk..b......",
+    "...kpk..........",
+    "....k....kk.kk..",
+    "........kwrkrrk.",
+    ".....b..krrrrrk.",
+    "......b..krrrk..",
+    "..........krk...",
+    "...........k....",
+    "................",
+    "................",
+    "................",
+]
+
 SPRITES = {
     "CHARMANDER": charmander(),
     "CHARMELEON": charmeleon(),
@@ -696,6 +716,7 @@ SPRITES = {
     "ICON_TROPHY": ICON_TROPHY,
     "ICON_FUN": ICON_FUN,
     "ICON_GYM": ICON_GYM,
+    "ICON_LINK": ICON_LINK,
     "ICON_STAR": icon_star(),
     "EGG": egg(),
     "POOP": poop(),

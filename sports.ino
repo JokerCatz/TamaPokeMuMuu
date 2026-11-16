@@ -7,7 +7,7 @@
 // Va a ~10 fps (lo que da volcar la pantalla entera): todo se mueve con el tiempo real.
 // (pestaña de TamaPoke.ino: Arduino la une al final del principal)
 
-enum : uint8_t { CH_MENU = 0, CH_READY, CH_COUNT, CH_PLAY, CH_DONE };
+enum : uint8_t { CH_MENU = 0, CH_READY, CH_COUNT, CH_PLAY, CH_DONE, CH_WAIT };  // WAIT: a que conteste el amigo
 static uint8_t chStage = CH_MENU, chEv = EV_SPRINT;
 static bool chGym = false;          // prueba de gimnasio (uno contra uno), no el torneo
 static uint32_t chT0 = 0;           // inicio de la fase (millis)
@@ -20,6 +20,8 @@ static float marks[3];              // segundos, metros, kilos, puntos (segun la
 static uint8_t chPlace = 0;
 static bool chStone = false, chRoundWon = false;
 static bool chPractice = false;     // consola SPORT: sin premio ni cansancio
+static int8_t chFriend = -1;        // con un amigo (friend_play.ino): su indice; -1 = solo
+static bool chHost = false;         // con un amigo: yo invite (sorteo y calculo; el lo ve)
 static char chTitle[48];            // gimnasio: quien y que ronda
 
 // como se juega en pantalla
@@ -75,6 +77,7 @@ void openSports() {
   chOpen = true;
   chGym = false;
   chPractice = false;
+  chFriend = -1;
   chStage = CH_MENU;
 }
 
@@ -82,13 +85,124 @@ void sportsPractice(uint8_t ev) {  // consola: directo a una prueba del torneo, 
   chOpen = true;
   chGym = false;
   chPractice = true;
+  chFriend = -1;
   startEvent(ev);
 }
 
 static void closeSports() {
   chOpen = false;
   chStage = CH_MENU;
+  chFriend = -1;
   for (int i = 0; i < 2; i++) rivalPmd[i].unload();
+}
+
+// ---------- carrera con un amigo (friend_play.ino) ----------
+// Tres carriles: yo, el amigo y un rival al azar. El que invita sortea el rival y la suerte,
+// calcula las marcas y se las manda (FM_RACE); los dos empiezan a la vez, sin tocar. Cada uno
+// se lleva lo suyo como siempre (el ganador, su Mega Stone del dia). Nada de puntos.
+
+bool sportsWithFriendNow() { return chOpen && chFriend >= 0; }
+
+void sportsWithFriend(uint8_t fi) {
+  openSports();
+  chFriend = fi;
+  chHost = true;
+}
+
+// el rival del carril 2: al azar, distinto de los dos amigos
+static void pickRivalFor(int16_t a, int16_t b) {
+  rivalPmd[1].unload();
+  rivalDex[1] = -1;
+  for (int tries = 0; tries < 12 && !rivalPmd[1].loaded; tries++) {
+    int16_t d = 1 + random(DEX_COUNT);
+    if (d == a || d == b || DEX_TBL[d].rarity == R_NONE) continue;
+    if (rivalPmd[1].load(d, false)) rivalDex[1] = d;
+  }
+  if (rivalDex[1] < 0) rivalDex[1] = 1 + random(151);
+}
+
+// con las marcas ya puestas (carril 0 yo, 1 el amigo, 2 el rival): cuenta atras en las dos
+static void startTogether(uint8_t fi) {
+  chGym = false;
+  chPractice = friendTestMode();  // consola FRIENDTEST: sin premio ni cansancio
+  nAth = 3;
+  athPmd[0] = &pmd;
+  athPmd[1] = &rivalPmd[0];
+  athPmd[2] = &rivalPmd[1];
+  athName[0] = T(S_YOU);
+  athName[1] = friendName(fi);
+  athName[2] = dexName(rivalDex[1]);
+  chTime = 0;
+  chStage = CH_COUNT;
+  chT0 = millis();
+  Serial.printf("sports con amigo ev=%u yo=%.2f amigo=%.2f rival=%d %.2f\n", chEv, marks[0], marks[1], rivalDex[1],
+                marks[2]);
+}
+
+// yo invite y el amigo contesta: si viene, se decide la carrera y se le manda
+void sportsFriendAnswer(uint8_t fi, const FInviteAns &a) {
+  if (!chOpen || chFriend != (int8_t)fi || chStage != CH_WAIT) return;
+  if (a.answer != FW_OK) {
+    toast(T(a.answer == FW_BUSY ? S_FR_BUSY : a.answer == FW_CANT ? S_FR_CANT : S_LINK_SAID_NO));
+    chStage = CH_MENU;
+    return;
+  }
+  rivalPmd[0].unload();
+  rivalPmd[0].load(a.ath.dex, a.ath.shiny);
+  rivalDex[0] = a.ath.dex;
+  pickRivalFor(pet.speciesId, a.ath.dex);
+  Athlete at[3] = { petAthlete(), friendAthlete(a.ath), rivalAthlete(rivalDex[1], urand(), urand(), urand(), urand()) };
+  FRace r;
+  r.ev = chEv;
+  r.dex[0] = pet.speciesId;
+  r.dex[1] = a.ath.dex;
+  r.dex[2] = rivalDex[1];
+  r.shiny[0] = pet.shiny;
+  r.shiny[1] = a.ath.shiny;
+  for (int i = 0; i < 3; i++) r.marks[i] = marks[i] = eventMark(chEv, performance(athleteRating(at[i], chEv), urand()));
+  friendSendRace(fi, r);
+  startTogether(fi);
+}
+
+// el amigo invito, dije que si y llega su carrera: la misma, con mi carril el primero
+void sportsJoinRace(uint8_t fi, const FRace &r) {
+  chOpen = true;
+  chFriend = fi;
+  chHost = false;
+  chEv = r.ev < EV_COUNT ? r.ev : EV_SPRINT;  // las 11 del torneo
+  rivalPmd[0].unload();
+  rivalPmd[0].load(r.dex[0], r.shiny[0]);
+  rivalDex[0] = r.dex[0];
+  rivalPmd[1].unload();
+  rivalPmd[1].load(r.dex[2], false);
+  rivalDex[1] = r.dex[2];
+  marks[0] = r.marks[1];
+  marks[1] = r.marks[0];
+  marks[2] = r.marks[2];
+  startTogether(fi);
+}
+
+// el amigo fi propone algo mientras aqui se esta en su menu de carreras o en el podio: se deja para
+// contestarle. Si los dos invitaron a la vez (los dos esperando), cede el de numero de jugador mas
+// alto: el otro sigue esperando su respuesta, y este la pregunta
+bool sportsLeaveForFriend(uint8_t fi) {
+  if (!chOpen || chFriend != (int8_t)fi || fi >= linkFriendCount()) return false;
+  bool cede = chStage == CH_MENU || chStage == CH_DONE || (chStage == CH_WAIT && linkSelfId() > linkFriendAt(fi).pid);
+  if (!cede) return false;
+  closeSports();
+  return true;
+}
+
+void sportsFriendGone(uint8_t fi) {  // el amigo se fue mientras se le esperaba
+  if (chOpen && chFriend == (int8_t)fi && chStage == CH_WAIT) {
+    toast(T(S_FR_GONE));
+    chStage = CH_MENU;
+  }
+}
+
+void sportsMarks(float out[2]) {  // las de la ultima prueba de gimnasio (gyms.ino las manda al amigo)
+  out[0] = marks[0];
+  out[1] = marks[1];
 }
 
 // torneo: se sortean los rivales y se decide ya como le va a cada uno; luego solo se ve
@@ -117,8 +231,9 @@ static void startEvent(uint8_t ev) {
 }
 
 // gimnasio: una prueba uno contra uno (los sprites ya cargados por gyms.ino)
+// together: con un amigo (empieza ya, sin tocar, en las dos); fixed: las marcas que mando el
 void sportsRound(uint8_t ev, PmdMon *mine, const char *mineName, const Athlete &a, PmdMon *theirs,
-                 const char *theirName, const Athlete &b, const char *title) {
+                 const char *theirName, const Athlete &b, const char *title, bool together, const float *fixed) {
   chOpen = true;
   chGym = true;
   chPractice = false;
@@ -128,12 +243,18 @@ void sportsRound(uint8_t ev, PmdMon *mine, const char *mineName, const Athlete &
   athPmd[1] = theirs;
   athName[0] = mineName;
   athName[1] = theirName;
-  marks[0] = eventMark(ev, performance(athleteRating(a, ev), urand()));
-  marks[1] = eventMark(ev, performance(athleteRating(b, ev), urand()));
+  if (fixed) {
+    marks[0] = fixed[0];
+    marks[1] = fixed[1];
+  } else {
+    marks[0] = eventMark(ev, performance(athleteRating(a, ev), urand()));
+    marks[1] = eventMark(ev, performance(athleteRating(b, ev), urand()));
+  }
   strncpy(chTitle, title, sizeof(chTitle) - 1);
   chTitle[sizeof(chTitle) - 1] = 0;
   chTime = 0;
-  chStage = CH_READY;
+  chStage = together ? CH_COUNT : CH_READY;
+  chT0 = millis();
 }
 
 static void finishEvent() {
@@ -687,6 +808,17 @@ void renderSports() {
     gfx->flush();
     return;
   }
+  if (chStage == CH_WAIT) {  // esperando al amigo (con un plazo)
+    if (now - chT0 > 35000) {
+      toast(T(S_FR_GONE));
+      chStage = CH_MENU;
+    }
+    renderSportsMenu();
+    lkPanel(nullptr, T(S_FR_WAIT_FRIEND), nullptr);
+    drawToast();
+    gfx->flush();
+    return;
+  }
   if (chStage == CH_COUNT || chStage == CH_PLAY) wakeScreen(now);  // mirando no se atenua
   if (chStage == CH_COUNT && now - chT0 >= 2100) {
     chStage = CH_PLAY;
@@ -751,7 +883,20 @@ void sportsTap(int16_t x, int16_t y) {
       int i = menuHit(x, y);
       if (i >= 0) {
         sfxPlay(SFX_TAP);
-        startEvent(i);
+        if (chFriend < 0) {
+          startEvent(i);
+          break;
+        }
+        FInvite v;  // con un amigo: se le invita a esta prueba y se espera su si
+        v.kind = FK_RACE;
+        v.a = (uint8_t)i;
+        if (!friendInvite(chFriend, v)) {
+          toast(T(S_FR_GONE));
+          break;
+        }
+        chEv = i;
+        chStage = CH_WAIT;
+        chT0 = millis();
       }
       break;
     }
@@ -763,7 +908,11 @@ void sportsTap(int16_t x, int16_t y) {
       if (millis() - chT0 < 1500) break;
       if (chGym) {
         chOpen = false;
-        gymRoundDone(chRoundWon);  // gyms.ino: la siguiente prueba o el final
+        if (gymsOpen) gymRoundDone(chRoundWon);  // gyms.ino: la siguiente prueba o el final
+        break;                                    // (si ayudo a un amigo, la siguiente la manda el)
+      }
+      if (chFriend >= 0 && !chHost) {  // fui a la carrera de un amigo: vuelta a "见面"
+        closeSports();
         break;
       }
       for (int i = 0; i < 2; i++) rivalPmd[i].unload();
@@ -776,6 +925,15 @@ void sportsTap(int16_t x, int16_t y) {
 
 void sportsSwipe(int dir) {
   if (dir <= 0 || chGym) return;  // en un gimnasio no se sale a medias
+  if (chStage == CH_WAIT) {      // ya no se espera al amigo
+    friendCancel(chFriend);
+    chStage = CH_MENU;
+    return;
+  }
+  if (chFriend >= 0 && !chHost && chStage == CH_DONE) {
+    closeSports();
+    return;
+  }
   if (chStage == CH_COUNT || chStage == CH_PLAY) return;  // mientras se juega no se sale sin querer
   if (chStage == CH_MENU) closeSports();  // a actividades
   else {

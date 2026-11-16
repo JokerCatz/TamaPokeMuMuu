@@ -5,7 +5,7 @@
 // Un intento al dia por gimnasio (y por liga). Las pruebas las juega sports.ino.
 // (pestaña de TamaPoke.ino: Arduino la une al final del principal)
 
-enum : uint8_t { GY_LIST = 0, GY_DETAIL, GY_TEAM, GY_ORDER, GY_END };
+enum : uint8_t { GY_LIST = 0, GY_DETAIL, GY_TEAM, GY_ORDER, GY_END, GY_WAIT };  // WAIT: a que conteste el amigo
 static uint8_t gyStage = GY_LIST, gyRegion = 0, gySel = 0;  // gySel 0..7 gimnasio, 8 liga
 static bool gyLeague = false;
 static uint8_t lgMember = 0;             // liga: 0..3 alto mando, 4 campeon
@@ -20,6 +20,12 @@ static uint8_t gyItem = 0xFF;            // regalo con la medalla
 static bool gyNewBadge = false;
 static uint32_t gyEndAt = 0;
 static bool gyPractice = false;         // consola GYM: sin gastar el intento ni ganar nada
+// con un amigo (friend_play.ino): yo pongo el compañero y uno de la granja, el su compañero (el 3o
+// del equipo). El intento y la medalla son mios; yo calculo cada prueba y se la mando (FM_ROUND)
+static int8_t gyFriend = -1;
+static FAthlete gyFriendAth;
+static bool gyHelper = false;           // soy el amigo: solo se ve lo que manda el
+static uint32_t gyWaitAt = 0;
 
 static const char *gtx(const char *en, const char *zh) { return gLang == LANG_ZH ? zh : en; }
 
@@ -33,6 +39,7 @@ void openGyms() {
   if (pet.ceremony) return;
   gymsOpen = true;
   gyPractice = false;
+  gyFriend = -1;
   gyStage = GY_LIST;
   // la primera region abierta en la que aun falte algo
   gyRegion = 0;
@@ -41,6 +48,8 @@ void openGyms() {
 }
 
 static void closeGyms() {
+  if (gyFriend >= 0 && gyStage == GY_WAIT) friendCancel(gyFriend);
+  gyFriend = -1;
   gymsOpen = false;
   for (int i = 0; i < 2; i++) rivalPmd[i].unload();
 }
@@ -142,7 +151,8 @@ static void gymListTap(int16_t x, int16_t y) {
 
 // por que no se puede retar ahora (nullptr = si se puede)
 static const char *gymBlocked() {
-  if (gyPractice) return farmCount() < 2 ? T(S_NEED_FARM2) : nullptr;
+  uint8_t granja = gyFriend >= 0 ? 1 : 2;  // con un amigo, el tercero lo pone el
+  if (gyPractice) return farmCount() < granja ? T(S_NEED_FARM2) : nullptr;
   const char *s = sportsBlocked();
   if (s) return s;
   if (gyRegion >= pet.unlockedRegions()) return T(S_REGION_LOCKED);
@@ -153,7 +163,7 @@ static const char *gymBlocked() {
     if (!pet.gymOpen(gyRegion, gySel)) return T(S_GYM_NEED_BADGE);
     if (pet.gymTriedToday(gyRegion, gySel)) return T(S_GYM_TRIED);
   }
-  if (farmCount() < 2) return T(S_NEED_FARM2);
+  if (farmCount() < granja) return T(S_NEED_FARM2);
   return nullptr;
 }
 
@@ -236,6 +246,16 @@ static void gymDetailTap(int16_t x, int16_t y) {
   const char *no = gymBlocked();
   if (no) { toast(no); return; }
   sfxPlay(SFX_TAP);
+  if (gyFriend >= 0) {  // con un amigo: se le pregunta y se espera a que traiga su compañero
+    FInvite v;
+    v.kind = FK_GYM;
+    v.a = gyRegion;
+    v.b = gyLeague ? 8 : gySel;
+    if (!friendInvite(gyFriend, v)) { toast(T(S_FR_GONE)); return; }
+    gyStage = GY_WAIT;
+    gyWaitAt = millis();
+    return;
+  }
   farmPick[0] = farmPick[1] = -1;
   gyPage = 0;
   gyStage = GY_TEAM;
@@ -265,13 +285,21 @@ static void renderGymTeam() {
   gfx->fillScreen(RGB565_BLACK);
   gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
   gfx->setTextColor(UI_INK);
+  bool juntos = gyFriend >= 0;
+  const char *h = T(juntos ? S_PICK_ONE : S_PICK_TWO);
   setSize(3);
-  setCur(centerX(T(S_PICK_TWO), 3), 34);
-  printT(T(S_PICK_TWO));
-  // el compañero siempre va
+  setCur(centerX(h, 3), 34);
+  printT(h);
+  // el compañero siempre va (y con un amigo, el suyo)
+  int xc = juntos ? CX - 88 : CX - 32;
   const uint8_t *t = thumbs.get(pet.speciesId);
-  if (t) drawThumb(t, CX - 32, 74, 2, false);
-  drawFitMarks(pet.speciesId, CX - 40, 74, 80);
+  if (t) drawThumb(t, xc, 74, 2, false);
+  drawFitMarks(pet.speciesId, xc - 8, 74, 80);
+  if (juntos) {
+    const uint8_t *f = thumbs.get(gyFriendAth.dex);
+    if (f) drawThumb(f, CX + 8, 74, 2, false);
+    drawFitMarks(gyFriendAth.dex, CX, 74, 80);
+  }
   for (int i = 0; i < 6; i++) {
     int idx = gyPage * 6 + i;
     if (idx >= farmCount()) break;
@@ -283,7 +311,7 @@ static void renderGymTeam() {
     if (th) drawThumbIn(th, x, y, 2, false, FT_CELL - 6);
     drawFitMarks(farmAt(idx).speciesId, x, y, FT_CELL - 6);
   }
-  bool listo = farmPick[0] >= 0 && farmPick[1] >= 0;
+  bool listo = farmPick[0] >= 0 && (juntos || farmPick[1] >= 0);
   gfx->fillRoundRect(CX - 90, 340, 180, 42, 14, listo ? UI_BAR_OK : UI_TRACK);
   gfx->setTextColor(listo ? UI_WHITE : UI_HINT);
   setSize(2);
@@ -311,6 +339,11 @@ static void toOrder() {
   teamDex[0] = pet.speciesId;
   teamA[0] = petAthlete();
   for (int i = 0; i < 2; i++) {
+    if (i == 1 && gyFriend >= 0) {  // el tercero es el compañero del amigo
+      teamDex[2] = gyFriendAth.dex;
+      teamA[2] = friendAthlete(gyFriendAth);
+      continue;
+    }
     teamDex[i + 1] = farmAt(farmPick[i]).speciesId;
     teamA[i + 1] = farmAthlete(farmPick[i]);
   }
@@ -324,7 +357,7 @@ static void toOrder() {
 
 static void gymTeamTap(int16_t x, int16_t y) {
   if (y >= 340 && y <= 382 && abs(x - CX) < 90) {
-    if (farmPick[0] < 0 || farmPick[1] < 0) { toast(T(S_PICK_TWO)); return; }
+    if (farmPick[0] < 0 || (gyFriend < 0 && farmPick[1] < 0)) { toast(T(gyFriend >= 0 ? S_PICK_ONE : S_PICK_TWO)); return; }
     sfxPlay(SFX_TAP);
     toOrder();
     return;
@@ -335,6 +368,10 @@ static void gymTeamTap(int16_t x, int16_t y) {
   int idx = gyPage * 6 + r * 3 + c;
   if (idx >= farmCount()) return;
   sfxPlay(SFX_TAP);
+  if (gyFriend >= 0) {  // con un amigo solo se elige uno
+    farmPick[0] = farmPick[0] == idx ? -1 : idx;
+    return;
+  }
   if (farmPick[0] == idx) farmPick[0] = -1;       // otra vez: se quita
   else if (farmPick[1] == idx) farmPick[1] = -1;
   else if (farmPick[0] < 0) farmPick[0] = idx;
@@ -346,6 +383,7 @@ static void gymTeamTap(int16_t x, int16_t y) {
 
 static const char *memberName(int i) {
   if (i == 0) return pet.nick[0] ? pet.nick : dexName(pet.speciesId);
+  if (i == 2 && gyFriend >= 0) return dexName(gyFriendAth.dex);
   const FarmEntry &e = farmAt(farmPick[i - 1]);
   return e.nick[0] ? e.nick : dexName(e.speciesId);
 }
@@ -418,14 +456,31 @@ static char roundTitle[48];
 static void startRound() {
   uint8_t ev = gyEv[gyRound], mine = gyPerm[gyRound], his = foePerm[gyRound];
   PmdMon *pm = &pmd;
-  if (mine != 0) {  // uno de la granja
-    rivalPmd[0].load(teamDex[mine], false);
+  if (mine != 0) {  // uno de la granja (o el compañero del amigo)
+    rivalPmd[0].load(teamDex[mine], mine == 2 && gyFriend >= 0 && gyFriendAth.shiny);
     pm = &rivalPmd[0];
   }
   rivalPmd[1].load(foe().team[his], false);
   snprintf(roundTitle, sizeof(roundTitle), T(S_ROUND_FMT), gtx(foe().en, foe().zh), (unsigned)gyRound + 1);
   sportsRound(ev, pm, memberName(mine), teamA[mine], &rivalPmd[1], dexName(foe().team[his]), foeAthlete(his),
-              roundTitle);
+              roundTitle, gyFriend >= 0, nullptr);
+  if (gyFriend >= 0) {  // el amigo ve la misma prueba, con las mismas marcas
+    FRound r;
+    r.round = gyRound;
+    r.ev = ev;
+    r.wins = gyWins;
+    r.lost = gyLost;
+    r.league = gyLeague;
+    r.member = lgMember;
+    r.region = gyRegion;
+    r.gym = gyLeague ? 8 : gySel;
+    r.mineDex = teamDex[mine];
+    r.foeDex = foe().team[his];
+    r.mineShiny = mine == 0 ? pet.shiny : mine == 2 ? gyFriendAth.shiny : 0;
+    r.mineHelper = mine == 2;
+    sportsMarks(r.marks);
+    friendSendRound(gyFriend, r);
+  }
 }
 
 // el marcador de la serie, en el resultado de cada prueba (ya contando esta)
@@ -470,6 +525,14 @@ void gymRoundDone(bool won) {
   sfxPlay(gyWon ? SFX_MEDAL : SFX_TAP);
   gyEndAt = millis();
   gyStage = GY_END;
+  if (gyFriend >= 0) {  // el amigo: como acabo (el no se lleva medalla; su compañero se alegra)
+    FGymEnd e;
+    e.won = gyWon;
+    e.region = gyRegion;
+    e.gym = gyLeague ? 8 : gySel;
+    e.member = lgMember;
+    friendSendGymEnd(gyFriend, e);
+  }
   Serial.printf("gimnasio r=%u g=%u liga=%d %s medalla=%d regalo=%d\n", gyRegion, gySel, gyLeague, gyWon ? "gana" : "pierde",
                 gyNewBadge, gyItem);
 }
@@ -536,6 +599,7 @@ void gymsPractice(uint8_t r, uint8_t k) {
   if (r >= REGION_COUNT || k > 8) return;
   hubOpen = gymsOpen = true;
   gyPractice = true;
+  gyFriend = -1;
   gyRegion = r;
   gySel = k;
   gyLeague = k == 8;
@@ -551,6 +615,14 @@ void renderGyms() {
     case GY_DETAIL: renderGymDetail(); break;
     case GY_TEAM: renderGymTeam(); break;
     case GY_ORDER: renderGymOrder(); break;
+    case GY_WAIT:  // esperando al amigo (con un plazo)
+      if (millis() - gyWaitAt > 35000) {
+        toast(T(S_FR_GONE));
+        gyStage = GY_DETAIL;
+      }
+      renderGymDetail();
+      lkPanel(nullptr, T(S_FR_WAIT_FRIEND), nullptr);
+      break;
     default: renderGymEnd();
   }
   gfx->flush();
@@ -562,6 +634,7 @@ void gymsTap(int16_t x, int16_t y) {
     case GY_DETAIL: gymDetailTap(x, y); break;
     case GY_TEAM: gymTeamTap(x, y); break;
     case GY_ORDER: gymOrderTap(x, y); break;
+    case GY_WAIT: break;
     default:
       if (millis() - gyEndAt < 1500) break;  // no con un toque que aun llega
       for (int i = 0; i < 2; i++) rivalPmd[i].unload();
@@ -572,6 +645,13 @@ void gymsTap(int16_t x, int16_t y) {
 // en la lista: izquierda/derecha cambia de region (de la primera, a la derecha, se sale);
 // en las demas pantallas, a la derecha se vuelve atras
 void gymsSwipe(int dir) {
+  if (gyStage == GY_WAIT) {  // ya no se espera al amigo
+    if (dir > 0) {
+      friendCancel(gyFriend);
+      gyStage = GY_DETAIL;
+    }
+    return;
+  }
   if (gyStage == GY_LIST) {
     int r = (int)gyRegion + (dir > 0 ? -1 : 1);
     if (r < 0) { closeGyms(); return; }
@@ -586,3 +666,72 @@ void gymsSwipe(int dir) {
   else if (gyStage == GY_TEAM) gyStage = GY_DETAIL;
   else if (gyStage == GY_ORDER && !(gyLeague && lgMember > 0)) gyStage = GY_TEAM;  // la liga, ya empezada, sigue
 }
+
+// ---------- con un amigo (friend_play.ino) ----------
+
+bool gymsWithFriendNow() { return (gymsOpen && gyFriend >= 0) || gyHelper; }
+
+void gymsWithFriend(uint8_t fi) {
+  openGyms();
+  gyFriend = fi;
+  gyPractice = friendTestMode();  // consola FRIENDTEST: sin gastar el intento ni ganar nada
+}
+
+// yo invite: si viene, a elegir uno de la granja (el tercero es su compañero)
+void gymsFriendAnswer(uint8_t fi, const FInviteAns &a) {
+  if (!gymsOpen || gyFriend != (int8_t)fi || gyStage != GY_WAIT) return;
+  if (a.answer != FW_OK) {
+    toast(T(a.answer == FW_BUSY ? S_FR_BUSY : a.answer == FW_CANT ? S_FR_CANT : S_LINK_SAID_NO));
+    gyStage = GY_DETAIL;
+    return;
+  }
+  gyFriendAth = a.ath;
+  farmPick[0] = farmPick[1] = -1;
+  gyPage = 0;
+  gyStage = GY_TEAM;
+}
+
+// como sportsLeaveForFriend: en la lista, la ficha o el final con ese amigo se deja; si los dos
+// esperan la respuesta del otro, cede el de numero mas alto (sin avisar: la invitacion del otro sigue)
+bool gymsLeaveForFriend(uint8_t fi) {
+  if (!gymsOpen || gyFriend != (int8_t)fi || fi >= linkFriendCount()) return false;
+  bool cede = gyStage == GY_LIST || gyStage == GY_DETAIL || gyStage == GY_END ||
+              (gyStage == GY_WAIT && linkSelfId() > linkFriendAt(fi).pid);
+  if (!cede) return false;
+  gyStage = GY_LIST;  // closeGyms no le manda "lo dejo"
+  closeGyms();
+  return true;
+}
+
+void gymsFriendGone(uint8_t fi) {
+  if (gymsOpen && gyFriend == (int8_t)fi && gyStage == GY_WAIT) {
+    toast(T(S_FR_GONE));
+    gyStage = GY_DETAIL;
+  }
+}
+
+// soy el amigo que ayuda: una prueba tal como la mando el (mi compañero sale como "YOU")
+void gymsHelperRound(const FRound &r) {
+  gyHelper = true;
+  gyRegion = r.region < REGION_COUNT ? r.region : 0;
+  gyLeague = r.gym >= 8;
+  gySel = gyLeague ? 8 : r.gym;
+  lgMember = r.member < LEAGUE_SIZE ? r.member : 0;
+  gyRound = r.round;
+  gyWins = r.wins;
+  gyLost = r.lost;
+  PmdMon *pm = &pmd;
+  if (!r.mineHelper) {
+    rivalPmd[0].unload();
+    rivalPmd[0].load(r.mineDex, r.mineShiny);
+    pm = &rivalPmd[0];
+  }
+  rivalPmd[1].unload();
+  rivalPmd[1].load(r.foeDex, false);
+  snprintf(roundTitle, sizeof(roundTitle), T(S_ROUND_FMT), gtx(foe().en, foe().zh), (unsigned)gyRound + 1);
+  float m[2] = { r.marks[0], r.marks[1] };
+  sportsRound(r.ev < EV_COUNT ? r.ev : 0, pm, r.mineHelper ? T(S_YOU) : dexName(r.mineDex), athleteOf(r.mineDex),
+              &rivalPmd[1], dexName(r.foeDex), athleteOf(r.foeDex), roundTitle, true, m);
+}
+
+void gymsHelperEnd() { gyHelper = false; }

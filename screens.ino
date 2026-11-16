@@ -317,6 +317,7 @@ void clockTap(int16_t x, int16_t y) {
     if (audioEnabled()) sfxPlay(SFX_TAP);  // confirma al encender
   } else if (row0 && col1) {  // configurar wi-fi
     clockOpen = false;
+    if (linkActive()) linkStop();  // la radio no puede estar en las dos cosas
     wifiPortalStart();
   } else if (row1 && col0) {  // cicla idioma
     setLang((Lang)((gLang + 1) % LANG_COUNT));

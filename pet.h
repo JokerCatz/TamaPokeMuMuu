@@ -298,6 +298,9 @@ public:
   // corto (los 19 bytes de cuando habia 151) lo copia y deja el resto a 0.
   uint8_t dexReg[PET_DEX_BYTES] = { 0 };       // pokedex de criados
   uint8_t dexShinyReg[PET_DEX_BYTES] = { 0 };  // criados en version shiny
+  // criados por un amigo ("见面", friend_play.ino): solo una marca en la pokedex. No cuentan como
+  // criados: ni abren regiones ni dan el premio de region
+  uint8_t dexFriend[PET_DEX_BYTES] = { 0 };
   // racha de cuidado diario (del jugador: persiste entre crianzas)
   uint16_t streak = 0, bestStreak = 0;
   uint32_t lastCareDay = 0;
@@ -476,6 +479,11 @@ public:
   bool isRegistered(int16_t dex) const {
     return dex >= 1 && dex <= PET_DEX_MAX && (dexReg[(dex - 1) >> 3] & (1 << ((dex - 1) & 7)));
   }
+  bool isFriendSeen(int16_t dex) const {
+    return dex >= 1 && dex <= PET_DEX_MAX && (dexFriend[(dex - 1) >> 3] & (1 << ((dex - 1) & 7)));
+  }
+  void addFriendDex(const uint8_t *bits, size_t n);  // lo que ha criado un amigo (se suma)
+  void friendPlay();  // jugo con un amigo (la primera vez del dia con el): animo y vinculo
   bool isShinyRegistered(int16_t dex) const {
     return dex >= 1 && dex <= PET_DEX_MAX && (dexShinyReg[(dex - 1) >> 3] & (1 << ((dex - 1) & 7)));
   }

@@ -4,6 +4,7 @@
 #include <WebServer.h>
 #include <ESPmDNS.h>
 #include <Preferences.h>
+#include "config.h"  // MDNS_HOST
 
 static WebServer *srv = nullptr;
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
@@ -73,8 +74,8 @@ void phoneStepsLoop() {
     srv->on("/hockey", HTTP_GET, hockey);
     srv->onNotFound([] { srv->send(200, "text/plain", "TamaPoke"); });
     srv->begin();
-    if (MDNS.begin("tamapoke")) MDNS.addService("http", "tcp", 80);
-    Serial.printf("pasos del movil: http://tamapoke.local/steps (%s)\n", WiFi.localIP().toString().c_str());
+    if (MDNS.begin(MDNS_HOST)) MDNS.addService("http", "tcp", 80);
+    Serial.printf("pasos del movil: http://%s.local/steps (%s)\n", MDNS_HOST, WiFi.localIP().toString().c_str());
   }
   srv->handleClient();
 }

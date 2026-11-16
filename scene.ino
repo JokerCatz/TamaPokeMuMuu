@@ -295,7 +295,7 @@ void renderStandby() {
 
 // la pantalla principal esta libre (sin otras pantallas ni dialogos encima)
 bool mainScreenFree() {
-  return !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !shopOpen && !cardOpen && !kbOpen && !clockOpen && !wifiPortalActive() &&
+  return !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !linkOpen && !shopOpen && !cardOpen && !kbOpen && !clockOpen && !wifiPortalActive() &&
          !feedMenuUntil && !actionUntil && !confirmUntil && !choiceKind && !reportPending && !pet.awaitingStarter();
 }
 

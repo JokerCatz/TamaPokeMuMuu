@@ -41,6 +41,9 @@
 #include "steps.h"
 #include "stackchan.h"
 #include "phonesteps.h"
+#include "link.h"     // "见面": otra placa por ESP-NOW
+#include "friendmsg.h" // y los juegos con un amigo (friend_play.ino)
+#include "photos.h"
 #include "holiday.h"
 #include "memoir.h"
 #include "backup.h"
@@ -255,6 +258,7 @@ bool hubOpen = false;    // a la izquierda de la principal: granja y pruebas dep
 bool chOpen = false;     // torneo y pruebas de los gimnasios (sports.ino)
 bool gymsOpen = false;   // gimnasios (gyms.ino)
 bool funOpen = false;    // ocio: huerto, pesca, mina, expedicion (fun.ino)
+bool linkOpen = false;   // "见面": otra placa cerca (link_ui.ino)
 uint32_t grassFxUntil = 0;  // consola GRASSFX: la mata de la hierba se ve un rato (solo se ve)
 PmdMon rivalPmd[2];      // torneo: los rivales; gimnasio: el del jugador (si no es el compañero) y el del lider
 // las pruebas (sport.h): nombre, que cuenta, tipos con ventaja y color (torneo y gimnasios)
@@ -463,6 +467,7 @@ void setup() {
 
   netSetUsb(usbPresent());
   netBegin();  // tiempo cada hora y, con USB, Stack-chan (en el otro nucleo)
+  linkSetGameHandler(friendRx);  // "见面": los mensajes de los juegos con un amigo
 
   lastInteract = lastUserAt = millis();
 }
@@ -568,6 +573,20 @@ void loop() {
     beh.until = 0;
   }
   stackchanService();
+  // "见面": la radio habla con otra placa (link.cpp). Si se cerro sola (3 min sin tocar), la pagina tambien
+  if (linkActive()) {
+    linkSetSelf(pet.isEgg() || pet.vacant ? 0 : pet.speciesId, pet.shiny, pet.level());
+    linkLoop(now);
+    // en la pagina, lo que llega de la otra placa (alguien que llega o se va, una pregunta) enciende la
+    // pantalla: si no, con USB el reloj de espera taparia la pregunta (no cuenta como toque)
+    static uint8_t vistos = 0, vistoSt = LP_IDLE;
+    uint8_t n = linkNearbyCount(), st = linkPairing().st;
+    if (linkOpen && (n != vistos || st != vistoSt)) wakeScreen(now);
+    vistos = n;
+    vistoSt = st;
+  }
+  friendLoop(now);  // juegos con un amigo: plazos, la pokedex y la foto del dia
+  if (linkOpen && !linkActive()) linkOpen = false;
 
   // hora del NTP (al arrancar y cada hora): si el reloj se ha ido mas de 10 s
   // (o se paro sin corriente), se corrige. Sin aplicar progresion: si estuvo
@@ -595,7 +614,7 @@ void loop() {
   // (a medianoche si esta encendida; si estaba apagada, al encenderla). Si
   // falla, se reintenta a los 30 min. Sin cuenta de chess.com no se intenta.
   static uint32_t nextSyncCheck = 0;
-  if (!wifiPortalActive() && (syncRequested || (int32_t)(now - nextSyncCheck) >= 0)) {
+  if (!wifiPortalActive() && !linkActive() && (syncRequested || (int32_t)(now - nextSyncCheck) >= 0)) {
     nextSyncCheck = now + 60000;
     if (syncRequested || (wifiHasCreds() && rtcEpoch() / 86400 != chessSyncDay())) {
       bool manual = syncRequested;
@@ -845,7 +864,8 @@ void updateBrightness(uint32_t now) {
 // no perder el puerto serie de la tarjeta SD: se mira sin cache, por si se acaba de enchufar.
 void idleWait(PowerCtx c) {
   // no se duerme justo tras dibujar (el volcado DMA del frame sigue en marcha) ni con un aviso sonando
-  if (lightSleepAllowed(c) && millis() - lastRender >= 100 && !audioBusy()) {
+  // con "见面" abierto tampoco: la radio tiene que oir a la otra placa
+  if (lightSleepAllowed(c) && !linkActive() && millis() - lastRender >= 100 && !audioBusy()) {
     c.usb = usbPresentNow();
     if (!lightSleepAllowed(c)) { delay(idleDelayMs(c)); return; }
     // apagada con PWR el toque no cuenta: ni impide dormir (un dedo apoyado en el bolsillo) ni despierta
