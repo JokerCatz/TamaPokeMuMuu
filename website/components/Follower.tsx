@@ -1,7 +1,7 @@
 "use client";
 
 // The friend hatched at the top walks along in the corner while the page scrolls.
-// It steps aside where it is already on screen: the egg scene, the care demo and the race.
+// It steps aside where it is already on screen: the egg scene, the care demo, the race and the road.
 import { useEffect, useState } from "react";
 import { useSite } from "@/lib/state";
 import Sprite from "./Sprite";
@@ -31,7 +31,7 @@ export default function Follower() {
       },
       { threshold: 0.3 },
     );
-    for (const id of ["top", "live", "tournament"]) {
+    for (const id of ["top", "live", "tournament", "regions"]) {
       const el = document.getElementById(id);
       if (el) io.observe(el);
     }

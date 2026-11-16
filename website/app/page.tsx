@@ -6,8 +6,8 @@ import Footer from "@/components/Footer";
 import Friends from "@/components/Friends";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import Journey from "@/components/Journey";
 import PixelEdge from "@/components/PixelEdge";
-import Regions from "@/components/Regions";
 import Reveal from "@/components/Reveal";
 import Story from "@/components/Story";
 import Tournament from "@/components/Tournament";
@@ -32,7 +32,7 @@ export default function Home() {
         <PixelEdge from={YELLOW} to={PINK} />
         <Tournament />
         <PixelEdge from={PINK} to={BLUE} />
-        <Regions />
+        <Journey />
         <PixelEdge from={BLUE} to="var(--color-night)" />
         <Friends />
         <PixelEdge from="var(--color-night2)" to={CREAM} />

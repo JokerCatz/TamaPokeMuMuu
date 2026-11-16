@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { asset } from "@/lib/asset";
 
-type Anim = { w: number; h: number; durations: number[] };
+type Anim = { w: number; h: number; durations: number[]; foot?: number }; // foot: empty rows under the feet
 type Meta = Record<string, Anim>;
 
 const metaCache: Record<string, Promise<Meta>> = {};
@@ -19,12 +19,14 @@ export default function Sprite({
   anim = "idle",
   scale = 4,
   label,
+  grounded = false,
   className = "",
 }: {
   id: string;
   anim?: string;
   scale?: number;
   label?: string;
+  grounded?: boolean; // feet on the bottom edge of the box, whatever the frame's padding
   className?: string;
 }) {
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -66,6 +68,7 @@ export default function Sprite({
         backgroundSize: `${a.w * a.durations.length * scale}px ${a.h * scale}px`,
         backgroundPosition: `${-frame * a.w * scale}px 0`,
         backgroundRepeat: "no-repeat",
+        marginBottom: grounded ? -(a.foot ?? 0) * scale : undefined,
       }}
     />
   );

@@ -62,13 +62,14 @@ const en = {
 
   regions_kicker: "06 · Explore nine regions",
   regions_title: "One region at a time.",
-  regions_lead: "Eggs come from the regions you have opened. Register the common and rare Pokémon of one region and the next one opens.",
+  regions_lead: "Eggs come from the regions you have opened, and the regions open one after another. Walk the road with your friend and see.",
   regions_species: "{n} Pokémon",
   regions_range: "No. {a}–{b}",
   regions_gyms: "8 gyms, Elite Four and Champion",
-  regions_first: "Open from the start.",
-  regions_unlock: "Opens after {r}.",
-  regions_close: "Close",
+  regions_go: "On to {r} →",
+  regions_back: "← Back",
+  regions_done: "You have seen all nine regions!",
+  regions_rule: "On the board, {next} opens once every common and rare Pokémon of {cur} is in the Pokédex.",
 
   live_kicker: "04 · A living companion",
   live_title: "Feed it. Play. Sleep. Grow.",
@@ -182,13 +183,14 @@ const zh: typeof en = {
 
   regions_kicker: "06 · 探索九个地区",
   regions_title: "一个地区接一个地区。",
-  regions_lead: "蛋来自你已经开放的地区。把一个地区的普通和稀有宝可梦都登记进图鉴，下一个地区就会开放。",
+  regions_lead: "蛋来自已经开放的地区，地区一个接一个开放。带上你的伙伴，沿着这条路走走看。",
   regions_species: "{n} 种宝可梦",
   regions_range: "图鉴 {a}–{b}",
   regions_gyms: "8 个道馆、四天王和冠军",
-  regions_first: "一开始就开放。",
-  regions_unlock: "{r}之后开放。",
-  regions_close: "关闭",
+  regions_go: "前往{r} →",
+  regions_back: "← 往回走",
+  regions_done: "九个地区都走到了！",
+  regions_rule: "在板子上，把{cur}的普通和稀有宝可梦都登记进图鉴，{next}才会开放。",
 
   live_kicker: "04 · 活生生的伙伴",
   live_title: "喂它、陪它玩、哄它睡，看它长大。",
@@ -251,17 +253,17 @@ export const STARTERS = [
 ] as const;
 export type StarterId = (typeof STARTERS)[number]["id"];
 
-// regions.h: dex ranges per generation
+// regions.h: dex ranges per generation; mons: who stands at that stop of the road (PMD sprites in public/sprites)
 export const REGIONS = [
-  { id: "kanto", en: "Kanto", zh: "关都", a: 1, b: 151 },
-  { id: "johto", en: "Johto", zh: "城都", a: 152, b: 251 },
-  { id: "hoenn", en: "Hoenn", zh: "丰缘", a: 252, b: 386 },
-  { id: "sinnoh", en: "Sinnoh", zh: "神奥", a: 387, b: 493 },
-  { id: "unova", en: "Unova", zh: "合众", a: 494, b: 649 },
-  { id: "kalos", en: "Kalos", zh: "卡洛斯", a: 650, b: 721 },
-  { id: "alola", en: "Alola", zh: "阿罗拉", a: 722, b: 809 },
-  { id: "galar", en: "Galar", zh: "伽勒尔", a: 810, b: 905 },
-  { id: "paldea", en: "Paldea", zh: "帕底亚", a: 906, b: 1025 },
+  { id: "kanto", en: "Kanto", zh: "关都", a: 1, b: 151, mons: ["pikachu", "eevee", "psyduck"] },
+  { id: "johto", en: "Johto", zh: "城都", a: 152, b: 251, mons: ["chikorita", "cyndaquil", "totodile"] },
+  { id: "hoenn", en: "Hoenn", zh: "丰缘", a: 252, b: 386, mons: ["treecko", "torchic", "mudkip"] },
+  { id: "sinnoh", en: "Sinnoh", zh: "神奥", a: 387, b: 493, mons: ["turtwig", "chimchar", "piplup"] },
+  { id: "unova", en: "Unova", zh: "合众", a: 494, b: 649, mons: ["snivy", "tepig", "oshawott"] },
+  { id: "kalos", en: "Kalos", zh: "卡洛斯", a: 650, b: 721, mons: ["chespin", "fennekin", "froakie"] },
+  { id: "alola", en: "Alola", zh: "阿罗拉", a: 722, b: 809, mons: ["rowlet", "litten", "popplio"] },
+  { id: "galar", en: "Galar", zh: "伽勒尔", a: 810, b: 905, mons: ["grookey", "scorbunny", "sobble"] },
+  { id: "paldea", en: "Paldea", zh: "帕底亚", a: 906, b: 1025, mons: ["sprigatito", "fuecoco", "quaxly"] },
 ] as const;
 
 // The scroll story: a day with the board, from dawn to night. The 3D board turns to
