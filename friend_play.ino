@@ -45,7 +45,7 @@ static char fpToastBuf[64];
 #define FP_PH_W 326
 #define FP_PH_RH 72
 
-const char *friendName(uint8_t fi) { return fi < linkFriendCount() ? linkFriendAt(fi).name : "?"; }
+const char *friendName(uint8_t fi) { return fi < linkFriendCount() ? shownName(linkFriendAt(fi).name) : "?"; }
 
 static const LinkPeer *fpPeer(uint8_t fi) {
   int k = linkFriendNearby(fi);
@@ -727,7 +727,7 @@ static void renderFriendPhotos() {
     gfx->setTextColor(UI_INK);
     setSize(2);
     setCur(FP_PH_X + 126, y + 10);
-    printT(p.name);
+    printT(shownName(p.name));
     gfx->setTextColor(UI_HINT);
     setCur(FP_PH_X + 126, y + 36);
     printT(d);

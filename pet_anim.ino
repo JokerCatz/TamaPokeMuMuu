@@ -644,7 +644,7 @@ const char *statusMsg() {
     return visitMsg;
   }
   if (gHoliday == HOL_BIRTHDAY) {  // con el nombre del dueño (config.h)
-    snprintf(visitMsg, sizeof(visitMsg), T(S_HOL_BIRTHDAY), OWNER_NAME);
+    snprintf(visitMsg, sizeof(visitMsg), T(S_HOL_BIRTHDAY), shownName(OWNER_NAME));
     return visitMsg;
   }
   if (gHoliday) return T((StrId)(S_HOL_NEWYEAR + gHoliday - 1));  // dia de fiesta: felicita

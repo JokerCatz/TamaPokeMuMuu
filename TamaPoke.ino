@@ -263,6 +263,10 @@ bool linkOpen = false;   // "见面": otra placa cerca (link_ui.ino)
 bool friendsOpen = false; // "好友": amigos (ver "见面" y el correo de lejos, mail_ui.ino)
 PmdMon mailPmd;          // el mensajero que trae el correo a la principal
 uint32_t grassFxUntil = 0;  // consola GRASSFX: la mata de la hierba se ve un rato (solo se ve)
+// consola SHOTNAME: en las capturas, un nombre neutro en vez del del dueño y los de los amigos
+// (solo se ve, solo RAM; vacio = los de verdad)
+char shotName[17] = "";
+const char *shownName(const char *real) { return shotName[0] ? shotName : real; }
 PmdMon rivalPmd[2];      // torneo: los rivales; gimnasio: el del jugador (si no es el compañero) y el del lider
 // las pruebas (sport.h): nombre, que cuenta, tipos con ventaja y color (torneo y gimnasios)
 static const StrId EV_NAME[EV_COUNT] = { S_EV_SPRINT, S_EV_HURDLES, S_EV_SWIM, S_EV_LONGJUMP, S_EV_HIGHJUMP,

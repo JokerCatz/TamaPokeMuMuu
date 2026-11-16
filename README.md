@@ -213,6 +213,8 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
 - **Natures** (rolled at hatch): easygoing, glutton, playful, tidy, lazy. One
   need drops a little faster and its favourite care gives more.
 
+<table><tr><td align="center"><img src="docs/screenshots/en/care_feed.png" width="220" alt="Feeding"><br>Feeding</td><td align="center"><img src="docs/screenshots/en/care_bath.png" width="220" alt="Bath"><br>Bath</td><td align="center"><img src="docs/screenshots/en/care_pat.png" width="220" alt="Head pat"><br>Head pat</td></tr></table>
+
 ### Growing up
 
 - Evolution is by **age**, the same for every line: the first at 3 days, the
@@ -271,7 +273,7 @@ last week.
 
 <table><tr><td align="center"><img src="docs/screenshots/en/shop.png" width="220" alt="Shop"><br>Shop</td><td align="center"><img src="docs/screenshots/en/bag.png" width="220" alt="Bag"><br>Bag</td><td align="center"><img src="docs/screenshots/en/accessories.png" width="220" alt="Accessories"><br>Accessories</td></tr></table>
 
-<table><tr><td align="center"><img src="docs/screenshots/en/shop_confirm.png" width="220" alt="Confirm before buying"><br>Confirm before buying</td></tr></table>
+<table><tr><td align="center"><img src="docs/screenshots/en/shop_confirm.png" width="220" alt="Confirm before buying"><br>Confirm before buying</td><td align="center"><img src="docs/screenshots/en/points_book.png" width="220" alt="Points book"><br>Points book</td></tr></table>
 
 ### Surprises in the grass
 
@@ -388,10 +390,10 @@ activity; if you won, the rare finds are twice as likely.
 
 ### Friends: meet and mail
 
-When a friend has a board too, the two can become friends. Swipe left on the main screen and tap **MEET**.
-Both boards need this firmware or newer.
+When a friend has a board too, the two can become friends. Swipe left on the main screen and tap **FRIENDS**: **MEET** is at
+the top and your friends are listed below. Both boards need this firmware or newer.
 
-**Meet (boards side by side)**: both open the **MEET** page and each board finds the other when they are close.
+**Meet (boards side by side)**: both open **MEET** and each board finds the other when they are close.
 Tap the other board and say yes on both; the two screens show the same 4-digit code, and once it matches you
 are friends. While the page is open the boards talk directly over radio (ESP-NOW) and home Wi-Fi pauses; it
 comes back when the page closes or after 3 idle minutes.
@@ -419,6 +421,10 @@ encrypted and signed with the key made when the two boards paired, so the mailbo
 own mailbox, deploy the free Cloudflare Worker in [`tools/mailbox-worker`](tools/mailbox-worker/README.md) and
 set `MAILBOX_URL` and `MAILBOX_KEY` in `config_private.h`. Friends belong to the save, not the board: move a
 save to another board and your friends still know it.
+
+<table><tr><td align="center"><img src="docs/screenshots/en/friends.png" width="220" alt="Friends"><br>Friends</td><td align="center"><img src="docs/screenshots/en/friends_meet.png" width="220" alt="Meet"><br>Meet</td><td align="center"><img src="docs/screenshots/en/friends_menu.png" width="220" alt="A friend nearby"><br>A friend nearby</td></tr></table>
+
+<table><tr><td align="center"><img src="docs/screenshots/en/friends_play.png" width="220" alt="Play together"><br>Play together</td><td align="center"><img src="docs/screenshots/en/friends_mail.png" width="220" alt="A messenger arrives"><br>A messenger arrives</td><td align="center"><img src="docs/screenshots/en/friends_card.png" width="220" alt="Postcard"><br>Postcard</td></tr></table>
 
 ### Mega Evolution
 
@@ -473,6 +479,8 @@ Same conditions as the steps: board plugged in, phone on the home Wi-Fi.
 - **Standby clock:** plugged in and untouched for 90 seconds, the screen shows
   a large clock with the date and weather.
 - Time comes from NTP at boot and every hour.
+
+<table><tr><td align="center"><img src="docs/screenshots/en/scene_snow_night.png" width="220" alt="Snowy night"><br>Snowy night</td><td align="center"><img src="docs/screenshots/en/scene_christmas.png" width="220" alt="Christmas"><br>Christmas</td><td align="center"><img src="docs/screenshots/en/scene_halloween.png" width="220" alt="Halloween"><br>Halloween</td></tr></table>
 
 ### Stack-chan / xiaozhi (optional)
 

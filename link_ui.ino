@@ -50,7 +50,7 @@ static void lkSort() {
 
 // el nombre con el que se enseña otra placa: el del dueño si es amigo; si no, su compañero
 static const char *lkName(const LinkPeer &p) {
-  if (p.fr >= 0) return linkFriendAt(p.fr).name;
+  if (p.fr >= 0) return shownName(linkFriendAt(p.fr).name);
   return p.species > 0 ? dexName(p.species) : "TamaPoke";
 }
 
@@ -179,7 +179,7 @@ void renderLink() {
       if (pr.st == LP_DONE) sfxPlay(SFX_MEDAL);
     }
     if (pr.st == LP_DONE) {
-      snprintf(l1, sizeof(l1), T(S_LINK_DONE_FMT), linkPairName());
+      snprintf(l1, sizeof(l1), T(S_LINK_DONE_FMT), shownName(linkPairName()));
       char code[8];
       snprintf(code, sizeof(code), "%04u", pr.code());
       lkPanel(l1, T(S_LINK_CODE_HINT), code);

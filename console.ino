@@ -389,6 +389,13 @@ void handleSerial() {
     pet.megaUntil = s > 0 && pet.lastSeenEpoch ? pet.lastSeenEpoch + s : 0;
     Serial.printf("mega=%d hasta=%lu\n", pet.isMega(), (unsigned long)pet.megaUntil);
     Serial.println("DONE");
+  } else if (line.startsWith("SHOTNAME")) {  // capturas: SHOTNAME Ash = ese nombre en pantalla; SHOTNAME = los de verdad
+    String n = line.substring(8);
+    n.trim();
+    strncpy(shotName, n.c_str(), sizeof(shotName) - 1);
+    shotName[sizeof(shotName) - 1] = 0;
+    Serial.printf("shotname=%s\n", shotName);
+    Serial.println("DONE");
   } else if (line.startsWith("FRIENDTEST")) {  // FRIENDTEST 1/0: juegos con un amigo sin efectos (solo RAM)
     friendSetTest(line.substring(10).toInt() != 0);
     Serial.printf("friendtest=%d\n", friendTestMode());

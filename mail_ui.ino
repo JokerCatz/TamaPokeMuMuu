@@ -28,7 +28,7 @@ static uint64_t muPid() { return muFi < linkFriendCount() ? linkFriendAt(muFi).p
 // nombre del amigo que manda algo (por su numero de jugador)
 static const char *mailFromName(uint64_t pid) {
   for (uint8_t i = 0; i < linkFriendCount(); i++)
-    if (linkFriendAt(i).pid == pid) return linkFriendAt(i).name;
+    if (linkFriendAt(i).pid == pid) return shownName(linkFriendAt(i).name);
   return "?";
 }
 
@@ -111,13 +111,13 @@ static void renderFriendsList() {
     if (!listo) snprintf(sub, sizeof(sub), "%s", T(S_ML_NEED_MEET));
     else if (enCamino) snprintf(sub, sizeof(sub), T(S_ML_ONWAY_FMT), (unsigned)enCamino);
     else snprintf(sub, sizeof(sub), "%s", T(S_ML_READY));
-    hubRow(i + 1, 0xB6F2, SPR_ICON_PLAY, listo, f.name, sub);
+    hubRow(i + 1, 0xB6F2, SPR_ICON_PLAY, listo, shownName(f.name), sub);
   }
   muFooter(T(S_ML_SYNC), true);
 }
 
 static void renderFriendMail() {
-  muTitle(linkFriendAt(muFi).name);
+  muTitle(shownName(linkFriendAt(muFi).name));
   hubRow(MUR_VISIT, C565(0xf8, 0xd0, 0xc8), SPR_ICON_LINK, !pet.isEgg(), T(S_ML_VISIT), T(S_ML_VISIT_SUB));
   hubRow(MUR_CARD, 0xFF2E, SPR_ICON_STAR, true, T(S_ML_CARD), T(S_ML_CARD_SUB));
   hubRow(MUR_GIFT, 0xB6F2, SPR_ICON_CANDY, true, T(S_ML_GIFT), T(S_FR_GIFT_SUB));
@@ -226,7 +226,7 @@ void renderFriends() {
   if (muAsk) {  // ¿lo mando?
     char l1[64], nb[24];
     if (muKind == MT_VISIT) {
-      snprintf(l1, sizeof(l1), T(S_ML_VISIT_Q_FMT), linkFriendAt(muFi).name);
+      snprintf(l1, sizeof(l1), T(S_ML_VISIT_Q_FMT), shownName(linkFriendAt(muFi).name));
       drawAskBox(l1, pet.nick[0] ? pet.nick : dexName(pet.speciesId));
     } else {
       snprintf(l1, sizeof(l1), T(S_ML_CARRIES_FMT), muMessengerName(nb, sizeof(nb)));

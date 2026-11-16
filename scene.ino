@@ -318,7 +318,7 @@ const char *pickBubble() {
   if (r < 75) return T(pet.nature == NAT_EASY || pet.nature >= NAT_COUNT ? S_SAY_EASY
                                                                           : (StrId)(S_SAY_GLUTTON + pet.nature - 1));
   if (r >= 88) return T(S_SAY_HI);
-  snprintf(bubbleBuf, sizeof(bubbleBuf), T(S_SAY_LOVE), OWNER_NAME);  // con el nombre del dueño (config.h)
+  snprintf(bubbleBuf, sizeof(bubbleBuf), T(S_SAY_LOVE), shownName(OWNER_NAME));  // con el nombre del dueño (config.h)
   return bubbleBuf;
 }
 

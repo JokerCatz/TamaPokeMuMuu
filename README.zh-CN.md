@@ -186,6 +186,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 - **性格**（孵化时随机）：乖巧、贪吃、爱玩、爱干净、懒洋洋。某一项需求会掉得稍快，
   它喜欢的那种照顾效果也更好。
 
+<table><tr><td align="center"><img src="docs/screenshots/zh/care_feed.png" width="220" alt="喂食"><br>喂食</td><td align="center"><img src="docs/screenshots/zh/care_bath.png" width="220" alt="洗澡"><br>洗澡</td><td align="center"><img src="docs/screenshots/zh/care_pat.png" width="220" alt="摸摸头"><br>摸摸头</td></tr></table>
+
 ### 成长
 
 - 进化看**天数**，所有进化链都一样：第一次在第 3 天，第二次在第 5 天。每次照顾失误推迟
@@ -233,7 +235,7 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 
 **积分本**在商店的最后一页（也可以点商店顶部的积分）：本周每天赚了（绿）和花了（橙）多少，从哪来（下棋、走路、其他）、花在哪（商店、趣玩），还有上周的对比。每周一主屏会弹出上周积分小结。
 
-<table><tr><td align="center"><img src="docs/screenshots/zh/shop_confirm.png" width="220" alt="买之前先确认"><br>买之前先确认</td></tr></table>
+<table><tr><td align="center"><img src="docs/screenshots/zh/shop_confirm.png" width="220" alt="买之前先确认"><br>买之前先确认</td><td align="center"><img src="docs/screenshots/zh/points_book.png" width="220" alt="积分本"><br>积分本</td></tr></table>
 
 ### 草丛彩蛋
 
@@ -329,9 +331,9 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 
 ### 好友：见面和寄信
 
-和朋友各有一块板子时，可以成为好友一起玩。在主屏幕向左滑，点**见面**。两块板子都要刷这一版或更新的固件。
+和朋友各有一块板子时，可以成为好友一起玩。在主屏幕向左滑，点**好友**：上面是**见面**，下面是好友列表。两块板子都要刷这一版或更新的固件。
 
-**见面（两块板子放在一起）**：两人同时打开**见面**页，板子会找到靠得很近的对方。点一下对方，两边都同意后，
+**见面（两块板子放在一起）**：两人同时打开**见面**，板子会找到靠得很近的对方。点一下对方，两边都同意后，
 两块屏幕会显示同一个 4 位数，核对一样就成了好友。见面页开着时，两块板子用无线电直接连接（ESP-NOW），
 家里的 Wi-Fi 先暂停，关掉页面或 3 分钟没操作就恢复。
 
@@ -356,6 +358,10 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 信箱只看得到乱码。也可以用自己的信箱：按 [`tools/mailbox-worker`](tools/mailbox-worker/README.md) 部署一个免费的
 Cloudflare Worker，再在 `config_private.h` 里设置 `MAILBOX_URL` 和 `MAILBOX_KEY`。好友认的是存档而不是板子，
 存档搬到另一块板子上，好友照样认得。
+
+<table><tr><td align="center"><img src="docs/screenshots/zh/friends.png" width="220" alt="好友"><br>好友</td><td align="center"><img src="docs/screenshots/zh/friends_meet.png" width="220" alt="见面"><br>见面</td><td align="center"><img src="docs/screenshots/zh/friends_menu.png" width="220" alt="好友就在旁边"><br>好友就在旁边</td></tr></table>
+
+<table><tr><td align="center"><img src="docs/screenshots/zh/friends_play.png" width="220" alt="一起玩"><br>一起玩</td><td align="center"><img src="docs/screenshots/zh/friends_mail.png" width="220" alt="信使送信来了"><br>信使送信来了</td><td align="center"><img src="docs/screenshots/zh/friends_card.png" width="220" alt="明信片"><br>明信片</td></tr></table>
 
 ### 超级进化
 
@@ -400,6 +406,8 @@ Cloudflare Worker，再在 `config_private.h` 里设置 `MAILBOX_URL` 和 `MAILB
   感恩节、万圣节、圣诞节）和生日（通过串口用 `BDAY 月 日` 设置）。
 - **待机时钟：** 插着电、90 秒没人碰时，屏幕会显示大时钟，以及日期和天气。
 - 开机时和之后每小时通过网络校准时间。
+
+<table><tr><td align="center"><img src="docs/screenshots/zh/scene_snow_night.png" width="220" alt="雪夜"><br>雪夜</td><td align="center"><img src="docs/screenshots/zh/scene_christmas.png" width="220" alt="圣诞节"><br>圣诞节</td><td align="center"><img src="docs/screenshots/zh/scene_halloween.png" width="220" alt="万圣节"><br>万圣节</td></tr></table>
 
 ### Stack-chan / 小智（可选）
 
