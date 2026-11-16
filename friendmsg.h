@@ -12,8 +12,9 @@
 // lo que sabe hacer cada placa (HELLO.caps): asi una puede ir por delante de la otra
 enum : uint32_t {
   CAP_LINK = 1u << 0, CAP_PLAY = 1u << 1, CAP_GIFT = 1u << 2, CAP_RACE = 1u << 3, CAP_GYM = 1u << 4,
+  CAP_MAIL = 1u << 5,  // correo de lejos (mail.h): al verse se dicen su buzon
 };
-#define FRIEND_CAPS (CAP_LINK | CAP_PLAY | CAP_GIFT | CAP_RACE | CAP_GYM)
+#define FRIEND_CAPS (CAP_LINK | CAP_PLAY | CAP_GIFT | CAP_RACE | CAP_GYM | CAP_MAIL)
 
 enum : uint8_t {
   FM_DEX = 0x20,         // lo que he criado (la pokedex en bits): para su "visto por un amigo"
@@ -27,6 +28,7 @@ enum : uint8_t {
   FM_ROUND = 0x28,       // una prueba del gimnasio ya decidida
   FM_GYM_END = 0x29,     // como acabo el gimnasio
   FM_CANCEL = 0x2A,      // lo dejo (el que invito se fue)
+  FM_MAILBOX = 0x2B,     // mi buzon para el correo de lejos (url, nombre y clave; mailbox.h)
 };
 enum : uint8_t { FK_RACE = 1, FK_GYM = 2 };
 enum : uint8_t { FW_OK = 0, FW_NO, FW_BUSY, FW_CANT };  // respuesta a una invitacion

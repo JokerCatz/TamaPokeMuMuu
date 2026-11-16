@@ -83,7 +83,7 @@ void handleShake(uint32_t now) {
   }
   orientation(gy, gz, now);
   if (!ev || screenOff || pet.awaitingStarter() || pet.ceremony) return;
-  if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || linkOpen || shopOpen || cardOpen || kbOpen || clockOpen || wifiPortalActive()) return;
+  if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || linkOpen || friendsOpen || shopOpen || cardOpen || kbOpen || clockOpen || wifiPortalActive()) return;
   wakeUI();
   if (pet.isEgg()) {
     if (!pet.vacant && (ev & SHAKE_SOFT)) {
@@ -205,6 +205,10 @@ void handleSerial() {
   } else if (line.startsWith("MISTAKES ")) {  // fija los descuidos (mantenimiento)
     pet.dbgSetMistakes((uint8_t)constrain(line.substring(9).toInt(), 0, 255));
     Serial.printf("desc=%u\n", pet.careMistakes);
+    Serial.println("DONE");
+  } else if (line.startsWith("BOND ")) {  // fija el vinculo (mantenimiento)
+    pet.dbgSetBond((uint8_t)constrain(line.substring(5).toInt(), 0, 100));
+    Serial.printf("bond=%u\n", pet.bond);
     Serial.println("DONE");
   } else if (line.startsWith("NEEDS ")) {  // NEEDS comida animo energia limpieza (pruebas)
     char *p = (char *)line.c_str() + 6;
@@ -389,6 +393,8 @@ void handleSerial() {
     friendSetTest(line.substring(10).toInt() != 0);
     Serial.printf("friendtest=%d\n", friendTestMode());
     Serial.println("DONE");
+  } else if (line.startsWith("MAIL")) {  // correo con amigos lejos (mailbox.h): pruebas
+    consoleMail(line.substring(4));
   } else if (line.startsWith("LINK")) {  // "见面" sin la pagina (pruebas con dos placas; ver link.h)
     consoleLink(line.substring(4));
   } else if (line == "VISIT") {  // que venga ya alguien de la granja (pruebas)
@@ -601,6 +607,61 @@ void consoleLink(String a) {
     else { hubOpen = true; openLink(); }
   } else {
     Serial.println("LINK ON [min] | OFF | INFO | PAIRTEST | PING n [bytes] | BIG n | VER [a.b] | FORGET i|ALL | PAGE");
+  }
+  Serial.println("DONE");
+}
+
+// MAIL INFO | SYNC | FAKE v|c|g (solo se ve: un mensajero de mentira en la principal) |
+// SEND v|c|g i [frase/objeto] (de verdad: al amigo i; con FRIENDTEST un regalo no sale de la mochila)
+void consoleMail(String a) {
+  a.trim();
+  if (a == "INFO") {
+    mailInfo();
+    mailVisitorInfo();
+  } else if (a == "SYNC") {
+    mailSyncSoon();
+    Serial.println("correo: se recoge en la proxima vuelta de la red");
+  } else if (a.startsWith("FAKE")) {
+    MailMsg m;
+    char k = a.length() > 5 ? a[5] : 'c';
+    m.type = k == 'v' ? MT_VISIT : k == 'g' ? MT_GIFT : MT_CARD;
+    linkFriendsLoad();
+    m.from = linkFriendCount() ? linkFriendAt(0).pid : 0;
+    m.species = 25;
+    m.level = 12;
+    m.phrase = 1;
+    m.sticker = 0;
+    m.item = ITEM_CANDY;
+    m.qty = 1;
+    m.id = esp_random();
+    Serial.println(mailFakeArrival(m) ? "correo: mensajero de prueba en camino (solo se ve)" : "correo: lleno");
+    if (m.type == MT_GIFT && !friendTestMode()) Serial.println("correo: OJO, sin FRIENDTEST el regalo de prueba si va a la mochila");
+  } else if (a.startsWith("SEND")) {
+    a = a.substring(4);
+    a.trim();
+    char k = a.length() ? a[0] : 'c';
+    int sp = a.indexOf(' '), sp2 = sp > 0 ? a.indexOf(' ', sp + 1) : -1;
+    int fi = sp > 0 ? a.substring(sp + 1).toInt() : 0;
+    int arg = sp2 > 0 ? a.substring(sp2 + 1).toInt() : 0;
+    linkFriendsLoad();
+    if (fi >= linkFriendCount() || !mailFriendReady(linkFriendAt(fi).pid)) {
+      Serial.println("correo: ese amigo no esta o aun no se sabe su buzon");
+    } else {
+      MailMsg m;
+      m.type = k == 'v' ? MT_VISIT : k == 'g' ? MT_GIFT : MT_CARD;
+      m.species = pet.isEgg() ? 25 : pet.speciesId;
+      m.shiny = pet.shiny;
+      m.level = pet.level();
+      m.phrase = (uint8_t)(arg % MAIL_PHRASES);
+      m.sticker = (uint8_t)(arg % MAIL_STICKERS);
+      m.item = (uint8_t)(arg < ITEM_COUNT ? arg : 0);
+      m.qty = 1;
+      bool ok = mailSend(linkFriendAt(fi).pid, m);
+      if (ok && m.type == MT_GIFT && !friendTestMode() && pet.bag[m.item]) { pet.bag[m.item]--; pet.markDirty(); }
+      Serial.println(ok ? "correo: a la cola (sale en la proxima vuelta de la red)" : "correo: cola llena");
+    }
+  } else {
+    Serial.println("MAIL INFO | SYNC | FAKE v|c|g | SEND v|c|g amigo [frase|objeto]");
   }
   Serial.println("DONE");
 }

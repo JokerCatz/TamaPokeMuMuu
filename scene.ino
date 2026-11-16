@@ -295,7 +295,7 @@ void renderStandby() {
 
 // la pantalla principal esta libre (sin otras pantallas ni dialogos encima)
 bool mainScreenFree() {
-  return !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !linkOpen && !shopOpen && !cardOpen && !kbOpen && !clockOpen && !wifiPortalActive() &&
+  return !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !linkOpen && !friendsOpen && !shopOpen && !cardOpen && !kbOpen && !clockOpen && !wifiPortalActive() &&
          !feedMenuUntil && !actionUntil && !confirmUntil && !choiceKind && !reportPending && !pet.awaitingStarter();
 }
 
@@ -399,7 +399,7 @@ void visitTick(uint32_t now) {
     if ((int32_t)(now - nextVisit) < 0) return;
     nextVisit = now + 600000 + random(900000);
     if (!mainScreenFree() || pet.isEgg() || pet.vacant || pet.sleeping || pet.ceremony || dimStage || !farmReady() ||
-        farmCount() == 0)
+        farmCount() == 0 || mailVisitorOn())  // con el mensajero de un amigo, nadie mas
       return;
     const FarmEntry &e = farmAt(random(farmCount()));
     if (!visitorPmd.load(e.speciesId, e.shiny)) return;

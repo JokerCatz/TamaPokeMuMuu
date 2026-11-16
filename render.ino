@@ -49,6 +49,10 @@ bool render() {
     renderLink();
     return true;
   }
+  if (friendsOpen) {
+    renderFriends();
+    return true;
+  }
   if (hubOpen) {
     renderHub();
     return true;
@@ -130,6 +134,7 @@ bool render() {
     drawHeader(name, gNight ? UI_INK_NIGHT : d.accent, statusMsg());
     drawGrassPrize();  // detras del bicho
     drawVisitor(millis());
+    drawMailVisitor(millis());  // el mensajero de un amigo lejos
     if (pet.questAway()) drawAwaySign();  // de expedicion (fun.ino)
     else drawPet();
     drawBath();
@@ -257,6 +262,7 @@ bool render() {
     else drawChoiceDialog();
   }
 
+  drawMailPanel();  // lo que trae el mensajero, encima de todo
   if (reportPending) drawReport();
   drawToast();
   gfx->flush();

@@ -127,8 +127,8 @@ void renderLink() {
   gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
-  setCur(centerX(T(S_HUB_LINK), 3), 50);
-  printT(T(S_HUB_LINK));
+  setCur(centerX(T(S_LINK_TITLE), 3), 50);
+  printT(T(S_LINK_TITLE));
   lkSort();
   if (!lkN) {
     lkRadar(CX, 214, 96, now);

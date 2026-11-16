@@ -12,7 +12,7 @@ bool inPetZone(int16_t x, int16_t y) {
 // no debe accionar botones, pero sostenerlo 3 s sobre el bicho es a proposito
 // (antes se tragaba y "la pulsacion larga no hacia nada" al volver a la placa).
 bool holdOnPet() {
-  return !holdFired && !gestureMoved && !strokeFired && !dragFired && !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !linkOpen && !cardOpen && !pet.questAway() && !kbOpen && !clockOpen &&
+  return !holdFired && !gestureMoved && !strokeFired && !dragFired && !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !linkOpen && !friendsOpen && !cardOpen && !pet.questAway() && !kbOpen && !clockOpen &&
          abs(tXl - tX0) < 30 && abs(tYl - tY0) < 30 && inPetZone(tX0, tY0) &&
          !pet.isEgg() && !confirmUntil && !actionUntil && !pet.ceremony;
 }
@@ -190,7 +190,7 @@ void onSwipeV(int dir) {
     gallerySwipeV(dir);
     return;
   }
-  if (farmOpen || hubOpen || chOpen || gymsOpen || funOpen || linkOpen || shopOpen || kbOpen || pet.ceremony) return;
+  if (farmOpen || hubOpen || chOpen || gymsOpen || funOpen || linkOpen || friendsOpen || shopOpen || kbOpen || pet.ceremony) return;
   if (clockOpen) { clockOpen = statsOpen = false; return; }
   if (cardOpen) {
     if (dir < 0) cardOpen = false;  // arriba cierra la ficha
@@ -230,6 +230,10 @@ void onSwipe(int dir) {
   }
   if (linkOpen) {
     linkSwipe(dir);
+    return;
+  }
+  if (friendsOpen) {
+    friendsSwipe(dir);
     return;
   }
   if (hubOpen) {
@@ -332,6 +336,10 @@ void onTap(int16_t x, int16_t y) {
     linkTap(x, y);
     return;
   }
+  if (friendsOpen) {
+    friendsTap(x, y);
+    return;
+  }
   if (hubOpen) {
     hubTap(x, y);
     return;
@@ -413,6 +421,7 @@ void onTap(int16_t x, int16_t y) {
     reportPending = false;
     return;
   }
+  if (mailVisitorTap(x, y)) return;  // el mensajero de un amigo lejos (mail_ui.ino)
   if (y < 48 && x >= gPtsX0 - 12 && x <= gPtsX1 + 12) {  // contador de puntos: abre la tienda
     openShop(0);
     return;

@@ -44,6 +44,7 @@
 #include "link.h"     // "见面": otra placa por ESP-NOW
 #include "friendmsg.h" // y los juegos con un amigo (friend_play.ino)
 #include "photos.h"
+#include "mailbox.h"  // correo con amigos lejos (mail_ui.ino)
 #include "holiday.h"
 #include "memoir.h"
 #include "backup.h"
@@ -54,7 +55,7 @@
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
 // version de esta fork: la fecha en que se publica (la base es la v1.18 de socquique)
-#define FW_VERSION "2026.11.15"
+#define FW_VERSION "2026.11.16"
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
   LCD_CS, LCD_SCLK, LCD_SDIO0, LCD_SDIO1, LCD_SDIO2, LCD_SDIO3);
@@ -259,6 +260,8 @@ bool chOpen = false;     // torneo y pruebas de los gimnasios (sports.ino)
 bool gymsOpen = false;   // gimnasios (gyms.ino)
 bool funOpen = false;    // ocio: huerto, pesca, mina, expedicion (fun.ino)
 bool linkOpen = false;   // "见面": otra placa cerca (link_ui.ino)
+bool friendsOpen = false; // "好友": amigos (ver "见面" y el correo de lejos, mail_ui.ino)
+PmdMon mailPmd;          // el mensajero que trae el correo a la principal
 uint32_t grassFxUntil = 0;  // consola GRASSFX: la mata de la hierba se ve un rato (solo se ve)
 PmdMon rivalPmd[2];      // torneo: los rivales; gimnasio: el del jugador (si no es el compañero) y el del lider
 // las pruebas (sport.h): nombre, que cuenta, tipos con ventaja y color (torneo y gimnasios)
@@ -468,6 +471,7 @@ void setup() {
   netSetUsb(usbPresent());
   netBegin();  // tiempo cada hora y, con USB, Stack-chan (en el otro nucleo)
   linkSetGameHandler(friendRx);  // "见面": los mensajes de los juegos con un amigo
+  mailBegin();                   // correo con amigos lejos (lo que salia o llego se conserva)
 
   lastInteract = lastUserAt = millis();
 }
@@ -586,6 +590,18 @@ void loop() {
     vistoSt = st;
   }
   friendLoop(now);  // juegos con un amigo: plazos, la pokedex y la foto del dia
+  // correo con amigos lejos: la hora para la tarea de red; al cerrar "见面" los amigos pueden haber
+  // cambiado (o su buzon); un regalo que no llego en 14 dias vuelve; el mensajero de la principal
+  mailTick(pet.lastSeenEpoch);
+  static bool linkEra = false;
+  if (linkEra && !linkActive()) mailRefreshFriends();
+  linkEra = linkActive();
+  uint8_t devuelto;
+  if (mailTakeRefund(devuelto)) {
+    if (!friendTestMode() && devuelto < ITEM_COUNT) pet.give(devuelto, 1);
+    toast(T(S_ML_BACK));
+  }
+  mailVisitTick(now);
   if (linkOpen && !linkActive()) linkOpen = false;
 
   // hora del NTP (al arrancar y cada hora): si el reloj se ha ido mas de 10 s

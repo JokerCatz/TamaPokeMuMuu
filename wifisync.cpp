@@ -14,6 +14,7 @@
 #include "i18n.h"  // gLang: la pagina del portal sale en el idioma de la placa
 #include "wifipick.h"
 #include "phonesteps.h"  // pasos del movil (servidor en la red de casa)
+#include "mailbox.h"     // correo con amigos lejos
 
 static WebServer *server = nullptr;
 static DNSServer *dns = nullptr;
@@ -707,6 +708,7 @@ static void netTask(void *) {
         if (!ws) mcpStart();
         if (ws) ws->loop();
         phoneStepsLoop();
+        if (mailSyncDue(true)) mailNetSync();  // correo: cada 15 min con USB (o si lo piden)
       }
     } else if (ws || phoneStepsOn()) {  // sin USB: se apaga la radio
       mcpStop();
@@ -721,10 +723,16 @@ static void netTask(void *) {
       if (u > 1700000000) madrugada = (wallFromUtc((uint32_t)u) / 3600) % 24 < WX_BATT_QUIET_UNTIL;
     }
     if (!wxNow && madrugada && (int32_t)(now - nextWx) >= 0) nextWx = now + 30UL * 60 * 1000;
+    if (!keep && mailSyncWanted()) {  // con bateria y piden el correo ya ("立即收发" o algo que sale)
+      if (conectar()) mailNetSync();
+      else mailSyncCancel();  // sin red: no se reintenta en cada vuelta; lo que sale espera al tiempo (3 h)
+      desconectarSiSobra();
+    }
     if (wxNow || (int32_t)(now - nextWx) >= 0) {
       wxNow = false;
       bool con = conectar();
       if (con) pedirHora();
+      if (con && !keep) mailNetSync();  // con bateria, el correo va con el tiempo (cada 3 h)
       bool ok = con && bajarTiempo();
       desconectarSiSobra();
       nextWx = millis() + (ok ? (usbPower ? WX_EVERY_MS : WX_EVERY_BATT_MS) : 15UL * 60 * 1000);

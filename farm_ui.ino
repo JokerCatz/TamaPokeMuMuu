@@ -112,7 +112,7 @@ void renderHub() {
   snprintf(b, sizeof(b), T(S_BADGES_TOTAL_FMT), (unsigned)pet.totalBadges());
   hubRow(HUB_GYMS, 0xAEFF, SPR_ICON_GYM, true, T(S_GYMS), b);  // la lista sirve tambien de vitrina
   hubRow(HUB_FUN, C565(0xf8, 0xd0, 0xc8), SPR_ICON_FUN, true, T(S_HUB_FUN), T(S_HUB_FUN_HINT));
-  hubRow(HUB_LINK, C565(0xd8, 0xd8, 0xf8), SPR_ICON_LINK, true, T(S_HUB_LINK), T(S_HUB_LINK_HINT));
+  hubRow(HUB_LINK, C565(0xd8, 0xd8, 0xf8), SPR_ICON_LINK, true, T(S_HUB_LINK), T(S_HUB_FRIENDS_SUB));
   gfx->setTextColor(UI_HINT);
   setSize(2);
   setCur(centerX(T(S_SWIPE_R_BACK), 2), 392);
@@ -141,7 +141,7 @@ void hubTap(int16_t x, int16_t y) {
     openFun();
   } else {
     sfxPlay(SFX_TAP);
-    openLink();
+    openFriends();  // "好友": "见面" con los de al lado y el correo con los de lejos (mail_ui.ino)
   }
 }
 

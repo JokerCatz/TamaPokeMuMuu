@@ -715,6 +715,9 @@ uint8_t linkNearbyCount() { return nearN; }
 const LinkPeer &linkNearby(uint8_t i) { return near[i]; }
 bool linkPeerSameMajor(const LinkPeer &p) { return p.major == myMajor; }
 uint8_t linkFriendCount() { return frN; }
+void linkFriendsLoad() {
+  if (!active) loadFriends();
+}
 const LinkFriend &linkFriendAt(uint8_t i) { return fr[i]; }
 bool linkFriendRam(uint8_t i) { return i < frN && frRam[i]; }
 

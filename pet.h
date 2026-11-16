@@ -464,6 +464,7 @@ public:
     save();
   }
   void dbgSetMistakes(uint8_t n) { careMistakes = n; save(); }  // consola MISTAKES n
+  void dbgSetBond(uint8_t n) { bond = n > 100 ? 100 : n; save(); }  // consola BOND n
   void dbgNeeds(int f, int j, int e, int h) {  // consola NEEDS
     fullness = clamp100(f); joy = clamp100(j); energy = clamp100(e); hygiene = clamp100(h);
     save();

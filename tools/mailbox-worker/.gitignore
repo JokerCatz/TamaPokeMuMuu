@@ -1,0 +1,3 @@
+# lo que deja wrangler en local (wrangler dev): estado y datos de la peticion, no se sube
+.wrangler/
+node_modules/

@@ -13,3 +13,8 @@
 #define LOCAL_TZ "EST5EDT,M3.2.0,M11.1.0"
 #define TZ_STD_OFFSET_H (-5)
 #define TZ_DST_NA 1
+
+// correo con amigos lejos: por defecto ntfy.sh (publico, sin clave). Con tu propio Worker
+// (tools/mailbox-worker/README.md) pon su direccion y la clave; todos los amigos, la misma
+// #define MAILBOX_URL "https://tamapoke-mailbox.<your-subdomain>.workers.dev"
+// #define MAILBOX_KEY "the KEY secret you set with wrangler"

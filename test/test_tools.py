@@ -272,6 +272,11 @@ class TestBuffersDeTexto(unittest.TestCase):
         'S_FR_RACE_IN_FMT': ('dueño',),
         'S_FR_GYM_IN_FMT': ('dueño',),
         'S_FR_GO_Q_FMT': ('prueba_o_lider',),    # la prueba de la carrera o el lider del gimnasio
+        'S_ML_CARRIES_FMT': ('nombre_o_apodo',), # amigos lejos (mail_ui.ino): el mensajero
+        'S_ML_VISIT_Q_FMT': ('dueño',),
+        'S_ML_FROM_CARD_FMT': ('dueño',),
+        'S_ML_FROM_GIFT_FMT': ('dueño',),
+        'S_ML_VISITED_FMT': ('dueño', 'nombre'),
     }
     CIFRAS = {'u': 5, 'd': 5, 'lu': 10}
     ESPEC = re.compile(r'%0?\d*(lu|u|d|s)')

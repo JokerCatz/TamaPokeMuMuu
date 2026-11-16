@@ -68,6 +68,7 @@ inline bool linkPeerNear(const LinkPeer &p) { return p.rssi >= LINK_NEAR_RSSI; }
 bool linkPeerSameMajor(const LinkPeer &p);
 
 uint8_t linkFriendCount();
+void linkFriendsLoad();  // sin "见面" abierto: los amigos de la NVS (para el correo)
 const LinkFriend &linkFriendAt(uint8_t i);
 bool linkFriendRam(uint8_t i);  // de prueba (LINK PAIRTEST): no se guarda
 bool linkForget(uint8_t i);

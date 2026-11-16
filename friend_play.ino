@@ -24,6 +24,7 @@ static uint32_t fpWaitUntil = 0;
 static const char *fpMsg = nullptr;     // aviso en un panel (como acabo el gimnasio al que ayude)
 static uint32_t fpMsgUntil = 0;
 static bool fpDexSent[LINK_FRIENDS];
+static bool fpBoxSent[LINK_FRIENDS];   // ya le dije mi buzon (correo de lejos) en esta sesion
 static bool fpWasActive = false;
 static int fpPhotoN = 0;                // fotos en la SD (se cuentan al abrir la pagina)
 // consola FRIENDTEST 1 (solo RAM): los juegos con un amigo no cambian nada en esta placa (sin
@@ -289,6 +290,11 @@ void friendRx(uint8_t fi, uint8_t type, const uint8_t *b, uint16_t n) {
       sfxPlay(e.won ? SFX_MEDAL : SFX_TAP);
       break;
     }
+    case FM_MAILBOX: {  // su buzon: desde ahora se le puede escribir de lejos
+      MailBox mb;
+      if (fi < linkFriendCount() && !linkFriendRam(fi) && mailBoxFromWire(b, n, mb)) mailSetFriendBox(linkFriendAt(fi).pid, mb);
+      break;
+    }
     case FM_CANCEL:  // el otro lo dejo
       if (fpWaitHost == fi) {
         fpWaitHost = -1;
@@ -309,6 +315,7 @@ void friendLoop(uint32_t now) {
   if (act != fpWasActive) {  // "见面" se abrio o se cerro
     fpWasActive = act;
     for (auto &d : fpDexSent) d = false;
+    for (auto &d : fpBoxSent) d = false;
     if (!act) friendLinkClosed();
   }
   if (fpGift.on && (!act || fpGift.expired(now))) {  // sin respuesta: el regalo vuelve
@@ -343,6 +350,13 @@ void friendLoop(uint32_t now) {
     if (k < 0) continue;
     const LinkPeer &p = linkNearby(k);
     if (!fpDexSent[fi] && (p.caps & CAP_PLAY)) fpDexSent[fi] = linkSendGame(fi, FM_DEX, pet.dexReg, PET_DEX_BYTES, true);
+    if (!fpBoxSent[fi] && (p.caps & CAP_MAIL) && !linkFriendRam(fi)) {  // mi buzon, para el correo de lejos
+      MailBox mb;
+      mailMyBox(mb);
+      uint8_t w[MAIL_URL_MAX + MAIL_BOX_MAX + MAIL_AUTH_MAX];
+      size_t wn = mailBoxToWire(mb, w, sizeof(w));
+      if (wn) fpBoxSent[fi] = linkSendGame(fi, FM_MAILBOX, w, wn, true);
+    }
     if (!fpTest && (p.caps & CAP_PLAY) && linkFriendTakeDay(fi, LDAY_PHOTO)) {
       FriendPhoto ph = {};
       ph.ver = PHOTO_VER;

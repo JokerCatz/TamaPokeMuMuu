@@ -20,6 +20,15 @@ static_assert(sizeof(OWNER_NAME) <= 17, "OWNER_NAME: 16 bytes como mucho (cabe e
 #define MDNS_HOST "tamapoke"
 #endif
 
+// buzon para el correo con amigos lejos (mail.h): ntfy.sh (gratis, sin cuenta) o un Worker propio
+// (tools/mailbox-worker) con su clave. Cada placa le dice el suyo a sus amigos al verse
+#ifndef MAILBOX_URL
+#define MAILBOX_URL "https://ntfy.sh"
+#endif
+#ifndef MAILBOX_KEY
+#define MAILBOX_KEY ""
+#endif
+
 #ifndef CHESS_USER
 #define CHESS_USER ""  // usuario de chess.com por defecto; manda el del portal Wi-Fi (vacio = solo el del portal)
 #endif
