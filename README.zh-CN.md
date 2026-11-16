@@ -2,7 +2,7 @@
 
 <img src="docs/banner-zh.png" alt="TamaPoke 的圆形屏幕：熄屏时钟、伙伴卡片、夜晚的主屏幕、图鉴地区封面和商店" width="100%">
 
-# TamaPoke
+# TamaPoke with Chess
 
 靠真实的 **chess.com** 国际象棋对局"过日子"的温和宝可梦电子宠物。<br>
 下棋赚积分，给按天慢慢长大的伙伴买糖果、蛋和药剂。

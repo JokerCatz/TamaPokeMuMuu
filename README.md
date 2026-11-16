@@ -2,7 +2,7 @@
 
 <img src="docs/banner.png" alt="TamaPoke on the round screen: standby clock, pet card, main screen at night, Pokédex region cover and shop" width="100%">
 
-# TamaPoke
+# TamaPoke with Chess
 
 A gentle Pokémon pet that lives on real **chess.com** games.<br>
 Play chess, earn points, and spend them on candy, eggs and potions for a companion that grows up over days.
