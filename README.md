@@ -72,6 +72,7 @@ potions → the next morning the pet cheers about yesterday's games.**
 | Tournament | — | eleven events against two random Pokémon (track, pool, jumps, weights, climbing, diving, skating, torch run, trail run), played by stats and type, no fighting |
 | Gyms | — | 8 gyms per region (72), 3-on-3 team events against the leaders and their anime Pokémon, badges, Elite Four and Champion |
 | Fun | — | orchard, fishing, mining and treasure hunts by type; cost chess points, give fruits that raise training, eggs and Mega Stone shards |
+| Friends | — | put two boards side by side to become friends: play together, gifts, photos, races and gyms together; when apart, visits, postcards and gifts (all encrypted) |
 | On its own | — | behaviour planner, speech bubbles, self-care when plugged in |
 | Collection | Pokédex gallery, streak, bond, medals | adds farm, album, stats page, accessories |
 | Points | — | chess.com games, steps (also from an iPhone), hockey practice, region rewards → shop and fun |
@@ -133,6 +134,7 @@ and fill it in. Without it the firmware builds with neutral example values from
 | `WX_LAT`, `WX_LON`, `WX_TZ` | Open-Meteo location and IANA time zone (`/` written as `%2F`) |
 | `LOCAL_TZ` | POSIX time zone string for NTP |
 | `TZ_STD_OFFSET_H`, `TZ_DST_NA` | standard UTC offset in hours, and whether the US/Canada DST rule applies |
+| `MAILBOX_URL`, `MAILBOX_KEY` | mailbox for mail with friends; ntfy.sh by default, nothing to set. For your own Cloudflare Worker, its address and key (see "Friends" below) |
 
 ### SD card
 
@@ -383,6 +385,40 @@ activity; if you won, the rare finds are twice as likely.
   with the minutes left.
 
 <table><tr><td align="center"><img src="docs/screenshots/en/fun_list.png" width="220" alt="Fun"><br>Fun</td><td align="center"><img src="docs/screenshots/en/fun_orchard.png" width="220" alt="Orchard"><br>Orchard</td><td align="center"><img src="docs/screenshots/en/fun_fishing.png" width="220" alt="Fishing"><br>Fishing</td></tr></table>
+
+### Friends: meet and mail
+
+When a friend has a board too, the two can become friends. Swipe left on the main screen and tap **MEET**.
+Both boards need this firmware or newer.
+
+**Meet (boards side by side)**: both open the **MEET** page and each board finds the other when they are close.
+Tap the other board and say yes on both; the two screens show the same 4-digit code, and once it matches you
+are friends. While the page is open the boards talk directly over radio (ESP-NOW) and home Wi-Fi pauses; it
+comes back when the page closes or after 3 idle minutes.
+
+With a friend nearby:
+
+- **Play**: the two Pokémon run, catch and dance together; when both kids tap their own Pokémon at once, they high-five.
+- **Gift**: pick something from the bag; it only goes if the friend accepts, otherwise it comes back.
+- **Race and gyms together**: a tournament race with a third random rival; at a gym the one who invites brings two and the friend's companion is the third.
+- **Photo**: one per friend per day, the first time you meet, kept on the SD card and shown on the friend page. The Pokédex also marks species a friend has raised (they don't count as raised by you).
+
+**Mail (when apart)**: after meeting once, pick the friend in the list and send:
+
+- **Visit**: your companion goes to their screen, says hello and stays a few minutes.
+- **Postcard**: a messenger (your companion or a farm Pokémon) carries one of 12 phrases and one of 8 pictures.
+- **Gift**: an item from the bag, taken from the bag when sent.
+
+Mail arrives at the next sync: every 15 minutes on USB, with the weather on battery, or with **SYNC NOW**. The
+messenger walks onto the friend's main screen and waits with an envelope or a gift box until it is tapped; a
+gift goes into the bag. Mail is resent every 4 hours until the friend's board confirms it, and a gift that
+never arrives comes back after 14 days. Meeting and mail **give no points**.
+
+Mail goes through an internet mailbox, [ntfy.sh](https://ntfy.sh) by default (free, no account). Everything is
+encrypted and signed with the key made when the two boards paired, so the mailbox only sees noise. To use your
+own mailbox, deploy the free Cloudflare Worker in [`tools/mailbox-worker`](tools/mailbox-worker/README.md) and
+set `MAILBOX_URL` and `MAILBOX_KEY` in `config_private.h`. Friends belong to the save, not the board: move a
+save to another board and your friends still know it.
 
 ### Mega Evolution
 
