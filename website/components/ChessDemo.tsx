@@ -14,6 +14,7 @@ const PUZZLES = [
   "k7/8/1K6/8/8/8/8/7Q w - - 0 1", // Qh8#
 ];
 
+const CANDY_PRICE = 2; // ITEM_PRICE[ITEM_CANDY] in pet.h
 const GLYPH: Record<string, string> = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
 const FILES = "abcdefgh";
 
@@ -90,8 +91,8 @@ export default function ChessDemo() {
   };
 
   const buy = () => {
-    if (points < 10) return;
-    setPoints((p) => p - 10);
+    if (points < CANDY_PRICE) return;
+    setPoints((p) => p - CANDY_PRICE);
     setCandy((c) => c + 1);
     setMsg("bought");
   };
@@ -118,7 +119,7 @@ export default function ChessDemo() {
               <span className="kicker mt-1">{t("chess_points")}</span>
             </div>
             <div className="flex flex-col gap-3">
-              <button type="button" className="btn" disabled={points < 10} onClick={buy}>
+              <button type="button" className="btn" disabled={points < CANDY_PRICE} onClick={buy}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={asset("/img/icon_candy.png")} alt="" width={28} height={28} className="pixelated" />
                 {t("chess_buy")}
@@ -136,7 +137,9 @@ export default function ChessDemo() {
               </div>
             </div>
           </div>
-          <p className="mt-6 max-w-xl text-sm text-ink2">{t("chess_more")}</p>
+          <p className="mt-6 max-w-xl text-sm text-ink2">
+            {t("chess_price")} {t("chess_more")}
+          </p>
         </div>
 
         <div className="flex flex-col items-center gap-4" data-reveal>

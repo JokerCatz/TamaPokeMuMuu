@@ -14,6 +14,9 @@ export type Pose = { x: number; y: number };
 
 const MODEL = asset("/models/tamapoke_case.glb");
 const WHITE = new THREE.Color("#fff");
+// phones and tablets: fewer pixels, a smaller reflection map and a shadow drawn once
+// instead of every frame (this file only ever runs in the browser)
+const LITE = typeof window !== "undefined" && window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
 const textures = new Map<string, THREE.Texture>();
 
 // the lights follow the sky: dimmer and bluer in the last chapter (night)
@@ -157,7 +160,7 @@ export default function Board3D({
     <Canvas
       frameloop={active ? "always" : "never"}
       camera={{ position: [0, 0.1, 5.3], fov: 36 }}
-      dpr={[1, 2]}
+      dpr={LITE ? [1, 1.5] : [1, 2]}
       // neutral tone mapping keeps the red of the case red (the default one turns it orange)
       gl={{ antialias: true, alpha: true, toneMapping: THREE.NeutralToneMapping }}
     >
@@ -165,13 +168,13 @@ export default function Board3D({
       <Suspense fallback={null}>
         <Case shot={shot} pos={pos} poses={poses} onTap={onTap} onReady={onReady} />
         {/* studio panels for the reflections on the plastic and the glass (no image to download) */}
-        <Environment resolution={256}>
+        <Environment resolution={LITE ? 128 : 256}>
           <Lightformer form="rect" intensity={3} position={[0, 5, 2]} scale={[9, 3, 1]} target={[0, 0, 0]} />
           <Lightformer form="rect" intensity={1.6} position={[-6, 1, 2]} scale={[5, 4, 1]} target={[0, 0, 0]} />
           <Lightformer form="rect" intensity={1.3} position={[6, 0.5, 1]} scale={[5, 4, 1]} target={[0, 0, 0]} />
           <Lightformer form="circle" intensity={1.2} position={[0, -1, 7]} scale={3} target={[0, 0, 0]} />
         </Environment>
-        <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={6} blur={2.4} far={3} resolution={512} color="#10200f" />
+        <ContactShadows position={[0, -1.5, 0]} opacity={0.4} scale={6} blur={2.4} far={3} resolution={LITE ? 256 : 512} frames={LITE ? 1 : Infinity} color="#10200f" />
       </Suspense>
     </Canvas>
   );

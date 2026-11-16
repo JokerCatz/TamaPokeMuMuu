@@ -125,11 +125,11 @@ export default function Hero() {
           </h1>
           <p className="hero-line mt-6 max-w-xl text-lg text-ink2 md:text-xl">{t("hero_lead")}</p>
           <div className="hero-line mt-8 flex flex-wrap gap-3">
-            <a href="#meet" className="btn btn-green">
-              {t("hero_meet")}
+            <a href="#chess" className="btn btn-green">
+              {t("hero_chess")}
             </a>
-            <a href="#chess" className="btn">
-              {t("hero_how")}
+            <a href="#meet" className="btn">
+              {t("hero_meet")}
             </a>
           </div>
           <p className="hero-line mt-5 text-sm text-hint">{t("hero_facts")}</p>
