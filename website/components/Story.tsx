@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { asset } from "@/lib/asset";
 import { SHOT_CAPS, STORY } from "@/lib/dict";
 import { useSite, useT } from "@/lib/state";
+import WatchClip from "./WatchClip";
 import type { Pose } from "./Board3D";
 
 const Board3D = dynamic(() => import("./Board3D"), { ssr: false });
@@ -188,7 +189,11 @@ export default function Story() {
               {t("story_tap")}
             </button>
           </div>
-          <p className="mt-3 hidden max-w-sm text-center text-xs text-hint md:block">{t("meet_model")}</p>
+          {/* a div, not a p: the button carries its dialog with it */}
+          <div className="mt-3 hidden max-w-sm text-center text-xs text-hint md:block">
+            {t("meet_model")}{" "}
+            <WatchClip className="inline-flex items-center gap-1.5 font-semibold text-ink underline underline-offset-2">{t("hero_watch")}</WatchClip>
+          </div>
         </div>
 
         <div className="md:order-1">

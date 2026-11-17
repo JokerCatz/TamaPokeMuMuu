@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { asset } from "@/lib/asset";
 import { STARTERS, type StarterId } from "@/lib/dict";
 import { useSite, useT } from "@/lib/state";
+import WatchClip from "./WatchClip";
 import Sprite from "./Sprite";
 
 gsap.registerPlugin(useGSAP);
@@ -128,9 +129,7 @@ export default function Hero() {
             <a href="#chess" className="btn btn-green">
               {t("hero_chess")}
             </a>
-            <a href="#meet" className="btn">
-              {t("hero_meet")}
-            </a>
+            <WatchClip className="btn">{t("hero_watch")}</WatchClip>
           </div>
           <p className="hero-line mt-5 text-sm text-hint">{t("hero_facts")}</p>
         </div>
