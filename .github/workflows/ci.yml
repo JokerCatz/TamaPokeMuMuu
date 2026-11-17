@@ -1,8 +1,12 @@
 name: CI
 
+# Not for changes that only touch the website, the installer page, the pictures
+# or the documents: no job here reads them (the Website workflow builds the site).
 on:
   push:
+    paths-ignore: ["website/**", "web/**", "docs/**", "**.md", ".github/workflows/pages.yml"]
   pull_request:
+    paths-ignore: ["website/**", "web/**", "docs/**", "**.md", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 jobs:

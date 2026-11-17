@@ -17,11 +17,11 @@
 
 [English](README.md) · **简体中文**
 
-<img src="docs/demo.gif" alt="真机实拍：碰一下熄屏时钟，宠物就醒来四处走动" width="360">
+<a href="https://mu-muu.github.io/TamaPoke/#build"><img src="docs/demo.gif" alt="真机实拍：装在外壳里的板子拿在手里转一圈，点一下唤醒，宠物四处走动" width="360"></a>
 
 </div>
 
-**[项目网站](https://mu-muu.github.io/TamaPoke/)**：在浏览器里孵蛋、做一道棋题、跑一场比赛。
+**[项目网站](https://mu-muu.github.io/TamaPoke/)**：在浏览器里孵蛋、做一道棋题、跑一场比赛，还有一段[真机实拍视频](https://mu-muu.github.io/TamaPoke/#build)。
 
 **[在浏览器里一键安装](https://mu-muu.github.io/TamaPoke/web/)**（电脑上用 Chrome 或 Edge，不用装 Arduino）。
 
@@ -79,7 +79,8 @@ AMOLED 触摸屏）上。本项目分叉自
 - 一张 microSD 卡（FAT32），存放精灵图、农场、相册和备份。
 - 可选：3.7 V 锂电池，MX1.25 插头（先确认正负极）；一个小喇叭，接在 MX1.25 喇叭接口上。
 - 可选：原项目的 3D 打印精灵球外壳
-  （[MakerWorld](https://makerworld.com/es/models/2937822-tamapoke-a-pokemon-pokeball-tamagotchi)）。
+  （[MakerWorld](https://makerworld.com/es/models/2937822-tamapoke-a-pokemon-pokeball-tamagotchi)），
+  另需 3 颗 M2×5 自攻螺丝和 6 颗 6×2 mm 磁铁。
 
 ## 编译和刷机
 
@@ -438,6 +439,10 @@ python3 tools/test_i18n_formats.py
 - 调试用的串口控制台，波特率 115200，比如 `HEALTH`、`STATS`、`SHOT`（截屏）、`WX`、`SYNC`。
 - 发布前，`tools/privacy_check.py` 会检查要上传的内容里有没有 `config_private.h` 里的值，以及
   本地可选的 `.privacy_denylist` 里的词。它可以作为 `pre-push` 钩子自动运行。
+- 网站：`website/` 是一个 Next.js 静态站点（`npm ci && npm run build`，产物在 `website/out`）。
+  Website 工作流会把它和安装页（`web/`）一起发布到 GitHub Pages。网站里的锦标赛用的是
+  `sport.h` 的移植版：改了 `sport.h` 之后，运行 `bash website/scripts/check-sport.sh` 核对两边是否一致。
+- 只改 `website/`、`web/`、`docs/` 或 Markdown 文件的提交不会触发 CI。
 
 ## 致谢
 
@@ -457,5 +462,7 @@ python3 tools/test_i18n_formats.py
 
 - 代码：MIT，见 [LICENSE](LICENSE)。本分叉的改动采用同样的许可。
 - 精灵图（`tools/sdcard/mons`）：CC BY-NC 4.0，来自 PMD SpriteCollab，不可商用。
-- 原项目在 MakerWorld 上的 3D 外壳：CC BY-NC-SA。
+- 原项目在 MakerWorld 上的 3D 外壳：CC BY-NC-SA。网站上的 3D 模型
+  （`website/public/models/tamapoke_case.glb`）由它制作，采用同样的许可，见
+  [website/case3d](website/case3d/README.md)。
 - 宝可梦的名字和角色归其权利人所有。

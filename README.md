@@ -17,11 +17,11 @@ Play chess, earn points, and spend them on candy, eggs and potions for a compani
 
 **English** · [简体中文](README.zh-CN.md)
 
-<img src="docs/demo.gif" alt="On the real board: tap the standby clock and the pet wakes up and walks around" width="360">
+<a href="https://mu-muu.github.io/TamaPoke/#build"><img src="docs/demo.gif" alt="The real board in its case: turned in the hand, then a tap wakes it and the pet walks around" width="360"></a>
 
 </div>
 
-**[Website](https://mu-muu.github.io/TamaPoke/)**: hatch an egg, try a chess puzzle and run a race in your browser.
+**[Website](https://mu-muu.github.io/TamaPoke/)**: hatch an egg, try a chess puzzle and run a race in your browser, and watch a [clip of the real board](https://mu-muu.github.io/TamaPoke/#build).
 
 **[Install it from your browser](https://mu-muu.github.io/TamaPoke/web/)** (Chrome or Edge on a computer, no Arduino needed).
 
@@ -90,7 +90,8 @@ potions → the next morning the pet cheers about yesterday's games.**
 - Optional: a 3.7 V LiPo with an MX1.25 plug (check polarity), and a small
   speaker on the MX1.25 speaker connector.
 - Optional: the 3D-printed Poké Ball case from upstream
-  ([MakerWorld](https://makerworld.com/es/models/2937822-tamapoke-a-pokemon-pokeball-tamagotchi)).
+  ([MakerWorld](https://makerworld.com/es/models/2937822-tamapoke-a-pokemon-pokeball-tamagotchi)),
+  with 3 M2×5 self-tapping screws and 6 magnets (6×2 mm).
 
 ## Build and flash
 
@@ -518,6 +519,12 @@ python3 tools/test_i18n_formats.py
 - Before publishing, `tools/privacy_check.py` scans what would be uploaded for
   the values in `config_private.h` and an optional local `.privacy_denylist`.
   It can run as a `pre-push` hook.
+- Website: `website/` is a Next.js static site (`npm ci && npm run build`, output
+  in `website/out`). The Website workflow publishes it to GitHub Pages together
+  with the installer (`web/`). Its tournament uses a port of `sport.h`: after
+  changing `sport.h`, run `bash website/scripts/check-sport.sh` to compare the two.
+- CI doesn't run for changes that only touch `website/`, `web/`, `docs/` or
+  Markdown files.
 
 ## Credits
 
@@ -541,5 +548,7 @@ python3 tools/test_i18n_formats.py
   license.
 - Sprites (`tools/sdcard/mons`): CC BY-NC 4.0, from PMD SpriteCollab. Don't
   use them commercially.
-- Upstream's 3D case on MakerWorld: CC BY-NC-SA.
+- Upstream's 3D case on MakerWorld: CC BY-NC-SA. The 3D model on the website
+  (`website/public/models/tamapoke_case.glb`) is made from it, under the same
+  license; see [website/case3d](website/case3d/README.md).
 - Pokémon names and characters belong to their owners.
