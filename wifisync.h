@@ -40,6 +40,8 @@ void netBegin();            // arranca la tarea de red (al final de setup)
 void netRadioTake();        // la pagina "见面" se queda la radio (para Stack-chan y el movil)
 void netRadioGive();        // y la devuelve: la tarea de red vuelve a conectar
 void netSetUsb(bool usb);   // con USB se queda conectada para Stack-chan
+bool netSleepTake();        // antes de dormir la CPU: true solo con la radio apagada (y no se enciende hasta netSleepGive)
+void netSleepGive();
 Weather weatherNow();       // el ultimo tiempo (valid = false si no hay o es viejo)
 void weatherRefresh();      // pedir el tiempo ya (consola WX)
 // hora UTC recibida del NTP desde la ultima llamada (al arrancar y cada hora,

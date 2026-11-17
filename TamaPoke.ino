@@ -55,7 +55,7 @@
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
 // version de esta fork: la fecha en que se publica (la base es la v1.18 de socquique)
-#define FW_VERSION "2026.11.16"
+#define FW_VERSION "2026.11.17"
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
   LCD_CS, LCD_SCLK, LCD_SDIO0, LCD_SDIO1, LCD_SDIO2, LCD_SDIO3);
@@ -538,6 +538,15 @@ void loop() {
       if (!screenOff) wakeUI();
     }
   }
+  // con bateria y 5 min sin tocarla se apaga sola, como con el boton (autoScreenOff, power.h)
+  static uint32_t noUsbSince = 0;
+  PowerCtx pw = powerCtx(now);
+  if (pw.usb) noUsbSince = 0;
+  else if (!noUsbSince) noUsbSince = now ? now : 1;
+  if (autoScreenOff(pw, noUsbSince ? now - noUsbSince : 0)) {
+    screenOff = true;
+    pet.screenNap(true);
+  }
 
   updateBrightness(now);
 
@@ -891,6 +900,7 @@ void idleWait(PowerCtx c) {
     // apagada con PWR el toque no cuenta: ni impide dormir (un dedo apoyado en el bolsillo) ni despierta
     bool tactil = touchWakes(c);
     if (tactil && digitalRead(TP_INT) == LOW) { gTouchIrq = true; delay(1); return; }  // toque pendiente: no se duerme
+    if (!netSleepTake()) { delay(idleDelayMs(c)); return; }  // la radio wifi en uso: no se duerme
     uint32_t ms = POWER_SLEEP_MS;
     uint32_t iv = frameIntervalMs(c);
     if (iv) {  // pantalla encendida: hasta el proximo frame
@@ -903,6 +913,7 @@ void idleWait(PowerCtx c) {
       esp_sleep_enable_gpio_wakeup();
     }
     esp_light_sleep_start();
+    netSleepGive();
     // la interrupcion del tactil vuelve a ser por flanco (como la dejo attachInterrupt); un toque
     // que ya haya bajado la linea se registra a mano
     if (tactil) {

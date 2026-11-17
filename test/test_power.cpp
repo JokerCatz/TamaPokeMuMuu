@@ -241,3 +241,24 @@ TEST(power, el_tope_de_bateria_manda_y_luego_se_aplica_el_nivel) {
   c.batPct = 15;  // baja: tope 100
   CHECK_EQ((int)brightnessFor(c), 30);
 }
+
+TEST(power, una_lectura_fallida_del_pmu_no_es_una_pulsacion_del_boton) {
+  CHECK(pwrShortFromIrq(0x08, 0x08));    // el aviso de pulsacion corta
+  CHECK(!pwrShortFromIrq(0x00, 0x08));   // nada
+  CHECK(!pwrShortFromIrq(0xF7, 0x08));   // otros avisos, ese no
+  CHECK(!pwrShortFromIrq(-1, 0x08));     // fallo de I2C: la libreria lo guardaba como 0xFF (todos los avisos)
+}
+
+TEST(power, con_bateria_y_5_min_sin_tocarla_se_apaga_sola_como_con_pwr) {
+  PowerCtx c = ctx(400000);                    // bateria, 5 min largos sin tocarla
+  CHECK(autoScreenOff(c, 60000));
+  CHECK(!autoScreenOff(c, 10000));             // "sin USB" desde hace nada: puede ser una lectura fallida del PMU
+  c.usb = true;
+  CHECK(!autoScreenOff(c, 0));                 // enchufada: se queda el reloj de espera
+  c = ctx(200000);
+  CHECK(!autoScreenOff(c, 60000));             // solo atenuada: aun no
+  c = ctx(400000);
+  c.screenOff = true;
+  CHECK(!autoScreenOff(c, 60000));             // ya apagada
+  CHECK(!touchWakes(c));                       // y apagada asi tampoco la enciende un toque: solo el boton
+}

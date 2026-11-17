@@ -108,6 +108,20 @@ inline bool lightSleepAllowed(const PowerCtx &c) {
 // abajo): en el bolsillo se encendia sola y gastaba bateria. Entonces solo el boton la enciende
 inline bool touchWakes(const PowerCtx &c) { return !c.screenOff; }
 
+// con bateria y 5 min sin tocarla (ya casi apagada) la pantalla se apaga sola, igual que con el
+// boton PWR: el bicho se duerme (dormido casi no pierde estado) y solo el boton la vuelve a
+// encender. Enchufada no: se queda el reloj de espera. `noUsbMs` = cuanto lleva sin USB seguido:
+// un "sin USB" suelto puede ser una lectura fallida del PMU
+#define POWER_AUTO_OFF_BAT_MS 30000UL
+inline bool autoScreenOff(const PowerCtx &c, uint32_t noUsbMs) {
+  return !c.usb && !c.screenOff && noUsbMs >= POWER_AUTO_OFF_BAT_MS && dimStageFor(c.idleMs) == DIM_OFF;
+}
+
+// boton PWR: `reg` es el registro de avisos del PMU donde va la pulsacion corta (-1 si la lectura
+// por I2C fallo) y `mask` su bit. Una lectura fallida no es una pulsacion: la libreria la guardaba
+// como 0xFF, todos los avisos a la vez, y la pantalla se encendia (o se apagaba) sola
+inline bool pwrShortFromIrq(int reg, uint8_t mask) { return reg >= 0 && (reg & mask); }
+
 // cada cuanto se lee la bateria por I2C
 inline uint32_t powerCacheMs(const PowerCtx &c) {
   return (c.screenOff || dimStageFor(c.idleMs) == DIM_OFF) ? 10000 : 2000;

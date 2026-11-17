@@ -21,7 +21,7 @@
 
 </div>
 
-**[项目网站](https://mu-muu.github.io/TamaPoke/?lang=zh)**：在浏览器里孵蛋、做一道棋题、跑一场比赛，还有一段[真机实拍视频](https://mu-muu.github.io/TamaPoke/?lang=zh#build)。
+**[项目网站](https://mu-muu.github.io/TamaPoke/?lang=zh)**：在浏览器里孵蛋、做一道棋题、跑一场比赛，还有一段[真机实拍视频](https://mu-muu.github.io/TamaPoke/?lang=zh#build)。第一次玩可以先看**[玩法教程](https://mu-muu.github.io/TamaPoke/guide/?lang=zh)**。
 
 **[在浏览器里一键安装](https://mu-muu.github.io/TamaPoke/web/)**（电脑上用 Chrome 或 Edge，不用装 Arduino）。
 
@@ -184,6 +184,8 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 - **夜里：** 如果灯还开着，它会在 23:00 自己睡着，07:00 醒来。用 PWR 键关掉屏幕，它也会去睡；
   这时只有再按一下 PWR 键才能重新点亮，碰屏幕没反应，放在口袋里不会被蹭亮（如果是屏幕朝下关掉的，
   翻回正面也会亮）。
+- **用电池时：** 5 分钟没人碰，屏幕会自己关掉，它也跟着去睡，和按了 PWR 键一样，
+  所以你不在的时候它的状态基本不掉。要叫醒它就按 PWR 键。插着电时屏幕不会关，而是显示待机时钟。
 - **自己照顾自己：** 插着电、10 分钟没人碰时，它会把低于 40 的需求补到 50，每分钟补一项，
   这段时间里也不会生病。这不算你的照顾。
 - **性格**（孵化时随机）：乖巧、贪吃、爱玩、爱干净、懒洋洋。某一项需求会掉得稍快，

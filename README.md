@@ -21,7 +21,7 @@ Play chess, earn points, and spend them on candy, eggs and potions for a compani
 
 </div>
 
-**[Website](https://mu-muu.github.io/TamaPoke/)**: hatch an egg, try a chess puzzle and run a race in your browser, and watch a [clip of the real board](https://mu-muu.github.io/TamaPoke/#build).
+**[Website](https://mu-muu.github.io/TamaPoke/)**: hatch an egg, try a chess puzzle and run a race in your browser, and watch a [clip of the real board](https://mu-muu.github.io/TamaPoke/#build). New to the game? Read the **[player's guide](https://mu-muu.github.io/TamaPoke/guide/)**.
 
 **[Install it from your browser](https://mu-muu.github.io/TamaPoke/web/)** (Chrome or Edge on a computer, no Arduino needed).
 
@@ -210,6 +210,10 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
   only another press of PWR turns it back on: touches are ignored then, so it
   doesn't wake up in a pocket (if you laid it face down, turning it face up
   works too).
+- **On battery:** after 5 minutes with nobody touching it, the screen turns
+  off by itself and it goes to sleep, exactly as if you had pressed PWR, so its
+  needs barely drop while you are away. Press PWR to wake it. Plugged in, the
+  screen stays on and shows the standby clock instead.
 - **Self-care:** while plugged in and with nobody touching it for 10 minutes,
   it brings any need below 40 back up to 50, one per minute, and it doesn't
   get sick. This doesn't count as your care.

@@ -1,5 +1,6 @@
 #include "batcurve.h"
 #include "rtcbat.h"
+#include "power.h"
 #include "pin_config.h"  // define XPOWERS_CHIP_AXP2101
 #include <Wire.h>
 #include <time.h>
@@ -115,8 +116,8 @@ void pwrSetup() {
 
 bool pwrShortPressed() {
   if (!pmuOk) return false;
-  pmu.getIrqStatus();
-  bool hit = pmu.isPekeyShortPressIrq();
+  // el registro se lee a mano, no con getIrqStatus(): ver pwrShortFromIrq (power.h)
+  bool hit = pwrShortFromIrq(pmu.readRegister(XPOWERS_AXP2101_INTSTS2), XPOWERS_AXP2101_PKEY_SHORT_IRQ >> 8);
   if (hit) pmu.clearIrqStatus();
   return hit;
 }

@@ -239,6 +239,17 @@ void netRadioTake() {
 
 void netRadioGive() { linkOn = false; }  // link.cpp ya apago el Wi-Fi: la tarea vuelve a conectar sola
 
+// El bucle principal va a dormir la CPU (light sleep). El wifi no lo aguanta: la radio se queda sin
+// reloj en mitad de una conexion y los plazos de la red dejan de correr. Solo se duerme con la radio
+// apagada, y con el cerrojo cogido para que la tarea de red no la encienda mientras tanto.
+bool netSleepTake() {
+  if (netMx && xSemaphoreTake(netMx, 0) != pdTRUE) return false;  // alguien esta con la radio
+  if (WiFi.getMode() == WIFI_OFF) return true;
+  netUnlock();
+  return false;
+}
+void netSleepGive() { netUnlock(); }
+
 // ---------- conexion ----------
 
 static volatile bool usbPower = false;
@@ -710,7 +721,7 @@ static void netTask(void *) {
         phoneStepsLoop();
         if (mailSyncDue(true)) mailNetSync();  // correo: cada 15 min con USB (o si lo piden)
       }
-    } else if (ws || phoneStepsOn()) {  // sin USB: se apaga la radio
+    } else if (ws || phoneStepsOn() || WiFi.getMode() != WIFI_OFF) {  // sin USB: se apaga la radio (tambien si se quedo encendida sin llegar a conectar)
       mcpStop();
       phoneStepsStop();
       WiFi.disconnect(true);

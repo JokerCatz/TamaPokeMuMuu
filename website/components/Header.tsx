@@ -15,9 +15,14 @@ const LINKS: [string, Key][] = [
   ["#build", "nav_build"],
 ];
 
-export default function Header() {
+// `page`: the sections live on the home page, so from the guide their links go back there
+export default function Header({ page = "home" }: { page?: "home" | "guide" }) {
   const { lang, setLang } = useSite();
   const t = useT();
+  // a language that came with ?lang= is not remembered: carry it to the other page
+  const q = lang === "zh" ? "?lang=zh" : "";
+  const to = (hash: string) => (page === "home" ? hash : asset("/") + q + hash);
+  const guide = asset("/guide/") + q;
   const [menu, setMenu] = useState(false); // the sections menu of narrow screens
 
   useEffect(() => {
@@ -32,7 +37,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b-2 border-ink bg-cream/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 lg:gap-6">
-        <a href="#top" className="flex items-center gap-2 font-pixel text-lg" onClick={() => setMenu(false)}>
+        <a href={to("#top")} className="flex items-center gap-2 font-pixel text-lg" onClick={() => setMenu(false)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={asset("/img/egg.png")} alt="" width={26} height={26} className="pixelated" />
           TamaPoke
@@ -40,10 +45,13 @@ export default function Header() {
         </a>
         <nav className="ml-auto hidden gap-5 text-sm font-semibold lg:flex">
           {LINKS.map(([href, k]) => (
-            <a key={href} href={href} className="hover:underline">
+            <a key={href} href={to(href)} className="hover:underline">
               {t(k)}
             </a>
           ))}
+          <a href={guide} aria-current={page === "guide" ? "page" : undefined} className="underline-offset-4 hover:underline aria-[current]:underline">
+            {t("nav_guide")}
+          </a>
         </nav>
         <a href={asset("/web/")} className="btn btn-green btn-sm ml-auto hidden shrink-0 whitespace-nowrap sm:inline-flex lg:ml-0">
           {t("nav_install")}
@@ -77,10 +85,13 @@ export default function Header() {
       {menu && (
         <nav id="sections-menu" className="absolute inset-x-0 top-full grid grid-cols-2 gap-x-4 border-b-2 border-ink bg-cream px-4 py-2 lg:hidden">
           {LINKS.map(([href, k]) => (
-            <a key={href} href={href} onClick={() => setMenu(false)} className="border-b border-ink/10 py-3 text-base font-semibold">
+            <a key={href} href={to(href)} onClick={() => setMenu(false)} className="border-b border-ink/10 py-3 text-base font-semibold">
               {t(k)}
             </a>
           ))}
+          <a href={guide} onClick={() => setMenu(false)} className="col-span-2 border-b border-ink/10 py-3 text-base font-semibold">
+            {t("nav_guide_long")}
+          </a>
           <a href={asset("/web/")} className="btn btn-green btn-sm col-span-2 my-3 sm:hidden">
             {t("nav_install_long")}
           </a>

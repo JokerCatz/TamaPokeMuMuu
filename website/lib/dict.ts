@@ -11,6 +11,8 @@ const en = {
   nav_install_long: "Install from a computer",
   nav_sports: "Sports",
   nav_menu: "Sections",
+  nav_guide: "Guide",
+  nav_guide_long: "Player's guide: how to play",
 
   hero_kicker: "TamaPoke with Chess · open-source virtual pet",
   hero_title_1: "A little friend.",
@@ -138,6 +140,8 @@ const zh: typeof en = {
   nav_install_long: "用电脑安装",
   nav_sports: "运动会",
   nav_menu: "章节",
+  nav_guide: "教程",
+  nav_guide_long: "玩法教程：怎么玩",
 
   hero_kicker: "TamaPoke with Chess · 开源电子宠物",
   hero_title_1: "小小的伙伴，",
