@@ -17,11 +17,11 @@
 
 [English](README.md) · **简体中文**
 
-<a href="https://mu-muu.github.io/TamaPoke/#build"><img src="docs/demo.gif" alt="真机实拍：装在外壳里的板子拿在手里转一圈，点一下唤醒，宠物四处走动" width="360"></a>
+<a href="https://mu-muu.github.io/TamaPoke/?lang=zh#build"><img src="docs/demo.gif" alt="真机实拍：装在外壳里的板子拿在手里转一圈，点一下唤醒，宠物四处走动" width="360"></a>
 
 </div>
 
-**[项目网站](https://mu-muu.github.io/TamaPoke/)**：在浏览器里孵蛋、做一道棋题、跑一场比赛，还有一段[真机实拍视频](https://mu-muu.github.io/TamaPoke/#build)。
+**[项目网站](https://mu-muu.github.io/TamaPoke/?lang=zh)**：在浏览器里孵蛋、做一道棋题、跑一场比赛，还有一段[真机实拍视频](https://mu-muu.github.io/TamaPoke/?lang=zh#build)。
 
 **[在浏览器里一键安装](https://mu-muu.github.io/TamaPoke/web/)**（电脑上用 Chrome 或 Edge，不用装 Arduino）。
 

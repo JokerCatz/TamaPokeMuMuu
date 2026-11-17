@@ -17,6 +17,8 @@ type State = {
 
 const Ctx = createContext<State | null>(null);
 
+// English, unless the address says ?lang=zh or the visitor picked 中文 before
+// (the browser's own language is not looked at).
 function detectLang(): Lang {
   const q = /[?&]lang=(en|zh)\b/.exec(window.location.search);
   if (q) return q[1] as Lang;
@@ -26,8 +28,7 @@ function detectLang(): Lang {
   } catch {
     /* storage blocked */
   }
-  const nav = navigator.languages?.[0] ?? navigator.language ?? "en";
-  return /^zh/i.test(nav) ? "zh" : "en";
+  return "en";
 }
 
 export function SiteProvider({ children }: { children: ReactNode }) {
