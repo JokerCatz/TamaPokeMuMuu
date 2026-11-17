@@ -281,7 +281,7 @@ static int http(bool post, const String &url, const char *auth, const String &bo
   if (tls) sc.setInsecure();  // da igual quien conteste: el contenido va cifrado y firmado
   HTTPClient h;
   h.setTimeout(8000);
-  h.setUserAgent("TamaPoke/1.0 (personal project)");
+  h.setUserAgent("TamaPoke/2026.11 (+https://github.com/Mu-Muu/TamaPoke)");
   if (!h.begin(tls ? (WiFiClient &)sc : pc, url)) return -1;
   if (auth && *auth) h.addHeader("X-Key", auth);
   int code;

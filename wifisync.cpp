@@ -356,7 +356,8 @@ static bool bajarJson(const String &url, JsonDocument &doc, JsonDocument *filtro
   cliente.setInsecure();  // datos publicos y de solo lectura
   HTTPClient http;
   http.useHTTP10(true);   // sin "chunked": ArduinoJson lee directo del flujo
-  http.setUserAgent("TamaPoke/1.0 (personal project)");
+  // chess.com pide que el user-agent diga como contactar con quien lo hizo (API publica, desde 2023)
+  http.setUserAgent("TamaPoke/2026.11 (+https://github.com/Mu-Muu/TamaPoke)");
   if (!http.begin(cliente, url)) return false;
   int code = http.GET();
   bool ok = false;
