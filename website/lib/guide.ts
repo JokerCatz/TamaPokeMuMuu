@@ -180,7 +180,7 @@ export const GUIDE: Chapter[] = [
           [t("You press PWR", "按一下电源键"), t("Screen off, pet asleep. Only PWR wakes it", "关屏，宠物入睡。只有电源键能叫醒")],
           [t("On battery, untouched for 5 minutes", "用电池，5 分钟没人碰"), t("The same as pressing PWR, by itself", "自动关屏入睡，效果和按电源键一样")],
           [t("Plugged in, untouched for 90 seconds", "插着电，90 秒没人碰"), t("The standby clock: time, date and weather", "显示待机时钟：时间、日期和天气")],
-          [t("Plugged in, untouched for 10 minutes", "插着电，10 分钟没人碰"), t("Self-care: any need below 40 goes back to 50, one a minute, and it can't get sick. This doesn't count as your care", "自己照顾自己：低于 40 的需求补到 50，每分钟补一项，这期间不会生病。这不算你的照顾")],
+          [t("Plugged in, untouched for 10 minutes", "插着电，10 分钟没人碰"), t("Self-care: any need below 40 goes back to 50, one a minute, silently (no animation, no sound), and it can't get sick. This doesn't count as your care", "自己照顾自己：低于 40 的需求补到 50，每分钟补一项，全程静默（没有动画和声音），这期间不会生病。这不算你的照顾")],
         ],
       },
       { k: "h", t: t("Natures", "性格") },

@@ -290,7 +290,6 @@ public:
   // para la animacion: que comio la ultima vez (FOOD_*) y cuantas veces ha jugado
   uint8_t lastFood = 0;
   uint16_t playSeq = 0;
-  uint16_t selfBathSeq = 0, selfDozeSeq = 0;  // se lavo / se echo una cabezada solo (animacion)
   uint32_t lastSeenEpoch = 0;   // ultima hora RTC vista (para progresion offline)
   uint8_t ceremony = CER_NONE;  // despedida/escapada/liberacion en curso
   uint8_t lastEnd = CER_NONE;   // como acabo la anterior (afecta al huevo)

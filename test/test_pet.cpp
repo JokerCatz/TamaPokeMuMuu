@@ -2567,16 +2567,36 @@ TEST(guardian, se_cuida_hasta_la_mitad_de_una_en_una) {
   advance(p, 1);
   CHECK_EQ(p.fullness, (uint8_t)AUTO_CARE_LEVEL);  // lo primero: comer
   CHECK(p.hygiene < AUTO_CARE_LEVEL);              // lo demas, en los minutos siguientes
-  CHECK(p.eating());
   advance(p, 1);
   CHECK(p.hygiene >= AUTO_CARE_LEVEL - 1);
-  CHECK_EQ(p.selfBathSeq, (uint16_t)1);
   advance(p, 2);
   mockClearForcedRandom();
   CHECK(p.energy >= AUTO_CARE_LEVEL - 2);
   CHECK(p.joy >= AUTO_CARE_LEVEL - 2);
   CHECK(p.fullness < 100);  // nunca lo llena del todo
   CHECK_EQ(p.streak, racha);  // no es cuidado del jugador
+}
+
+// cuidarse solo no se ve ni se oye: ni come con animacion, ni corazones, ni juego (eso
+// encendia la pantalla, que con USB esta en el reloj de espera, y el amplificador)
+TEST(guardian, se_cuida_en_silencio) {
+  Pet p;
+  makePet(p, 4);
+  p.setGuardian(true);
+  setStats(p, 20, 20, 20, 20);
+  p.poops = 2;
+  uint16_t jugadas = p.playSeq;
+  mockForceRandom(99);
+  for (int i = 0; i < 4; i++) {  // comer, lavarse, descansar y jugar: uno por minuto
+    advance(p, 1);
+    CHECK(!p.eating());
+    CHECK(!p.showHeart());
+    CHECK_EQ(p.playSeq, jugadas);
+  }
+  mockClearForcedRandom();
+  CHECK(p.fullness >= AUTO_CARE_FROM);  // y aun asi se ha cuidado
+  CHECK(p.joy >= AUTO_CARE_FROM);
+  CHECK_EQ(p.poops, (uint8_t)0);
 }
 
 TEST(guardian, dos_cacas_las_limpia_aunque_este_limpio) {

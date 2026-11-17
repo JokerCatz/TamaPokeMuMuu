@@ -1294,23 +1294,19 @@ void Pet::stroke() {
 
 // cuidarse solo hasta la mitad, de una en una: primero comer, luego lavarse
 // (tambien si hay 2 cacas: es lo que pone enfermo), descansar y jugar. No cuenta
-// como cuidado del jugador (ni racha ni vinculo).
+// como cuidado del jugador (ni racha ni vinculo). En silencio: sin animacion ni
+// aviso, que encendian la pantalla (con USB esta en el reloj de espera) y el altavoz.
 void Pet::autoCare() {
   if (ceremony != CER_NONE || isEgg() || sleeping) return;
   if (fullness < AUTO_CARE_FROM) {
     fullness = AUTO_CARE_LEVEL;
-    lastFood = FOOD_BERRY;
-    eatUntil = millis() + EAT_ANIM_MS;
   } else if (hygiene < AUTO_CARE_FROM || poops >= 2) {
     if (hygiene < AUTO_CARE_LEVEL) hygiene = AUTO_CARE_LEVEL;
     poops = 0;
-    selfBathSeq++;
   } else if (energy < AUTO_CARE_FROM) {
     energy = AUTO_CARE_LEVEL;
-    selfDozeSeq++;
   } else if (joy < AUTO_CARE_FROM) {
     joy = AUTO_CARE_LEVEL;
-    playSeq++;
   } else {
     return;
   }

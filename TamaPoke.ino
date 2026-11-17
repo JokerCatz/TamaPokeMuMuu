@@ -576,19 +576,6 @@ void loop() {
     // enchufado y sin que nadie lo atienda 10 min: se cuida solo (hasta la mitad)
     pet.setGuardian(usb && idleSince(now, lastUserAt) > 10UL * 60 * 1000);
   }
-  // lo que hace al cuidarse solo, que se vea: lavarse (sin el "limpio del todo"
-  // del baño de verdad) o echarse una cabezada
-  static uint16_t banosSolo = 0xFFFF, siestasSolo = 0xFFFF;
-  if (banosSolo == 0xFFFF) { banosSolo = pet.selfBathSeq; siestasSolo = pet.selfDozeSeq; }
-  if (pet.selfBathSeq != banosSolo) {
-    banosSolo = pet.selfBathSeq;
-    startBath(false);
-  }
-  if (pet.selfDozeSeq != siestasSolo) {
-    siestasSolo = pet.selfDozeSeq;
-    forceAct = ACT_DOZE;
-    beh.until = 0;
-  }
   stackchanService();
   // "见面": la radio habla con otra placa (link.cpp). Si se cerro sola (3 min sin tocar), la pagina tambien
   if (linkActive()) {

@@ -216,7 +216,8 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
   screen stays on and shows the standby clock instead.
 - **Self-care:** while plugged in and with nobody touching it for 10 minutes,
   it brings any need below 40 back up to 50, one per minute, and it doesn't
-  get sick. This doesn't count as your care.
+  get sick. It does this silently: no animation, no sound, and the standby
+  clock stays on. This doesn't count as your care.
 - **Natures** (rolled at hatch): easygoing, glutton, playful, tidy, lazy. One
   need drops a little faster and its favourite care gives more.
 
