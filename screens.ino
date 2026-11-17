@@ -131,7 +131,7 @@ void renderClock() {
     printT(u);
   }
 
-  // sonido, wi-fi (verde si ya hay red), idioma, restaurar la copia (su fecha debajo)
+  // sonido, wi-fi (verde si ya hay red), idioma, la copia de seguridad (su fecha debajo)
   char lp[10];
   snprintf(lp, sizeof(lp), "%s >", LANG_CODES[gLang]);
   uint32_t bk = 0;
@@ -143,10 +143,10 @@ void renderClock() {
     gmtime_r(&bt, &btm);
     snprintf(fecha, sizeof(fecha), "%u/%u", (unsigned)(btm.tm_mon + 1), (unsigned)btm.tm_mday);
   }
-  const char *snd = audioEnabled() ? T(S_SND_ON) : T(S_SND_OFF), *rest = hayCopia ? T(S_RESTORE) : T(S_NO_BACKUP);
+  const char *snd = audioEnabled() ? T(S_SND_ON) : T(S_SND_OFF);
   const StrId bl[2] = { S_STATS, S_SYNC_NOW };
   // un solo tamaño para todos los botones: el 3 si caben todos, si no el 2
-  const char *grandes[4] = { snd, T(S_WIFI_SETUP), lp, rest };
+  const char *grandes[4] = { snd, T(S_WIFI_SETUP), lp, T(S_BACKUP) };
   int ts = 3;
   for (const char *l : grandes)
     if (textW(l, 3) > SET_BTN_W - 16) ts = 2;
@@ -155,7 +155,7 @@ void renderClock() {
   setButton(SET_BTN_X0, SET_BTN_Y0, snd, audioEnabled(), false, ts);
   setButton(SET_BTN_X1, SET_BTN_Y0, T(S_WIFI_SETUP), wifiHasCreds(), false, ts);
   setButton(SET_BTN_X0, SET_BTN_Y1, lp, false, false, ts);
-  setButton(SET_BTN_X1, SET_BTN_Y1, rest, false, !hayCopia, ts, hayCopia ? fecha : nullptr);
+  setButton(SET_BTN_X1, SET_BTN_Y1, T(S_BACKUP), false, !sdReady, ts, hayCopia ? fecha : nullptr);
 
   // debajo: estadisticas, brillo y sincronizar el ajedrez ya (gris sin wi-fi o sin cuenta de chess.com)
   const int16_t bx[2] = { SET_BTN_X0, STATS_BTN_X1 };
@@ -183,20 +183,39 @@ void renderClock() {
   setCur(centerX(ver, 1), 422);
   printT(ver);
 
-  if (restoreAsk) {  // ¿seguro?
+  drawToast();  // "copia guardada" (o que fallo)
+  if (backupAsk) {  // la copia: que hacer con ella y, despues, ¿seguro?
     gfx->fillRoundRect(64, 168, 338, 152, 16, UI_WHITE);
     gfx->drawRoundRect(64, 168, 338, 152, 16, UI_INK);
+    char tit[48];
+    if (backupAsk != BK_MENU) snprintf(tit, sizeof(tit), "%s", T(backupAsk == BK_ASK_SAVE ? S_BK_SAVE_Q : S_RESTORE_Q));
+    else if (hayCopia) snprintf(tit, sizeof(tit), "%s %s", T(S_BACKUP), fecha);
+    else snprintf(tit, sizeof(tit), "%s", T(S_NO_BACKUP));
     gfx->setTextColor(UI_INK);
     setSize(2);
-    setCur(centerX(T(S_RESTORE_Q), 2), 200);
-    printT(T(S_RESTORE_Q));
-    gfx->fillRoundRect(118, 252, 100, 52, 12, UI_BAR_OK);
-    gfx->setTextColor(UI_WHITE);
-    setCur(118 + (100 - textW(T(S_YES), 2)) / 2, 270);
-    printT(T(S_YES));
-    gfx->fillRoundRect(248, 252, 100, 52, 12, UI_BAR_BAD);
-    setCur(248 + (100 - textW(T(S_NO), 2)) / 2, 270);
-    printT(T(S_NO));
+    setCur(centerX(tit, 2), 200);
+    printT(tit);
+    int ty = BK_BTN_Y + (BK_BTN_H - 14) / 2;
+    if (backupAsk == BK_MENU) {  // guardar ya / restaurar (gris si aun no hay copia)
+      const char *l[2] = { T(S_BK_SAVE), T(S_RESTORE) };
+      const int16_t bx[2] = { BK_MENU_X0, BK_MENU_X1 };
+      for (int i = 0; i < 2; i++) {
+        bool gris = i == 1 && !hayCopia;
+        gfx->fillRoundRect(bx[i], BK_BTN_Y, BK_MENU_W, BK_BTN_H, 12, gris ? UI_TRACK : UI_WHITE);
+        gfx->drawRoundRect(bx[i], BK_BTN_Y, BK_MENU_W, BK_BTN_H, 12, UI_INK);
+        gfx->setTextColor(gris ? UI_HINT : UI_INK);
+        setCur(bx[i] + (BK_MENU_W - textW(l[i], 2)) / 2, ty);
+        printT(l[i]);
+      }
+    } else {
+      gfx->fillRoundRect(BK_YES_X, BK_BTN_Y, BK_YN_W, BK_BTN_H, 12, UI_BAR_OK);
+      gfx->setTextColor(UI_WHITE);
+      setCur(BK_YES_X + (BK_YN_W - textW(T(S_YES), 2)) / 2, ty - 1);
+      printT(T(S_YES));
+      gfx->fillRoundRect(BK_NO_X, BK_BTN_Y, BK_YN_W, BK_BTN_H, 12, UI_BAR_BAD);
+      setCur(BK_NO_X + (BK_YN_W - textW(T(S_NO), 2)) / 2, ty - 1);
+      printT(T(S_NO));
+    }
   }
   gfx->flush();
 }
@@ -261,9 +280,20 @@ void renderStats() {
 }
 
 void clockTap(int16_t x, int16_t y) {
-  if (restoreAsk) {
-    restoreAsk = false;
-    if (x >= 118 && x <= 218 && y >= 252 && y <= 304) {  // SI: se restaura y se reinicia
+  if (backupAsk) {  // cualquier toque fuera de los botones lo cierra
+    uint8_t ask = backupAsk;
+    backupAsk = BK_NONE;
+    if (y < BK_BTN_Y || y > BK_BTN_Y + BK_BTN_H) return;
+    if (ask == BK_MENU) {  // guardar ya o restaurar: las dos preguntan antes
+      uint32_t bk;
+      if (x >= BK_MENU_X0 && x <= BK_MENU_X0 + BK_MENU_W) backupAsk = BK_ASK_SAVE;
+      else if (x >= BK_MENU_X1 && x <= BK_MENU_X1 + BK_MENU_W && backupInfo(bk)) backupAsk = BK_ASK_RESTORE;
+    } else if (x < BK_YES_X || x > BK_YES_X + BK_YN_W) {
+      return;  // NO
+    } else if (ask == BK_ASK_SAVE) {  // SI: la copia nueva sustituye a la que hubiera
+      pet.flushSave();
+      toast(T(backupSave(pet.lastSeenEpoch) ? S_BK_SAVED : S_BK_FAIL));
+    } else {  // SI: se restaura y se reinicia
       gfx->fillScreen(RGB565_BLACK);
       gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
       gfx->setTextColor(UI_INK);
@@ -323,9 +353,8 @@ void clockTap(int16_t x, int16_t y) {
     setLang((Lang)((gLang + 1) % LANG_COUNT));
     applyLangFont();  // la fuente cambia con el idioma
     sfxPlay(SFX_TAP);
-  } else if (row1 && col1) {  // restaurar la copia (con confirmacion)
-    uint32_t bk;
-    if (backupInfo(bk)) restoreAsk = true;
+  } else if (row1 && col1) {  // la copia de seguridad: guardar una ya o restaurarla
+    if (sdReady) backupAsk = BK_MENU;
   }
 }
 

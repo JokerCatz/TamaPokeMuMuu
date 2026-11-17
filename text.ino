@@ -152,6 +152,9 @@ static uint32_t screenKey() {
     h = mixKey(h, userDim);
     h = mixKey(h, tempF);
     h = mixKey(h, gLang);
+    // el menu de la copia y su aviso: sin esto salian (y se iban) solo al cambiar el minuto
+    h = mixKey(h, backupAsk);
+    h = mixKey(h, toastMsg && timeLeft(toastUntil) ? (uint32_t)(uintptr_t)toastMsg : 0);
   } else if (cardOpen) {
     for (uint32_t v : { (uint32_t)pet.speciesId, (uint32_t)pet.shiny, (uint32_t)pet.ageMinutes, (uint32_t)pet.streak,
                         (uint32_t)pet.bestStreak, (uint32_t)pet.bond, (uint32_t)pet.medals, (uint32_t)pet.weight,

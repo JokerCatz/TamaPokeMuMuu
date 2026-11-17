@@ -79,7 +79,7 @@ potions → the next morning the pet cheers about yesterday's games.**
 | Collection | Pokédex gallery, streak, bond, medals | adds farm, album, stats page, accessories |
 | Points | — | chess.com games, steps (also from an iPhone), hockey practice, region rewards → shop and fun |
 | World | biome and time-of-day backgrounds | real weather, sunrise/sunset, seasons, holidays, region landscapes |
-| Extras | battery, dimming, web installer | adds standby clock, NTP time, daily SD backup, optional Stack-chan control |
+| Extras | battery, dimming, web installer | adds standby clock, NTP time, SD backup (daily or on demand), optional Stack-chan control |
 
 ## Hardware
 
@@ -176,7 +176,7 @@ From the main screen:
 | swipe **right** | Pokédex: one cover per region, swipe on to the next region, tap a cover to open its grid (up/down for pages, tap a Pokémon for details) |
 | swipe **left** | activities: the farm (album button at the bottom), the tournament, the gyms and fun |
 | swipe **up** | the pet's card: profile, abilities, medals (swipe left/right for pages) |
-| swipe **down** | settings: clock, temperature unit (°C/°F), sound, Wi-Fi, language, restore backup, stats, screen brightness (three levels), sync chess now |
+| swipe **down** | settings: clock, temperature unit (°C/°F), sound, Wi-Fi, language, backup (save one now or restore it), stats, screen brightness (three levels), sync chess now |
 | tap the **points** at the top | shop (items, eggs, accessories) |
 | **long press** the pet | send it to the farm, or release it |
 
@@ -306,7 +306,13 @@ never give points.
 - The **album** keeps one page per companion that has left, with dates, level,
   medals and how it ended.
 - A **backup** of the game is written to the SD once a day (Wi-Fi details are
-  not included) and can be restored from settings.
+  not included). In settings, **BACKUP** saves a fresh one at any moment
+  (**SAVE NOW**) or brings it back (**RESTORE**); both ask first.
+- **Moving to another board:** SAVE NOW on the old board, then put its SD card
+  in the new one (the card also holds the farm, the album and the friend
+  photos). Flash the new board, pick any starter, set up Wi-Fi so the clock is
+  right, and RESTORE. When the new board looks right, erase the old one with
+  the web installer, so two boards don't share one game.
 
 <table><tr><td align="center"><img src="docs/screenshots/en/dex_cover.png" width="220" alt="Region cover"><br>Region cover</td><td align="center"><img src="docs/screenshots/en/dex_locked.png" width="220" alt="Locked region"><br>Locked region</td><td align="center"><img src="docs/screenshots/en/dex_grid.png" width="220" alt="Region grid"><br>Region grid</td></tr></table>
 

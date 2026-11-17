@@ -336,7 +336,7 @@ export const GUIDE: Chapter[] = [
         ],
       },
       { k: "h", t: t("Album and backup", "相册和备份") },
-      { k: "p", t: t("The album button is at the bottom of the farm: one page for every companion that has left, with its dates, level, medals and how it ended. The whole game is backed up to the SD card once a day (Wi-Fi details are not included) and can be restored from settings.", "相册按钮在农场底部：每位离开的伙伴一页，记着日期、等级、奖章和离开的方式。整个游戏每天备份到 SD 卡一次（不包括 Wi-Fi 信息），可以在设置里恢复。") },
+      { k: "p", t: t("The album button is at the bottom of the farm: one page for every companion that has left, with its dates, level, medals and how it ended. The whole game is backed up to the SD card once a day (Wi-Fi details are not included). In settings, **BACKUP** saves a fresh copy at any moment or restores it; both ask first.", "相册按钮在农场底部：每位离开的伙伴一页，记着日期、等级、奖章和离开的方式。整个游戏每天备份到 SD 卡一次（不包括 Wi-Fi 信息）。在设置里点**备份**，可以随时存一份新的，也可以恢复，两种操作都会先问一下。") },
       {
         k: "shots",
         items: [
@@ -591,8 +591,15 @@ export const GUIDE: Chapter[] = [
             a: t("All four needs must be at 40 or more, and each care mistake adds 2 hours to the wait. An evolution potion (100 points) evolves it at once.", "四项需求都要在 40 以上，而且每次照顾失误要多等 2 小时。进化药水（100 分）可以让它马上进化。"),
           },
           {
+            q: t("I got a new board. Can I move my game to it?", "换了一块新板子，存档能搬过去吗？"),
+            a: t(
+              "Yes. On the old board open settings, tap **BACKUP** and **SAVE NOW**. Put its SD card in the new board (the card also holds the farm, the album and the friend photos). Flash the new board, pick any starter, set up Wi-Fi so the clock is right, then tap BACKUP and **RESTORE**. Wi-Fi details are the only thing that does not move. When the new board looks right, erase the old one with the web installer so two boards don't share one game.",
+              "可以。在旧板子的设置里点**备份** → **立即备份**，再把它的 SD 卡插到新板子上（卡里还有农场、相册和好友合影）。给新板子刷机，随便选一只初始宝可梦，连上 Wi-Fi 让时钟校准，然后点备份 → **恢复备份**。只有 Wi-Fi 信息不会跟过去。确认新板子没问题后，用网页安装器把旧板子清空，免得两块板子共用一份存档。",
+            ),
+          },
+          {
             q: t("Will an update erase my game?", "更新固件会丢进度吗？"),
-            a: t("No. The web installer only replaces the program. The daily backup on the SD card is a second copy; it can be restored from settings.", "不会。网页安装器只替换程序。SD 卡上每天的备份是第二份保险，可以在设置里恢复。"),
+            a: t("No. The web installer only replaces the program. The backup on the SD card is a second copy: tap **BACKUP** and **SAVE NOW** in settings before updating if you want it fresh, and **RESTORE** brings it back.", "不会。网页安装器只替换程序。SD 卡上的备份是第二份保险：想要最新的，更新前在设置里点**备份** → **立即备份**；需要时点**恢复备份**就能找回来。"),
           },
         ],
       },

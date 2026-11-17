@@ -234,7 +234,18 @@ struct {
   char name[24] = "";
 } vis;
 uint32_t nextVisit = 0;
-bool restoreAsk = false;  // ajustes: confirmar restaurar la copia
+// ajustes, el boton de la copia: elegir (guardar ya / restaurar) y despues confirmar
+enum : uint8_t { BK_NONE = 0, BK_MENU, BK_ASK_RESTORE, BK_ASK_SAVE };
+uint8_t backupAsk = BK_NONE;
+// sus dos botones: anchos al elegir, SI / NO al confirmar
+#define BK_BTN_Y 252
+#define BK_BTN_H 52
+#define BK_MENU_X0 78
+#define BK_MENU_X1 240
+#define BK_MENU_W 148
+#define BK_YES_X 118
+#define BK_NO_X 248
+#define BK_YN_W 100
 bool statsOpen = false;   // ajustes: pagina de estadisticas
 // cima del ultimo sprite PMD dibujado (gorros, complementos, mareo, bocadillo)
 int gPmdTopY = 304 - 150, gPmdTopX = 233;

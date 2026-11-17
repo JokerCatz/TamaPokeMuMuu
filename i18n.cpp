@@ -155,6 +155,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "A gift came back to your bag", "Tap to open",
     "Hello!", "Miss you!", "Let's play!", "See you tomorrow!", "Good morning!", "Sweet dreams!",
     "Thank you!", "You can do it!", "Happy birthday!", "Had a great day!", "Won at chess today!", "My Pokemon evolved!",
+    "BACKUP", "SAVE NOW", "Save a new backup?", "Backup saved", "Backup failed",
   },
   // ---------------- ZH ----------------
   // Chino simplificado. Los especificadores van en el orden de la fila
@@ -346,6 +347,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "有个礼物回到背包了", "点一下打开",
     "你好呀！", "想你了！", "一起玩吧！", "明天见！", "早上好！", "好梦！",
     "谢谢你！", "加油！", "生日快乐！", "今天很开心！", "今天下棋赢了！", "我的宝可梦进化了！",
+    "备份", "立即备份", "保存一份新的备份？", "备份好了", "备份失败",
   },
 };
 
