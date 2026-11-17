@@ -168,3 +168,17 @@ TEST(stackchan, la_lista_de_herramientas) {
   CHECK_EQ(stackchanFind("tamapoke_feed", nada), (int)MCP_FEED);
   CHECK_EQ(stackchanFind("tamapoke_pokedex", nada), (int)MCP_POKEDEX);
 }
+
+// la mochila con objetos de todo tipo (frutas, pesca, mina, megapiedra...): cada uno con su nombre.
+// Faltaban los de despues de la piedra megaevolucion y el "%s" recibia un puntero nulo: en la placa
+// eso era un LoadProhibited en cuanto Stack-chan preguntaba como estaba el bicho
+TEST(stackchan, la_mochila_nombra_todos_los_objetos) {
+  Pet p;
+  nacer(p, 4);
+  for (int i = 0; i < ITEM_COUNT; i++) p.bag[i] = 1;
+  std::string r = usar(p, MCP_STATUS);
+  CHECK_MSG(!tiene(r, "(null)"), r);
+  CHECK_MSG(tiene(r, "Mega石"), r);
+  CHECK_MSG(tiene(r, "金果"), r);
+  CHECK_MSG(tiene(r, "化石蛋"), r);
+}

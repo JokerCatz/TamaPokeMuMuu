@@ -40,8 +40,13 @@ static const char *const INFO_ID[3] = { "chess", "pokedex", "farm" };
 static const uint8_t INFO_ACT[3] = { MCP_CHESS, MCP_POKEDEX, MCP_FARM };
 static const char *const BUY_ID[4] = { "candy", "medicine", "strength_potion", "speed_potion" };
 static const uint8_t BUY_ITEM[4] = { ITEM_CANDY, ITEM_MEDICINE, ITEM_POTION_STR, ITEM_POTION_SPD };
-static const char *const ITEM_ZH[ITEM_COUNT] = { "糖果", "药", "体力药剂", "活力药剂", "异色护符",
-                                                 "普通蛋", "稀有蛋", "传说蛋", "进化药水" };
+// un nombre por objeto, en el orden de ITEM_*: un hueco era un puntero nulo en el "%s" de la mochila
+// (la placa se reiniciaba en cuanto Stack-chan preguntaba con una megapiedra o una fruta en la mochila)
+static const char *const ITEM_ZH[] = { "糖果", "药", "体力药剂", "活力药剂", "异色护符",
+                                       "普通蛋", "稀有蛋", "传说蛋", "进化药水", "Mega石",
+                                       "体力果", "抵抗果", "活力果", "金果", "鱼", "珍珠", "Mega石碎片",
+                                       "水属性蛋", "化石蛋" };
+static_assert(sizeof(ITEM_ZH) / sizeof(ITEM_ZH[0]) == ITEM_COUNT, "falta el nombre de algun objeto");
 static const char *const NAT_ZH[NAT_COUNT] = { "乖巧", "贪吃", "爱玩", "爱干净", "懒洋洋" };
 static const char *const REGION_ZH[REGION_COUNT] = { "关都", "城都", "丰缘", "神奥", "合众",
                                                      "卡洛斯", "阿罗拉", "伽勒尔", "帕底亚" };
@@ -115,14 +120,18 @@ static void mochila(const Pet &pet, char *out, size_t cap) {
   size_t n = 0;
   for (int i = 0; i < ITEM_COUNT; i++) {
     if (!pet.bag[i]) continue;
-    n += snprintf(out + n, n < cap ? cap - n : 0, "%s%s %u", n ? "、" : "", ITEM_ZH[i], pet.bag[i]);
+    char e[40];
+    int k = snprintf(e, sizeof(e), "%s%s %u", n ? "、" : "", ITEM_ZH[i], pet.bag[i]);
+    if (k <= 0 || n + (size_t)k >= cap) break;  // entero o nada: cortado a mitad de un caracter no es UTF-8
+    memcpy(out + n, e, (size_t)k + 1);
+    n += (size_t)k;
   }
   if (!n) snprintf(out, cap, "空的");
 }
 
 // "PIKACHU Lv.6：饱食 75，心情 90，精力 40，清洁 100，醒着，积分 12。"
 static void resumen(const Pet &pet, const char *name, char *out, size_t cap) {
-  char bolsa[120];
+  char bolsa[400];  // con todo: 19 objetos de hasta 20 bytes
   mochila(pet, bolsa, sizeof(bolsa));
   snprintf(out, cap, "%s%s Lv.%u（性格%s）：饱食 %u，心情 %u，精力 %u，清洁 %u%s%s%s。积分 %ld，背包：%s，今天走了 %lu 步。",
            pet.shiny ? "异色" : "", name, pet.level(), NAT_ZH[pet.nature < NAT_COUNT ? pet.nature : 0],
@@ -184,7 +193,7 @@ static void comprar(Pet &pet, uint8_t item, uint8_t count, char *out, size_t cap
   }
   uint8_t ok = 0;
   while (ok < count && pet.buy(item)) ok++;
-  char bolsa[120];
+  char bolsa[400];  // con todo: 19 objetos de hasta 20 bytes
   mochila(pet, bolsa, sizeof(bolsa));
   if (!ok)
     snprintf(out, cap, "积分不够：%s要 %u 分，现在只有 %ld 分。", ITEM_ZH[item], ITEM_PRICE[item], (long)pet.points);

@@ -15,6 +15,8 @@
 #include "wifipick.h"
 #include "phonesteps.h"  // pasos del movil (servidor en la red de casa)
 #include "mailbox.h"     // correo con amigos lejos
+#include <mbedtls/platform.h>
+#include <esp_heap_caps.h>
 
 static WebServer *server = nullptr;
 static DNSServer *dns = nullptr;
@@ -753,8 +755,19 @@ static void netTask(void *) {
   }
 }
 
+// Cada sesion TLS (chess.com, el tiempo, el correo, xiaozhi) pide unos 47 KB, y el core
+// precompilado (CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC) los saca de la RAM interna: con xiaozhi
+// conectado (USB) y otra descarga a la vez, la interna llego a bajar a 15 KB. Van a la PSRAM,
+// como hace CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC; solo si alli no caben, a la interna.
+static void *tlsCalloc(size_t n, size_t size) {
+  void *p = heap_caps_calloc(n, size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  return p ? p : heap_caps_calloc(n, size, MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+}
+static void tlsFree(void *p) { heap_caps_free(p); }
+
 void netBegin() {
   if (netMx) return;
+  mbedtls_platform_set_calloc_free(tlsCalloc, tlsFree);  // antes de la primera conexion TLS
   // las credenciales se pasan siempre: que el wifi no las vuelva a escribir en la
   // NVS en cada intento (con varias redes, cada cambio era una escritura en flash)
   WiFi.persistent(false);
