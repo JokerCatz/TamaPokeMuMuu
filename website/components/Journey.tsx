@@ -93,7 +93,7 @@ export default function Journey() {
               <li key={r.id} className="w-[var(--w)] shrink-0" aria-current={i === at}>
                 <div className={`block-card relative overflow-hidden transition-[filter,opacity] duration-700 ${locked ? "opacity-60 grayscale" : ""}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={asset(`/regions/${r.id}.jpg`)} alt="" className="aspect-[495/159] w-full object-cover" draggable={false} />
+                  <img src={asset(`/regions/${r.id}.jpg`)} alt="" className="aspect-[495/159] w-full object-cover" draggable={false} loading="lazy" />
                   <div className="flex items-baseline justify-between gap-3 px-4 py-2.5">
                     <span className="text-lg font-bold">
                       <span className="font-pixel mr-2 text-sm text-hint">{String(i + 1).padStart(2, "0")}</span>

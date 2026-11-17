@@ -38,7 +38,7 @@ export default function Friends() {
                 <div className="case aspect-square w-[min(76vw,300px)]">
                   <div className="screen">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={asset(`/shots/${lang}/${name}.png`)} alt={cap} className="h-full w-full" loading="lazy" />
+                    <img src={asset(`/shots/${lang}/${name}.webp`)} alt={cap} className="h-full w-full" loading="lazy" />
                   </div>
                 </div>
                 <figcaption className="mt-4 font-bold">{cap}</figcaption>

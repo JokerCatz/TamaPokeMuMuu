@@ -21,6 +21,8 @@ Play chess, earn points, and spend them on candy, eggs and potions for a compani
 
 </div>
 
+**[Website](https://mu-muu.github.io/TamaPoke/)**: hatch an egg, try a chess puzzle and run a race in your browser.
+
 **[Install it from your browser](https://mu-muu.github.io/TamaPoke/web/)** (Chrome or Edge on a computer, no Arduino needed).
 
 A Pokémon virtual pet for the **Waveshare ESP32-S3-Touch-AMOLED-1.75** (round

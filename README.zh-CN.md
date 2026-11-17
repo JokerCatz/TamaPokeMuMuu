@@ -21,6 +21,8 @@
 
 </div>
 
+**[项目网站](https://mu-muu.github.io/TamaPoke/)**：在浏览器里孵蛋、做一道棋题、跑一场比赛。
+
 **[在浏览器里一键安装](https://mu-muu.github.io/TamaPoke/web/)**（电脑上用 Chrome 或 Edge，不用装 Arduino）。
 
 一个宝可梦电子宠物，运行在 **Waveshare ESP32-S3-Touch-AMOLED-1.75**（466×466 圆形

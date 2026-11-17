@@ -168,7 +168,7 @@ export default function Companion() {
             {/* scene */}
             <div className="absolute inset-x-0 top-0 h-[67%] overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={asset("/regions/kanto.jpg")} alt="" className="h-full w-full object-cover" />
+              <img src={asset("/regions/kanto.jpg")} alt="" className="h-full w-full object-cover" loading="lazy" />
               <div className="absolute inset-0 transition-colors duration-700" style={{ background: pet.sleeping ? "rgba(14,18,40,.62)" : "transparent" }} />
               <div className="absolute inset-x-0 top-[9%] text-center">
                 <p className="font-pixel text-[clamp(14px,4.4vw,20px)] text-white" style={{ textShadow: "0 0 3px #2a2a36, 0 2px 0 #2a2a36" }}>

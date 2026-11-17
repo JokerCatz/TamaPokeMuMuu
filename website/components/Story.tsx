@@ -129,12 +129,14 @@ export default function Story() {
     };
   }, []);
 
-  // a new chapter starts on its first picture; fetch this chapter's and the next one's ahead
+  // a new chapter starts on its first picture
+  useEffect(() => setShotIdx(0), [active]);
+  // once the story is near: fetch this chapter's pictures and the first of the next one
+  // ahead (not at page load, when the language may still change and nobody has scrolled)
   useEffect(() => {
-    setShotIdx(0);
-    for (const c of [STORY[active], STORY[Math.min(N - 1, active + 1)]])
-      for (const s of c.shots) new Image().src = asset(`/shots/${lang}/${s}.png`);
-  }, [active, lang]);
+    if (!near) return;
+    for (const s of [...STORY[active].shots, STORY[Math.min(N - 1, active + 1)].shots[0]]) new Image().src = asset(`/shots/${lang}/${s}.webp`);
+  }, [active, lang, near]);
 
   const chapter = STORY[active];
   const shot = chapter.shots[shotIdx % chapter.shots.length];
@@ -167,12 +169,12 @@ export default function Story() {
               <button type="button" onClick={nextShot} aria-label={t("story_tap")} className="case absolute inset-[20%]">
                 <span className="screen block">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={asset(`/shots/${lang}/${shot}.png`)} alt="" className="h-full w-full" />
+                  {near && <img src={asset(`/shots/${lang}/${shot}.webp`)} alt="" className="h-full w-full" />}
                 </span>
               </button>
             )}
             <div className="absolute inset-0">
-              {near && <Board3D shot={asset(`/shots/${lang}/${shot}.png`)} pos={pos} poses={POSES} onTap={nextShot} onReady={onReady} active={visible} />}
+              {near && <Board3D shot={asset(`/shots/${lang}/${shot}.webp`)} pos={pos} poses={POSES} onTap={nextShot} onReady={onReady} active={visible} />}
             </div>
           </div>
           <div className="mt-4 flex items-center gap-3 text-sm">
