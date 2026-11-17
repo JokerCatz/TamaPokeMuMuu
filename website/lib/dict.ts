@@ -107,6 +107,8 @@ const en = {
 
   build_kicker: "07 · Build your own",
   build_title: "Make one this weekend.",
+  build_clip: "The real thing, filmed on a desk: a 1.75-inch round AMOLED touch screen in a 3D-printed case. A tap wakes it; then the activities, a snack, a pat, a bath and back to sleep.",
+  build_clip_alt: "Video of the board in its case being woken, fed, petted and bathed",
   build_parts: "What you need",
   build_board: "Waveshare ESP32-S3-Touch-AMOLED-1.75 (Standard or -G, not the 1.75C)",
   build_sd: "A microSD card (FAT32)",
@@ -232,6 +234,8 @@ const zh: typeof en = {
 
   build_kicker: "07 · 自己做一个",
   build_title: "一个周末就能做好。",
+  build_clip: "真机实拍：1.75 英寸圆形 AMOLED 触摸屏，装在 3D 打印的外壳里。点一下唤醒，看看活动菜单，喂点吃的、摸一摸、洗个澡，再回去睡觉。",
+  build_clip_alt: "真机视频：唤醒装在外壳里的板子，喂食、抚摸、洗澡",
   build_parts: "需要准备",
   build_board: "Waveshare ESP32-S3-Touch-AMOLED-1.75（标准版或 -G 版，不是 1.75C）",
   build_sd: "一张 microSD 卡（FAT32）",

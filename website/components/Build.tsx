@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { asset } from "@/lib/asset";
 import { useT } from "@/lib/state";
 
@@ -7,6 +8,41 @@ const MAKERWORLD = "https://makerworld.com/es/models/2937822-tamapoke-a-pokemon-
 const WAVESHARE = "https://www.waveshare.com/wiki/ESP32-S3-Touch-AMOLED-1.75";
 const SD_ZIP = "https://github.com/Mu-Muu/TamaPoke/releases/latest/download/tamapoke-sd.zip";
 const GITHUB = "https://github.com/Mu-Muu/TamaPoke";
+
+// The clip of the real board. Nothing of it is fetched until it comes on screen
+// (the poster aside); it plays only while visible.
+function Clip({ label }: { label: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) v.play().catch(() => {});
+        else v.pause();
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <video
+      ref={ref}
+      src={asset("/video/board.mp4")}
+      poster={asset("/video/board.webp")}
+      width={720}
+      height={720}
+      muted
+      loop
+      playsInline
+      controls
+      preload="none"
+      aria-label={label}
+      className="block-card aspect-square h-auto w-full overflow-hidden bg-ink object-cover"
+    />
+  );
+}
 
 export default function Build() {
   const t = useT();
@@ -22,6 +58,10 @@ export default function Build() {
           <p className="kicker mb-3 text-hint">{t("build_kicker")}</p>
           <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl">{t("build_title")}</h2>
         </div>
+        <figure className="mt-10 grid items-center gap-6 md:grid-cols-[minmax(0,400px)_1fr] md:gap-10" data-reveal>
+          <Clip label={t("build_clip_alt")} />
+          <figcaption className="max-w-xl text-lg text-ink2">{t("build_clip")}</figcaption>
+        </figure>
         <div className="mt-10 grid items-start gap-6 md:grid-cols-2">
           <div className="block-card p-6" data-reveal>
             <h3 className="text-xl font-bold">{t("build_parts")}</h3>
