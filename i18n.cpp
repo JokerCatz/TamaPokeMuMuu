@@ -131,7 +131,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "or train with fruits", "Badges", "League titles", "Fun finds",
     "%u h", "%u min",
     "Buy for %u pts?", "Spend %u pts?",
-    "POINTS  %ld", "This week", "Chess +%u (won %u)", "Steps +%u  Hockey +%u  Other +%u", "Shop -%u  Fun -%u",
+    "POINTS  %ld", "This week", "Chess +%u (won %u)", "Steps +%u  Other +%u", "Shop -%u  Fun -%u",
     "Last week: +%u  -%u", "Most points came from chess!", "Play chess to earn more", "LAST WEEK", "Chess +%u, spent %u",
     "HOCKEY", "%u min today, +%u pts", "%u min today (max reached)",
     "FRIENDS", "Put boards together", "Looking for friends...", "Nobody here yet", "Tap: be friends",
@@ -156,6 +156,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "Hello!", "Miss you!", "Let's play!", "See you tomorrow!", "Good morning!", "Sweet dreams!",
     "Thank you!", "You can do it!", "Happy birthday!", "Had a great day!", "Won at chess today!", "My Pokemon evolved!",
     "BACKUP", "SAVE NOW", "Save a new backup?", "Backup saved", "Backup failed",
+    "REWARD", "+%u pts (%u today)", "Today's %u pts are all given", "Hockey +%u  Reward +%u",
   },
   // ---------------- ZH ----------------
   // Chino simplificado. Los especificadores van en el orden de la fila
@@ -323,7 +324,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "或者吃果子练训练值", "徽章总数", "联盟冠军", "趣玩收获",
     "%u 小时", "%u 分钟",
     "花 %u 分购买？", "花 %u 分？",
-    "积分本  %ld分", "本周", "下棋 +%u（赢 %u 盘）", "走路 +%u  冰球 +%u  其他 +%u", "商店 -%u  趣玩 -%u",
+    "积分本  %ld分", "本周", "下棋 +%u（赢 %u 盘）", "走路 +%u  其他 +%u", "商店 -%u  趣玩 -%u",
     "上周：赚 %u  花 %u", "积分大多来自下棋，加油！", "多下几盘棋，积分会更多", "上周积分", "下棋赚 %u 分，花了 %u 分",
     "冰球练习", "今天 %u 分钟，+%u 分", "今天 %u 分钟，今天的分已拿满",
     "好友", "两块板子放在一起", "正在等好友…", "还没有看到别人", "点一下成好友",
@@ -348,6 +349,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "你好呀！", "想你了！", "一起玩吧！", "明天见！", "早上好！", "好梦！",
     "谢谢你！", "加油！", "生日快乐！", "今天很开心！", "今天下棋赢了！", "我的宝可梦进化了！",
     "备份", "立即备份", "保存一份新的备份？", "备份好了", "备份失败",
+    "家长加分", "+%u 分（今天已加 %u 分）", "今天的加分已满 %u 分", "冰球 +%u  家长 +%u",
   },
 };
 

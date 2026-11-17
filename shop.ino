@@ -281,25 +281,32 @@ static void renderBook() {
   char l[48];
   gfx->setTextColor(C565(0x3c, 0x8a, 0x4c));
   snprintf(l, sizeof(l), T(S_BOOK_CHESS_FMT), w.cat[PT_CHESS], w.wins);
-  setCur(centerX(l, 2), 230);
+  setCur(centerX(l, 2), 228);
   printT(l);
-  snprintf(l, sizeof(l), T(S_BOOK_IN_FMT), w.cat[PT_STEPS], w.cat[PT_HOCKEY], w.cat[PT_OTHER]);
-  setCur(centerX(l, 2), 256);
+  snprintf(l, sizeof(l), T(S_BOOK_IN_FMT), w.cat[PT_STEPS], w.cat[PT_OTHER]);
+  setCur(centerX(l, 2), 250);
+  printT(l);
+  snprintf(l, sizeof(l), T(S_BOOK_EXTRA_FMT), w.cat[PT_HOCKEY], w.cat[PT_REWARD]);  // los dos del movil
+  setCur(centerX(l, 2), 272);
   printT(l);
   gfx->setTextColor(C565(0xb0, 0x60, 0x10));
   snprintf(l, sizeof(l), T(S_BOOK_OUT_FMT), w.cat[PT_SHOP], w.cat[PT_FUN]);
-  setCur(centerX(l, 2), 282);
+  setCur(centerX(l, 2), 294);
   printT(l);
   const PtsWeek &p = pet.ptLast;
-  unsigned in = p.cat[PT_CHESS] + p.cat[PT_STEPS] + p.cat[PT_HOCKEY] + p.cat[PT_OTHER], out = p.cat[PT_SHOP] + p.cat[PT_FUN];
+  unsigned in = 0, gan = 0;
+  for (int k = 0; k < PT_SHOP; k++) {  // lo ganado: todo lo que va antes de la tienda
+    in += p.cat[k];
+    gan += w.cat[k];
+  }
+  unsigned out = p.cat[PT_SHOP] + p.cat[PT_FUN];
   gfx->setTextColor(UI_HINT);
   snprintf(l, sizeof(l), T(S_BOOK_LAST_FMT), in, out);
-  setCur(centerX(l, 2), 308);
+  setCur(centerX(l, 2), 316);
   printT(l);
-  unsigned gan = w.cat[PT_CHESS] + w.cat[PT_STEPS] + w.cat[PT_HOCKEY] + w.cat[PT_OTHER];
   const char *m = T(w.cat[PT_CHESS] && w.cat[PT_CHESS] * 2 >= gan ? S_BOOK_CHESS_TOP : S_BOOK_MORE_CHESS);
   gfx->setTextColor(UI_INK);
-  setCur(centerX(m, 2), 342);
+  setCur(centerX(m, 2), 346);
   printT(m);
 }
 

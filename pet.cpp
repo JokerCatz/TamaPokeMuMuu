@@ -1107,6 +1107,27 @@ void Pet::ptRoll() {
   pendingSave = true;
 }
 
+// el libro guardado: el de ahora o el de antes del premio de casa (6 apartados, sin PT_REWARD en
+// medio), con cada numero en su sitio. Se mira cuanto ocupa: leido tal cual, se descolocaba
+static void ptLoad(Preferences &prefs, const char *key, PtsWeek &w) {
+  struct V1 { uint16_t week, dayIn[7], dayOut[7], cat[6], wins; };
+  static const uint8_t V1_CAT[6] = { PT_CHESS, PT_STEPS, PT_HOCKEY, PT_OTHER, PT_SHOP, PT_FUN };
+  uint8_t raw[sizeof(PtsWeek) > sizeof(V1) ? sizeof(PtsWeek) : sizeof(V1)];
+  size_t n = prefs.getBytes(key, raw, sizeof(raw));
+  if (n == sizeof(PtsWeek)) {
+    memcpy(&w, raw, sizeof(w));
+  } else if (n == sizeof(V1)) {
+    V1 v;
+    memcpy(&v, raw, sizeof(v));
+    w = PtsWeek{};
+    w.week = v.week;
+    memcpy(w.dayIn, v.dayIn, sizeof(w.dayIn));
+    memcpy(w.dayOut, v.dayOut, sizeof(w.dayOut));
+    for (int i = 0; i < 6; i++) w.cat[V1_CAT[i]] = v.cat[i];
+    w.wins = v.wins;
+  }
+}
+
 static void ptAdd(uint16_t &v, int32_t n) { v = v + n > 65535 ? 65535 : v + n; }
 
 // apunta n puntos de un origen (PT_CHESS..PT_OTHER) o destino (PT_SHOP, PT_FUN)
@@ -1138,6 +1159,19 @@ uint8_t Pet::hockey(uint16_t min) {
   if (!isEgg() && !vacant && ceremony == CER_NONE) joy = clamp100(joy + 5);  // le alegra que hagas deporte
   pendingSave = true;
   return nuevo;
+}
+
+uint8_t Pet::reward(uint8_t pts) {
+  uint16_t hoy = dayNow();
+  if (rewardDay != hoy) { rewardDay = hoy; rewardPts = 0; }
+  uint8_t queda = rewardPts < REWARD_PTS_DAY ? REWARD_PTS_DAY - rewardPts : 0;
+  uint8_t dar = pts < queda ? pts : queda;
+  if (!dar) return 0;
+  rewardPts += dar;
+  earn(dar, PT_REWARD);
+  if (!isEgg() && !vacant && ceremony == CER_NONE) joy = clamp100(joy + 5);  // le alegra que lo feliciten
+  pendingSave = true;
+  return dar;
 }
 
 void Pet::addPoints(int32_t n) {
@@ -1425,6 +1459,8 @@ void Pet::save() {
   prefs.putUShort("hkday", hockeyDay);
   prefs.putUShort("hkmin", hockeyMin);
   prefs.putUChar("hkpts", hockeyPts);
+  prefs.putUShort("rwday", rewardDay);
+  prefs.putUChar("rwpts", rewardPts);
   prefs.putBool("ptrep", ptReport);
   prefs.putUShort("sickm", sickMinutes);
   prefs.putUChar("wgt", weight);
@@ -1507,11 +1543,13 @@ void Pet::load() {
   chessWinDay = prefs.getUShort("chwin", 0);
   chessSeen = prefs.getUInt("chseen", chessPtsTotal);  // lo de antes no cuenta como de hoy
   funFinds = prefs.getUInt("funf", 0);
-  prefs.getBytes("ptwk", &ptNow, sizeof(ptNow));
-  prefs.getBytes("ptwl", &ptLast, sizeof(ptLast));
+  ptLoad(prefs, "ptwk", ptNow);
+  ptLoad(prefs, "ptwl", ptLast);
   hockeyDay = prefs.getUShort("hkday", 0);
   hockeyMin = prefs.getUShort("hkmin", 0);
   hockeyPts = prefs.getUChar("hkpts", 0);
+  rewardDay = prefs.getUShort("rwday", 0);
+  rewardPts = prefs.getUChar("rwpts", 0);
   ptReport = prefs.getBool("ptrep", false);
   sickMinutes = prefs.getUShort("sickm", 0);
   weight = prefs.getUChar("wgt", 0);

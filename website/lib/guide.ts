@@ -222,6 +222,7 @@ export const GUIDE: Chapter[] = [
         items: [
           t("**Steps**: 1 point per 1,000 steps, up to 5 a day, and 10 more the day you reach 10,000. The board counts them itself, also with the screen off.", "**走路**：每 1000 步 1 分，每天最多 5 分；当天走满 1 万步再加 10 分。板子自己计步，关屏时也算。"),
           t("**Hockey practice** (from an iPhone shortcut): 1 point every 5 minutes, up to 6 a day.", "**冰球练习**（用 iPhone 快捷指令上报）：每 5 分钟 1 分，每天最多 6 分。"),
+          t("**Rewards from home** (from a parent's iPhone shortcut): 1 to 10 points at a time for anything the parent likes, up to 20 a day.", "**家长加分**（用家长 iPhone 上的快捷指令）：奖励什么都行，每次 1 到 10 分，每天最多 20 分。"),
           t("**Completing a region's Pokédex**: 200 points, a crown and a shiny legendary egg of that region.", "**集齐一个地区的图鉴**：200 分、一顶皇冠，还有一个该地区的异色传说蛋。"),
           t("**The farm** gives a small harvest every day after 07:00.", "**农场**每天 07:00 后有一点小收获。"),
         ],
@@ -537,6 +538,15 @@ export const GUIDE: Chapter[] = [
         ],
       },
       { k: "p", t: t("1 point every 5 minutes, up to 6 a day. Keep the shortcut on a parent's phone so the points stay honest.", "每 5 分钟 1 分，每天最多 6 分。快捷指令放在家长的手机上，积分才可靠。") },
+      { k: "h", t: t("Rewards from a parent's iPhone", "家长用 iPhone 加分") },
+      {
+        k: "steps",
+        items: [
+          t("A new shortcut with **Ask for Input**: type Number, prompt “How many points? (1-10)”.", "新建一个快捷指令，添加**请求输入**：类型选数字，提示写“加几分？（1-10）”。"),
+          t("Add **Get Contents of URL**: http://tamapoke.local/reward?pts= + Provided Input + &k= + your code (the same one as for steps).", "添加**获取 URL 内容**：http://tamapoke.local/reward?pts= + 提供的输入 + &k= + 你的配对码（和步数用同一个）。"),
+        ],
+      },
+      { k: "p", t: t("1 to 10 points at a time, for chores, reading or a good day, up to 20 a day. The board wakes up and shows the reward; the points book has a line for it. Same conditions: board plugged in, phone on the same Wi-Fi.", "每次 1 到 10 分，做家务、读书、表现好都可以奖励，每天最多 20 分。板子会亮屏显示加分，积分本里也有一项。条件一样：板子插着电，手机和板子连着同一个 Wi-Fi。") },
       { k: "h", t: t("Voice control", "语音控制") },
       { k: "p", t: t("With a Stack-chan or another xiaozhi voice assistant, the board can be asked how the pet is and told to feed it, play, bathe it or put it to bed. The setup is in the README.", "有 Stack-chan 或其他小智语音设备时，可以用语音问宠物的状态，让它吃饭、玩耍、洗澡或睡觉。设置方法见说明文档。") },
       {

@@ -2199,6 +2199,64 @@ TEST(points, hockey_un_punto_cada_5_minutos_y_tope_diario) {
   CHECK_EQ((int)b.hockey(10), 2);   // sigue sumando desde los 10 guardados
 }
 
+// premio de casa: un Atajo del movil de un padre (phonesteps.h) da puntos; tope diario
+TEST(points, premio_de_casa_con_tope_diario) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  p.points = 0;
+  CHECK_EQ((int)p.reward(5), 5);
+  CHECK_EQ((int)p.reward(10), 10);
+  CHECK_EQ((int)p.reward(10), REWARD_PTS_DAY - 15);  // solo lo que falta hasta el tope
+  CHECK_EQ((int)p.reward(3), 0);                     // hoy ya no
+  CHECK_EQ((int)p.points, REWARD_PTS_DAY);
+  CHECK_EQ((int)p.ptNow.cat[PT_REWARD], REWARD_PTS_DAY);  // su propia linea en el libro
+  CHECK_EQ((int)p.ptNow.cat[PT_OTHER], 0);
+  CHECK_EQ((int)p.ptNow.dayIn[5], REWARD_PTS_DAY);        // cuenta como ganado
+  p.lastSeenEpoch += 86400;  // otro dia: vuelve a dar
+  CHECK_EQ((int)p.reward(4), 4);
+  p.rename("X");  // guarda
+  Pet b;
+  b.begin();
+  b.lastSeenEpoch = p.lastSeenEpoch;
+  CHECK_EQ((int)b.rewardPts, 4);
+  CHECK_EQ((int)b.reward(REWARD_PTS_DAY), REWARD_PTS_DAY - 4);  // sigue desde los 4 guardados
+}
+
+// el libro guardado antes de los premios (6 apartados) se lee con cada numero en su sitio
+TEST(points, el_libro_de_antes_de_los_premios_se_lee_bien) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  p.rename("X");
+  struct {
+    uint16_t week, dayIn[7], dayOut[7], cat[6], wins;
+  } viejo = {};
+  viejo.week = ptWeekOf(SAB);
+  viejo.dayIn[5] = 25;
+  viejo.dayOut[5] = 9;
+  const uint16_t cats[6] = { 11, 5, 6, 3, 2, 7 };  // ajedrez, pasos, hockey, otros, tienda, ocio
+  memcpy(viejo.cat, cats, sizeof(cats));
+  viejo.wins = 2;
+  Preferences pr;
+  pr.begin("tamapoke", false);
+  pr.putBytes("ptwk", &viejo, sizeof(viejo));
+  pr.end();
+  Pet b;
+  b.begin();
+  CHECK_EQ((int)b.ptNow.week, (int)ptWeekOf(SAB));
+  CHECK_EQ((int)b.ptNow.dayIn[5], 25);
+  CHECK_EQ((int)b.ptNow.dayOut[5], 9);
+  CHECK_EQ((int)b.ptNow.cat[PT_CHESS], 11);
+  CHECK_EQ((int)b.ptNow.cat[PT_STEPS], 5);
+  CHECK_EQ((int)b.ptNow.cat[PT_HOCKEY], 6);
+  CHECK_EQ((int)b.ptNow.cat[PT_REWARD], 0);
+  CHECK_EQ((int)b.ptNow.cat[PT_OTHER], 3);
+  CHECK_EQ((int)b.ptNow.cat[PT_SHOP], 2);
+  CHECK_EQ((int)b.ptNow.cat[PT_FUN], 7);
+  CHECK_EQ((int)b.ptNow.wins, 2);
+}
+
 TEST(points, la_semana_siguiente_trae_el_resumen) {
   Pet p;
   makePet(p, 4);

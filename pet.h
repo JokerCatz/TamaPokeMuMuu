@@ -100,11 +100,15 @@ enum : uint8_t { LUCK_NONE = 0, LUCK_PLAYED, LUCK_WON };
 enum : uint8_t { FRUIT_UP = 0, FRUIT_FULL, FRUIT_MAXED, FRUIT_NO };  // lo que hizo comerse una fruta
 // libro de puntos: de donde vienen (ajedrez, pasos, hockey, lo demas: region, granja) y en
 // que se gastan (tienda y complementos, ocio), por semanas de lunes a domingo
-enum : uint8_t { PT_CHESS = 0, PT_STEPS, PT_HOCKEY, PT_OTHER, PT_SHOP, PT_FUN, PT_KINDS };
+enum : uint8_t { PT_CHESS = 0, PT_STEPS, PT_HOCKEY, PT_REWARD, PT_OTHER, PT_SHOP, PT_FUN, PT_KINDS };
 // practica de hockey (SuperDeker): un Atajo del movil manda los minutos (phonesteps.h).
 // Un punto cada HOCKEY_MIN_PER_PT minutos del dia, como mucho HOCKEY_PTS_MAX al dia
 #define HOCKEY_MIN_PER_PT 5
 #define HOCKEY_PTS_MAX 6
+// premio de casa: un Atajo del movil de un padre manda puntos (de 1 a REWARD_PTS_REQ cada vez,
+// phonesteps.h); como mucho REWARD_PTS_DAY al dia
+#define REWARD_PTS_REQ 10
+#define REWARD_PTS_DAY 20
 struct PtsWeek {
   uint16_t week;                   // (dia + 3) / 7: semanas que empiezan en lunes
   uint16_t dayIn[7], dayOut[7];    // por dia (0 = lunes): ganados y gastados
@@ -286,6 +290,8 @@ public:
   PtsWeek ptNow = {}, ptLast = {};         // libro de puntos: esta semana y la anterior
   uint16_t hockeyDay = 0, hockeyMin = 0;   // hockey: dia y minutos de hoy
   uint8_t hockeyPts = 0;                   // y los puntos ya dados hoy por ellos
+  uint16_t rewardDay = 0;                  // premio de casa: dia
+  uint8_t rewardPts = 0;                   // y los puntos ya dados ese dia
   bool ptReport = false;                   // hay resumen de la semana pasada por enseñar
   // para la animacion: que comio la ultima vez (FOOD_*) y cuantas veces ha jugado
   uint8_t lastFood = 0;
@@ -377,6 +383,7 @@ public:
   void earn(int32_t n, uint8_t src);      // gana puntos y lo apunta en el libro (PT_CHESS, PT_STEPS...)
   void ptRoll();                          // cambia de semana en el libro si toca
   uint8_t hockey(uint16_t min);           // minutos de practica de hockey: los puntos que da ahora
+  uint8_t reward(uint8_t pts);            // premio de casa (Atajo de un padre): los puntos que da de verdad
   // sincronizacion de ajedrez: medallas para el compañero que estaba presente
   void chessMedals(uint16_t wins, bool record);
   // ocio (fun.ino / fun.h)

@@ -343,6 +343,7 @@ uint32_t unlockUntil = 0;  // region recien abierta (cartel)
 uint8_t unlockShow = 0;
 char harvestMsg[48];
 char hockeyMsg[64];  // cartel de la practica de hockey: minutos de hoy y puntos
+StrId phoneBanner = S_HOCKEY_BANNER;  // su titulo: hockey o premio de casa (los dos vienen del movil)
 // nombre de cada objeto de la tienda (orden de ITEM_*)
 static const StrId ITEM_NAME[ITEM_COUNT] = {
   S_ITEM_CANDY, S_ITEM_MEDICINE, S_ITEM_POTION_STR, S_ITEM_POTION_SPD, S_ITEM_SHINY_CHARM,
@@ -736,9 +737,21 @@ void loop() {
       snprintf(hockeyMsg, sizeof(hockeyMsg), T(S_HOCKEY_MAX_FMT), pet.hockeyMin);
     else
       snprintf(hockeyMsg, sizeof(hockeyMsg), T(S_HOCKEY_FMT), pet.hockeyMin, pts);
+    phoneBanner = S_HOCKEY_BANNER;
     hockeyUntil = now + 8000;
     if (pts) sfxPlay(SFX_MEDAL);
     Serial.printf("hockey: +%u min, hoy %u min, +%u puntos\n", hk, pet.hockeyMin, pts);
+  }
+  uint8_t premioCasa;
+  if (phoneRewardTake(premioCasa)) {  // premio de casa (Atajo del movil de un padre)
+    uint8_t pts = pet.reward(premioCasa);
+    if (pts) snprintf(hockeyMsg, sizeof(hockeyMsg), T(S_REWARD_FMT), pts, pet.rewardPts);
+    else snprintf(hockeyMsg, sizeof(hockeyMsg), T(S_REWARD_MAX_FMT), (unsigned)REWARD_PTS_DAY);
+    phoneBanner = S_REWARD_BANNER;
+    hockeyUntil = now + 8000;
+    wakeScreen(now);  // que se vea: con USB la pantalla suele estar en el reloj de espera
+    if (pts) sfxPlay(SFX_MEDAL);
+    Serial.printf("premio de casa: pide %u, da %u, hoy %u\n", premioCasa, pts, pet.rewardPts);
   }
   if (phoneStepsTake(movil)) {
     pet.phoneSteps(movil);

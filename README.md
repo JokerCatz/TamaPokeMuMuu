@@ -257,6 +257,8 @@ You start with 10 points. Basic care is free.
 - Completing a region's Pokédex: 200 points, a crown and a shiny legendary egg
   from that region.
 - A small daily farm harvest after 07:00.
+- **Rewards from home**: a parent's iPhone can give points for anything (chores,
+  reading, a good day), up to 20 a day (see [Rewards from a parent's iPhone](#rewards-from-a-parents-iphone)).
 
 | Item | Points |
 |---|---|
@@ -275,7 +277,7 @@ bag, then the **harvest** (what you get from [Fun](#fun)), then accessories, the
 Buying asks first (YES / NO), and so does anything in [Fun](#fun) that costs points.
 
 The **points book** is the last page of the shop (or tap the points at the top of the shop): this week
-day by day, points earned (green) and spent (orange), where they came from (chess, steps, other) and
+day by day, points earned (green) and spent (orange), where they came from (chess, steps, hockey, rewards from home, other) and
 where they went (shop, fun), and last week. Every Monday the main screen shows a short summary of
 last week.
 
@@ -480,6 +482,21 @@ In the **Shortcuts** app, a new shortcut with:
 3. **Show Result** (optional): the board answers `{"ok":true,"min":15}`.
 
 Same conditions as the steps: board plugged in, phone on the home Wi-Fi.
+
+### Rewards from a parent's iPhone
+
+A third shortcut lets a parent give points for anything they like (chores, reading,
+a good day): **1 to 10 points at a time, up to 20 a day**. The board wakes up and
+shows "REWARD" with the points, and the points book has a "reward" line. Keep it on
+a parent's phone.
+
+In the **Shortcuts** app, a new shortcut with:
+
+1. **Ask for Input**: type **Number**, prompt "How many points? (1-10)".
+2. **Get Contents of URL**: `http://tamapoke.local/reward?pts=` + Provided Input + `&k=` + your code (the same one as for steps).
+3. **Show Result** (optional): the board answers `{"ok":true,"pts":5}`.
+
+Same conditions as the steps: board plugged in, phone on the same Wi-Fi as the board.
 
 ### World and power
 

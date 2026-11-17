@@ -5,12 +5,14 @@
 #include <ESPmDNS.h>
 #include <Preferences.h>
 #include "config.h"  // MDNS_HOST
+#include "pet.h"     // REWARD_PTS_REQ
 
 static WebServer *srv = nullptr;
 static portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
 static uint32_t pendSteps = 0;
 static bool pendNew = false;
 static uint16_t pendHockey = 0;  // minutos de hockey que aun no ha recogido el bucle principal
+static uint8_t pendReward = 0;   // puntos del premio de casa que aun no ha recogido
 static uint16_t code = 0;
 
 uint16_t phoneStepsCode() {
@@ -65,6 +67,26 @@ static void hockey() {
   srv->send(200, "application/json", r);
 }
 
+// GET /reward?pts=5&k=1234: premio de casa (un padre, por lo que quiera); el tope del dia lo
+// pone la mascota (Pet::reward)
+static void premio() {
+  if (!srv->hasArg("k") || srv->arg("k").toInt() != phoneStepsCode()) {
+    srv->send(403, "application/json", "{\"ok\":false,\"error\":\"code\"}");
+    return;
+  }
+  long n = srv->hasArg("pts") ? srv->arg("pts").toInt() : 0;
+  if (n < 1 || n > REWARD_PTS_REQ) {
+    srv->send(400, "application/json", "{\"ok\":false,\"error\":\"pts\"}");
+    return;
+  }
+  portENTER_CRITICAL(&mux);
+  pendReward = pendReward + n > 100 ? 100 : pendReward + n;
+  portEXIT_CRITICAL(&mux);
+  char r[40];
+  snprintf(r, sizeof(r), "{\"ok\":true,\"pts\":%ld}", n);
+  srv->send(200, "application/json", r);
+}
+
 void phoneStepsLoop() {
   if (WiFi.status() != WL_CONNECTED) return;
   if (!srv) {
@@ -72,6 +94,7 @@ void phoneStepsLoop() {
     srv = new WebServer(80);
     srv->on("/steps", HTTP_GET, pasos);
     srv->on("/hockey", HTTP_GET, hockey);
+    srv->on("/reward", HTTP_GET, premio);
     srv->onNotFound([] { srv->send(200, "text/plain", "TamaPoke"); });
     srv->begin();
     if (MDNS.begin(MDNS_HOST)) MDNS.addService("http", "tcp", 80);
@@ -96,6 +119,14 @@ bool phoneHockeyTake(uint16_t &min) {
   pendHockey = 0;
   portEXIT_CRITICAL(&mux);
   return min > 0;
+}
+
+bool phoneRewardTake(uint8_t &pts) {
+  portENTER_CRITICAL(&mux);
+  pts = pendReward;
+  pendReward = 0;
+  portEXIT_CRITICAL(&mux);
+  return pts > 0;
 }
 
 bool phoneStepsTake(uint32_t &n) {

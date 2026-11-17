@@ -370,8 +370,8 @@ void drawCelebration() {
   if (timeLeft(unlockUntil) && unlockShow < REGION_COUNT) {  // region nueva
     l1 = T(S_REGION_UNLOCK);
     l2 = T((StrId)(S_REGION_1 + unlockShow));
-  } else if (timeLeft(hockeyUntil)) {  // practica de hockey (Atajo del movil)
-    l1 = T(S_HOCKEY_BANNER);
+  } else if (timeLeft(hockeyUntil)) {  // practica de hockey o premio de casa (Atajo del movil)
+    l1 = T(phoneBanner);
     l2 = hockeyMsg;
   } else if (timeLeft(harvestUntil)) {  // cosecha de la granja
     l1 = T(S_HARVEST);
