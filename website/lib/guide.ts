@@ -208,8 +208,9 @@ export const GUIDE: Chapter[] = [
         k: "table",
         head: [t("What you did", "做了什么"), t("Points", "积分")],
         rows: [
-          [t("Finished a game with 10 minutes or more on the clock, or a daily game", "下完一盘基础时间 10 分钟以上的棋，或一盘每日棋"), t("1", "1")],
-          [t("Won it", "赢了这盘"), t("10", "10")],
+          [t("Lost a game (10 minutes or more on the clock, or a daily game)", "输了一盘（基础时间 10 分钟以上，或每日棋）"), t("5", "5")],
+          [t("Drew a game", "和了一盘"), t("7", "7")],
+          [t("Won a game", "赢了一盘"), t("10", "10")],
           [t("A new best rapid or daily rating", "快棋或每日棋等级分创新高"), t("20", "20")],
           [t("Each new hundred in rapid (1000, 1100...)", "快棋每突破一个百位整数（1000、1100……）"), t("50", "50")],
           [t("A new best in tactics or Puzzle Rush", "战术题或 Puzzle Rush 创新纪录"), t("10", "10")],

@@ -64,18 +64,38 @@ TEST(chess, que_partidas_cuentan) {
   CHECK(!chessCountsTimeControl(nullptr));
 }
 
-TEST(chess, ganar_10_y_cualquier_otro_final_1) {
+TEST(chess, ganar_10_tablas_7_perder_5) {
   JsonDocument doc;
   cargar(doc, ARCHIVO);
   ChessState st = deYo();
   ChessReport rep;
   chessScoreArchive(doc.as<JsonVariantConst>(), st, rep);
-  // cuentan: 600 gana (10), 600 pierde (1), 900+10 tablas (1), diaria gana (10)
+  // cuentan: 600 gana (10), 600 pierde (5), 900+10 tablas (7), diaria gana (10)
   // no cuentan: la de 5 min ni la del bot
   CHECK_EQ(rep.games, (uint16_t)4);
   CHECK_EQ(rep.wins, (uint16_t)2);
-  CHECK_EQ(rep.gamePts, (int32_t)22);
+  CHECK_EQ(rep.gamePts, (int32_t)32);
   CHECK_EQ(rep.newestEnd, (uint32_t)6000);
+}
+
+TEST(chess, cada_final_de_chess_com) {
+  CHECK_EQ(chessGamePoints("win"), (int32_t)PTS_WIN);
+  // tablas
+  CHECK_EQ(chessGamePoints("agreed"), (int32_t)PTS_DRAW);
+  CHECK_EQ(chessGamePoints("repetition"), (int32_t)PTS_DRAW);
+  CHECK_EQ(chessGamePoints("stalemate"), (int32_t)PTS_DRAW);
+  CHECK_EQ(chessGamePoints("insufficient"), (int32_t)PTS_DRAW);
+  CHECK_EQ(chessGamePoints("50move"), (int32_t)PTS_DRAW);
+  CHECK_EQ(chessGamePoints("timevsinsufficient"), (int32_t)PTS_DRAW);
+  // derrotas, y lo que no se conoce cuenta como derrota
+  CHECK_EQ(chessGamePoints("checkmated"), (int32_t)PTS_LOSS);
+  CHECK_EQ(chessGamePoints("resigned"), (int32_t)PTS_LOSS);
+  CHECK_EQ(chessGamePoints("timeout"), (int32_t)PTS_LOSS);
+  CHECK_EQ(chessGamePoints("abandoned"), (int32_t)PTS_LOSS);
+  CHECK_EQ(chessGamePoints(""), (int32_t)PTS_LOSS);
+  CHECK_EQ(chessGamePoints(nullptr), (int32_t)PTS_LOSS);
+  // perder nunca vale mas que empatar, ni empatar mas que ganar
+  CHECK(PTS_LOSS < PTS_DRAW && PTS_DRAW < PTS_WIN);
 }
 
 TEST(chess, no_cuenta_dos_veces_la_misma_partida) {
@@ -101,7 +121,7 @@ TEST(chess, solo_cuenta_lo_posterior_a_la_marca) {
   ChessReport rep;
   chessScoreArchive(doc.as<JsonVariantConst>(), st, rep);
   CHECK_EQ(rep.games, (uint16_t)2);  // tablas 900+10 y la diaria
-  CHECK_EQ(rep.gamePts, (int32_t)11);
+  CHECK_EQ(rep.gamePts, (int32_t)17);  // tablas 7 + diaria ganada 10
 }
 
 static void stats(JsonDocument &doc, int rapid, int daily, int tactics, int rush) {

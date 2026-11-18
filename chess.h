@@ -8,9 +8,11 @@
 //
 // Partidas: solo las de 10 min o mas de base (y las diarias por correo); las
 // de sin reloj ("-", contra los bots de chess.com) no cuentan. Ganar = 10,
-// cualquier otro final = 1. Records: nueva mejor rapida o diaria +20, cada
-// centena nueva en rapidas +50, record de tacticas +10, record de Puzzle Rush
-// +10. La primera sincronizacion solo apunta las marcas (no paga el pasado).
+// tablas = 7, perder (cualquier otro final) = 5: perder tambien enseña, y asi
+// no compensa perder adrede para bajar de nivel. Records: nueva mejor rapida
+// o diaria +20, cada centena nueva en rapidas +50, record de tacticas +10,
+// record de Puzzle Rush +10. La primera sincronizacion solo apunta las marcas
+// (no paga el pasado).
 //
 // La cuenta se escribe en el portal Wi-Fi (NVS "chess"/"user"); si no hay,
 // vale la de config_private.h (CHESS_USER). Al cambiar de cuenta se vuelve a
@@ -22,7 +24,8 @@
 #define CHESS_USER_MIN 3   // usuarios de chess.com: de 3 a 25 caracteres
 #define CHESS_USER_MAX 25
 
-#define PTS_GAME 1
+#define PTS_LOSS 5
+#define PTS_DRAW 7
 #define PTS_WIN 10
 #define PTS_BEST_RATING 20
 #define PTS_HUNDRED 50
@@ -69,6 +72,10 @@ bool chessPrepare(ChessState &st, const char *user, const char *legacyOwner, uin
 
 // ¿cuenta una partida con este time_control? ("600", "900+10", "1/259200", "-")
 bool chessCountsTimeControl(const char *tc);
+// puntos de una partida que cuenta segun el "result" del jugador en chess.com:
+// "win" = PTS_WIN; tablas ("agreed", "repetition", "stalemate", "insufficient",
+// "50move", "timevsinsufficient") = PTS_DRAW; lo demas (perder) = PTS_LOSS
+int32_t chessGamePoints(const char *result);
 // filtro de ArduinoJson para el archivo mensual (solo los campos que se usan)
 void chessArchiveFilter(JsonDocument &filter);
 // suma las partidas nuevas (end_time > st.watermark) de st.owner en un archivo mensual

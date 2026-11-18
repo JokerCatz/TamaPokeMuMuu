@@ -37,7 +37,7 @@ const en = {
 
   chess_kicker: "03 · Play chess, earn rewards",
   chess_title: "Real games pay for everything.",
-  chess_lead: "Every night the board reads the public chess.com games of one username. A win gives 10 points, any other result 1. Bullet, blitz and bots don't count.",
+  chess_lead: "Every night the board reads the public chess.com games of one username. A win gives 10 points, a draw 7 and a loss 5. Bullet, blitz and bots don't count.",
   chess_puzzle: "White to move and checkmate in one.",
   chess_wrong: "Not quite. Try again!",
   chess_win: "Checkmate! +10 points",
@@ -167,7 +167,7 @@ const zh: typeof en = {
 
   chess_kicker: "03 · 下棋，换奖励",
   chess_title: "真实的对局，换来一切。",
-  chess_lead: "板子每晚读取一个用户名在 chess.com 上的公开对局。赢一盘得 10 分，其他结果得 1 分；超快棋、闪电战和跟电脑下的不算。",
+  chess_lead: "板子每晚读取一个用户名在 chess.com 上的公开对局。赢一盘得 10 分，和棋 7 分，输棋 5 分；超快棋、闪电战和跟电脑下的不算。",
   chess_puzzle: "白方走，一步将死。",
   chess_wrong: "不对哦，再试一次！",
   chess_win: "将死！+10 分",

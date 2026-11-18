@@ -47,9 +47,9 @@ accessories for her companion.
 potions → the next morning the pet cheers about yesterday's games.**
 
 - Only real games count: games with 10+ minutes of base time, or daily games.
-  Blitz, bullet and games against bots don't. A win gives 10 points and any
-  other result 1, and new personal bests (rating, tactics, Puzzle Rush) give
-  bonuses, so practice pays off.
+  Blitz, bullet and games against bots don't. A win gives 10 points, a draw 7
+  and a loss 5 (a lost game teaches as much as a won one), and new personal
+  bests (rating, tactics, Puzzle Rush) give bonuses, so practice pays off.
 - Everything else gives only a trickle of points (steps, a small farm
   harvest), so chess stays the main way to earn.
 - Basic care (food, play, bath, sleep) is always free. Skipping chess never
@@ -246,8 +246,8 @@ You start with 10 points. Basic care is free.
 - **chess.com** (once a username is set on the Wi-Fi page or in
   `CHESS_USER`): synced once a day at midnight, on
   the next boot, or with **Sync now**. A game with 10+ minutes base time or a
-  daily game gives 1 point, a win 10; games without a clock (bots) don't
-  count. A new best rapid or daily rating gives 20, each new hundred in rapid
+  daily game gives 10 points for a win, 7 for a draw and 5 for a loss; games
+  without a clock (bots) don't count. A new best rapid or daily rating gives 20, each new hundred in rapid
   50, a new tactics or Puzzle Rush best 10. The first sync, and the first after
   changing the username, only records your current marks.
 - **Steps** from the accelerometer, also with the screen off (not while the

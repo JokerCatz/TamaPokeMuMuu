@@ -68,6 +68,16 @@ bool chessCountsTimeControl(const char *tc) {
   return atoi(tc) >= CHESS_MIN_BASE_SECS;            // "600", "900+10"...
 }
 
+int32_t chessGamePoints(const char *result) {
+  static const char *const TABLAS[] = {"agreed", "repetition", "stalemate",
+                                       "insufficient", "50move", "timevsinsufficient"};
+  if (!result) return PTS_LOSS;
+  if (strcmp(result, "win") == 0) return PTS_WIN;
+  for (const char *t : TABLAS)
+    if (strcmp(result, t) == 0) return PTS_DRAW;
+  return PTS_LOSS;
+}
+
 void chessArchiveFilter(JsonDocument &filter) {
   JsonObject g = filter["games"].add<JsonObject>();
   g["end_time"] = true;
@@ -88,10 +98,10 @@ void chessScoreArchive(JsonVariantConst archive, const ChessState &st, ChessRepo
     if (strcasecmp(g["white"]["username"] | "", st.owner) == 0) lado = "white";
     else if (strcasecmp(g["black"]["username"] | "", st.owner) == 0) lado = "black";
     if (!lado) continue;
-    bool gana = strcmp(g[lado]["result"] | "", "win") == 0;
+    const char *res = g[lado]["result"] | "";
     rep.games++;
-    if (gana) rep.wins++;
-    rep.gamePts += gana ? PTS_WIN : PTS_GAME;
+    if (strcmp(res, "win") == 0) rep.wins++;
+    rep.gamePts += chessGamePoints(res);
     if (end > rep.newestEnd) rep.newestEnd = end;
   }
 }
