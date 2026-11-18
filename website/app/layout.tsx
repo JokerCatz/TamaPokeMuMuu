@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Silkscreen } from "next/font/google";
 import { SiteProvider } from "@/lib/state";
 import "./globals.css";
@@ -26,6 +27,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={silkscreen.variable}>
       <body className="antialiased">
         <SiteProvider>{children}</SiteProvider>
+        {/* Visit counter (GoatCounter): no cookies, nothing personal. Every page is a full
+            load (plain links), so count.js counts each one by itself. The same counter is in
+            web/index.html. */}
+        <Script
+          data-goatcounter="https://tamapoke-chess.goatcounter.com/count"
+          src="https://gc.zgo.at/count.v4.js"
+          integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

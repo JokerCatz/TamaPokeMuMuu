@@ -129,6 +129,7 @@ const en = {
 
   foot_fan: "TamaPoke with Chess is a non-commercial fan project, forked from socquique/TamaPoke. It is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company. Pokémon names and characters belong to their owners.",
   foot_credits: "Sprites: PMD SpriteCollab (CC BY-NC 4.0) · Data: PokéAPI · Weather: Open-Meteo · Case and 3D model: original project on MakerWorld, remix of “Pokeball” by yoyothechicken (CC BY-NC-SA) · Code: MIT",
+  foot_visits: "Visits are counted anonymously with GoatCounter: no cookies, nothing personal.",
 };
 
 const zh: typeof en = {
@@ -259,6 +260,7 @@ const zh: typeof en = {
 
   foot_fan: "TamaPoke with Chess 是非商业的同人项目，分叉自 socquique/TamaPoke。与任天堂、Game Freak、Creatures 和宝可梦公司无关，也未获得其认可。宝可梦的名字和角色归其所有者。",
   foot_credits: "精灵图：PMD SpriteCollab（CC BY-NC 4.0）· 数据：PokéAPI · 天气：Open-Meteo · 外壳和 3D 模型：原项目 MakerWorld 模型，改编自 yoyothechicken 的「Pokeball」（CC BY-NC-SA）· 代码：MIT",
+  foot_visits: "访问次数用 GoatCounter 匿名统计：不用 cookie，也不收集任何个人信息。",
 };
 
 export type Key = keyof typeof en;
