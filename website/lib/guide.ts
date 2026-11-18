@@ -255,7 +255,7 @@ export const GUIDE: Chapter[] = [
           [t("Vitality potion", "活力药剂"), t("5", "5"), t("Raises vitality: joy drops more slowly", "提高活力：心情掉得更慢")],
           [t("Common / rare / legendary egg", "普通蛋 / 稀有蛋 / 传说蛋"), t("10 / 30 / 100", "10 / 30 / 100"), t("Your next companion", "下一位伙伴")],
           [t("Shiny charm", "异色符"), t("50", "50"), t("Makes the next egg four times as likely to be shiny", "让下一颗蛋出异色的机会变成四倍")],
-          [t("Evolution potion", "进化药水"), t("100", "100"), t("Evolve now, without waiting", "不用等，马上进化")],
+          [t("Evolution potion", "进化药水"), t("100", "100"), t("Skips the wait in days (needs still 40+)", "省掉要等的天数（四项仍要 40 以上）")],
           [t("Mega Stone", "Mega石"), t("150", "150"), t("Mega Evolution for 24 hours", "超级进化 24 小时")],
           [t("Accessories", "饰品"), t("15-80", "15-80"), t("Bow, flower, cap, witch hat, top hat, crown", "蝴蝶结、小花、棒球帽、巫师帽、礼帽、皇冠")],
         ],
@@ -599,7 +599,7 @@ export const GUIDE: Chapter[] = [
           },
           {
             q: t("The evolution button doesn't appear.", "到时间了，进化按钮没出现。"),
-            a: t("All four needs must be at 40 or more, and each care mistake adds 2 hours to the wait. An evolution potion (100 points) evolves it at once.", "四项需求都要在 40 以上，而且每次照顾失误要多等 2 小时。进化药水（100 分）可以让它马上进化。"),
+            a: t("All four needs must be at 40 or more, and each care mistake adds 2 hours to the wait. An evolution potion (100 points) skips the wait in days, but the four needs still have to be at 40 or more.", "四项需求都要在 40 以上，而且每次照顾失误要多等 2 小时。进化药水（100 分）能省掉要等的天数，但四项需求仍要在 40 以上。"),
           },
           {
             q: t("I got a new board. Can I move my game to it?", "换了一块新板子，存档能搬过去吗？"),

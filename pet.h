@@ -440,6 +440,9 @@ public:
   }
 
   bool isEgg() const { return speciesId < 0; }
+  // ¿se puede sacar a uno de la granja? Con un huevo no; sin compañero (hueco, tras una
+  // despedida) si: es una de las dos salidas del hueco
+  bool canTakeFromFarm() const { return vacant || !isEgg(); }
   uint8_t eggCracks() const { return eggTaps; }
   bool eating() const { return timeLeft(eatUntil) > 0; }
   bool showHeart() const { return timeLeft(heartUntil) > 0; }

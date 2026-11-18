@@ -930,6 +930,36 @@ TEST(egg, abrir_un_huevo_de_la_mochila) {
   CHECK(!p.isEgg());
 }
 
+// el hueco tiene dos salidas: un huevo de la mochila o uno de la granja. Antes el hueco
+// contaba como huevo y la granja decia "primero abre el huevo": sin huevos ni puntos, atascado
+TEST(farm, sin_compañero_se_saca_uno_de_la_granja) {
+  Pet p;
+  dejarHueco(p);
+  CHECK(p.vacant);
+  CHECK(p.canTakeFromFarm());
+  Pet g;
+  makePet(g, 25);
+  PetRec r;
+  g.exportRec(r);
+  p.importRec(r);
+  CHECK(!p.vacant);
+  CHECK(!p.isEgg());
+  CHECK_EQ(p.speciesId, (int16_t)25);
+  CHECK(p.fromFarm);
+}
+
+TEST(farm, con_un_huevo_no_se_saca_de_la_granja) {
+  Pet p;
+  dejarHueco(p);
+  p.bag[ITEM_EGG_COMMON] = 1;
+  CHECK(p.hatchEgg(EGG_COMMON));
+  CHECK(p.isEgg());
+  CHECK(!p.canTakeFromFarm());
+  Pet q;
+  makePet(q, 4);
+  CHECK(q.canTakeFromFarm());  // con compañero: se cambia por el
+}
+
 TEST(egg, con_compañero_no_se_abren_huevos) {
   Pet p;
   makePet(p, 4);

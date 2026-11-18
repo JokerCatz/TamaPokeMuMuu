@@ -228,7 +228,8 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
 - Evolution is by **age**, the same for every line: the first at 3 days, the
   second at 5 days. Each care mistake delays it by 2 hours and all needs must
   be at 40 or more. When it's ready, a button lets you evolve or keep the
-  current form. An **evolution potion** (100 points) lets it evolve now.
+  current form. An **evolution potion** (100 points) skips the wait in days; the
+  needs still have to be at 40 or more.
 - In its final form, after **7 days** it asks to retire (you can choose to stay
   together for a while). It then moves to the **farm**, where you can take it
   back any time; the album keeps the page, and you open a new egg.

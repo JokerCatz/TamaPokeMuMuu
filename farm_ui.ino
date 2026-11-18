@@ -172,12 +172,20 @@ void closeFarm() {
 #define FARM_Y0 70
 static int farmPages() { return farmCount() > 0 ? (farmCount() + FARM_PER_PAGE - 1) / FARM_PER_PAGE : 1; }
 
-// sacar al elegido: el compañero actual entra en la granja en su lugar
+// sacar al elegido: el compañero actual entra en la granja en su lugar. Sin compañero
+// (hueco) sale sin mas: antes el hueco contaba como huevo y no dejaba sacar a nadie
 void farmSwapIn(int idx) {
-  if (pet.isEgg()) { toast(T(S_HATCH_FIRST)); return; }
+  if (!pet.canTakeFromFarm()) { toast(T(S_HATCH_FIRST)); return; }
   if (pet.ceremony || idx < 0 || idx >= farmCount()) return;
   int16_t dex = farmAt(idx).speciesId;
   PetRec cur, sale;
+  if (pet.vacant) {
+    if (farmTake(pet, dex, sale)) {
+      pet.importRec(sale);
+      closeFarm();
+    }
+    return;
+  }
   pet.exportRec(cur);
   if (!farmTake(pet, dex, sale)) return;
   if (!farmPut(pet, cur)) {  // no se pudo guardar al actual: se deshace
