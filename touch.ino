@@ -359,7 +359,12 @@ void onTap(int16_t x, int16_t y) {
   if (pet.ceremony) return;  // durante la despedida no hay botones
   if (cardOpen) {
     if (cardPage == 0 && y < 84) openKeyboard();  // tocar el nombre = renombrar
-    else cardOpen = false;
+    else if (cardPage == CARD_PAGES - 1 && x >= CEVO_BTN_X && x <= CEVO_BTN_X + CEVO_BTN_W &&
+             y >= CEVO_BTN_Y && y <= CEVO_BTN_Y + CEVO_BTN_H) {
+      // boton de evolucionar de "成长": si puede, la misma pregunta que el boton rojo de la
+      // principal (un toque para volver no evoluciona sin querer); apagado no hace nada
+      if (pet.canEvolveNow()) { cardOpen = false; choiceKind = 1; choiceUntil = millis() + 12000; }
+    } else cardOpen = false;
     return;
   }
   if (choiceKind) {          // dialogo de decision: boton accion (arriba) / mantener (abajo)

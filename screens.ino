@@ -548,7 +548,6 @@ void renderCardMedals(int first) {
 // pagina 3: progreso (nivel, evolucion, descuidos) — saca a la luz mecanicas
 // que antes eran invisibles (cuanto falta para subir/evolucionar y por que)
 void renderCardProgress() {
-  const DexEntry &d = DEX_TBL[pet.speciesId];
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(S_PROGRESS), 3), 44);
@@ -579,22 +578,25 @@ void renderCardProgress() {
   setCur(centerX(T(S_EVO_LABEL), 2), 230);
   printT(T(S_EVO_LABEL));
   char evoBuf[32];
-  const char *evo;
+  const char *evo = "";
   uint16_t evoCol = UI_INK;
-  if (d.evolvesTo == 0) {
+  uint8_t eb = pet.evoBlock();
+  if (eb == EVO_FINAL) {
     evo = T(S_FINAL_FORM);
-  } else {
-    uint32_t needed = pet.evoAgeNeeded();  // 3 dias la 1a, 5 la 2a (+ descuidos)
-    if (pet.evoBoost || pet.ageMinutes >= needed) {
-      if (pet.lowestStat() >= 40) { evo = T(S_EVO_READY); evoCol = UI_BAR_OK; }
-      else { evo = T(S_EVO_BLOCKED); evoCol = UI_BAR_BAD; }
-    } else {
-      uint32_t falta = needed - pet.ageMinutes;
-      unsigned dias = falta / 1440, horas = (falta % 1440 + 59) / 60;
-      if (horas == 24) { dias++; horas = 0; }
-      snprintf(evoBuf, sizeof(evoBuf), T(S_EVO_IN_FMT), dias, horas);
-      evo = evoBuf;
-    }
+  } else if (eb == EVO_WAIT) {
+    uint32_t falta = pet.evoAgeNeeded() - pet.ageMinutes;  // 3 dias la 1a, 5 la 2a (+ descuidos)
+    unsigned dias = falta / 1440, horas = (falta % 1440 + 59) / 60;
+    if (horas == 24) { dias++; horas = 0; }
+    snprintf(evoBuf, sizeof(evoBuf), T(S_EVO_IN_FMT), dias, horas);
+    evo = evoBuf;
+  } else if (eb == EVO_NEEDS) {
+    evo = T(S_EVO_BLOCKED); evoCol = UI_BAR_BAD;
+  } else if (eb == EVO_FARM) {
+    evo = T(S_EVO_FARM); evoCol = UI_BAR_BAD;
+  } else if (eb == EVO_ASLEEP) {
+    evo = T(S_EVO_ASLEEP); evoCol = UI_HINT;
+  } else if (eb == EVO_OK) {
+    evo = T(S_EVO_READY); evoCol = UI_BAR_OK;
   }
   gfx->setTextColor(evoCol);
   setCur(centerX(evo, 2), 256);
@@ -604,8 +606,15 @@ void renderCardProgress() {
   char ms[24];
   snprintf(ms, sizeof(ms), T(S_MISTAKES_FMT), pet.careMistakes);
   gfx->setTextColor(pet.careMistakes > 0 ? UI_BAR_BAD : UI_INK);
-  setCur(centerX(ms, 2), 312);
+  setCur(centerX(ms, 2), 278);
   printT(ms);
+
+  // boton de evolucionar: rojo si puede (abre la pregunta de la principal), gris si no
+  bool puede = eb == EVO_OK;
+  gfx->fillRoundRect(CEVO_BTN_X, CEVO_BTN_Y, CEVO_BTN_W, CEVO_BTN_H, 14, puede ? UI_BAR_BAD : UI_TRACK);
+  gfx->setTextColor(puede ? UI_WHITE : UI_HINT);
+  setCur(centerX(T(S_EVO_TAP), 2), CEVO_BTN_Y + 14);
+  printT(T(S_EVO_TAP));
 }
 
 void renderCard() {

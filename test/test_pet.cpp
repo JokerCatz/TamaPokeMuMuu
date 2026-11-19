@@ -754,6 +754,41 @@ TEST(farm, no_evoluciona_a_una_especie_de_la_granja) {
   CHECK_EQ(p.speciesId, (int16_t)4);
 }
 
+// la ficha "成长" dice por que el boton de evolucionar esta apagado
+TEST(evolve, la_ficha_sabe_por_que_no_evoluciona) {
+  Pet p;
+  makePet(p, 4);  // CHARMANDER -> CHARMELEON (5)
+  p.ageMinutes = EVO1_AGE_MIN - 1;
+  CHECK_EQ((int)p.evoBlock(), (int)EVO_WAIT);
+  p.ageMinutes = EVO1_AGE_MIN;
+  CHECK_EQ((int)p.evoBlock(), (int)EVO_OK);
+  p.joy = 39;
+  CHECK_EQ((int)p.evoBlock(), (int)EVO_NEEDS);
+  p.joy = 40;
+  p.sleeping = true;
+  CHECK_EQ((int)p.evoBlock(), (int)EVO_ASLEEP);
+  CHECK(!p.canEvolveNow());
+  p.sleeping = false;
+  aLaGranja(p, 5);
+  CHECK_EQ((int)p.evoBlock(), (int)EVO_FARM);
+  CHECK(!p.canEvolveNow());
+  Pet f;
+  makePet(f, 6);  // CHARIZARD: forma final
+  f.ageMinutes = EVO2_AGE_MIN;
+  CHECK_EQ((int)f.evoBlock(), (int)EVO_FINAL);
+}
+
+TEST(evolve, con_la_pocion_no_espera_pero_si_pide_las_necesidades) {
+  Pet p;
+  makePet(p, 4);
+  p.ageMinutes = 10;
+  p.bag[ITEM_POTION_EVO] = 1;
+  CHECK(p.useEvoPotion());
+  CHECK_EQ((int)p.evoBlock(), (int)EVO_OK);
+  p.hygiene = 10;
+  CHECK_EQ((int)p.evoBlock(), (int)EVO_NEEDS);
+}
+
 TEST(farm, la_rama_evita_la_de_la_granja_aunque_falte_en_la_pokedex) {
   for (int seed = 1; seed <= 12; seed++) {
     randomSeed(seed);

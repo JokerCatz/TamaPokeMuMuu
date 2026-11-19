@@ -51,6 +51,9 @@ static inline uint32_t timeLeft(uint32_t deadline) {
 
 // ceremonias de fin de ciclo (COLLECT: se va a la granja, final neutro)
 enum : uint8_t { CER_NONE = 0, CER_FAREWELL, CER_RUNAWAY, CER_RELEASE, CER_COLLECT };
+// por que no puede evolucionar ahora (Pet::evoBlock): huevo o en una ceremonia, forma final,
+// aun no tiene la edad, alguna necesidad bajo 40, sus formas estan en la granja, dormido
+enum : uint8_t { EVO_OK = 0, EVO_BUSY, EVO_FINAL, EVO_WAIT, EVO_NEEDS, EVO_FARM, EVO_ASLEEP };
 
 // Tienda y mochila (del jugador: duran entre compañeros). Los puntos se ganan
 // jugando al ajedrez (ver chess.h); la comida basica, el baño y dormir son gratis.
@@ -451,6 +454,7 @@ public:
     return 1.0f - (float)timeLeft(evolveUntil) / (float)EVOLVE_ANIM_MS;
   }
   bool canEvolveNow() const;  // condiciones de evolucion cumplidas (lista)
+  uint8_t evoBlock() const;   // EVO_OK o por que no puede evolucionar ahora (la ficha lo dice)
   void evolve();              // dispara la transformacion (la llama un toque del usuario)
   bool canFarewellNow() const;  // forma final + 7 dias: lista para despedirse (boton)
   bool canRunawayNow() const;   // abandono total 1h: lista para escaparse (boton triste)

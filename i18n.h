@@ -201,6 +201,8 @@ enum StrId : uint16_t {  // mas de 256 textos
   S_PH_THANKS, S_PH_CHEER, S_PH_BIRTHDAY, S_PH_HAPPY, S_PH_CHESS, S_PH_EVOLVED,
   S_BACKUP, S_BK_SAVE, S_BK_SAVE_Q, S_BK_SAVED, S_BK_FAIL,
   S_REWARD_BANNER, S_REWARD_FMT, S_REWARD_MAX_FMT, S_BOOK_EXTRA_FMT,
+  // ficha "成长": por que el boton de evolucionar esta apagado
+  S_EVO_ASLEEP, S_EVO_FARM,
   STR_COUNT
 };
 

@@ -887,13 +887,18 @@ void Pet::hatch() {
 // evolucion 1 nivel, y ademas tiene que estar bien cuidado en ese momento
 // (ninguna estadistica por debajo de 40). NO evoluciona sola: la dispara el
 // usuario tocando al bicho (evolve()), para que vea la transformacion.
-bool Pet::canEvolveNow() const {
-  if (isEgg() || sleeping || ceremony != CER_NONE) return false;
-  const DexEntry &d = DEX_TBL[speciesId];
-  if (d.evolvesTo == 0) return false;
+bool Pet::canEvolveNow() const { return evoBlock() == EVO_OK; }
+
+// el mismo examen, diciendo que falta (en el orden en que se lo diria la ficha)
+uint8_t Pet::evoBlock() const {
+  if (isEgg() || ceremony != CER_NONE) return EVO_BUSY;
+  if (DEX_TBL[speciesId].evolvesTo == 0) return EVO_FINAL;
+  if (!evoBoost && ageMinutes < evoAgeNeeded()) return EVO_WAIT;
+  if (lowestStat() < 40) return EVO_NEEDS;
   int16_t libres[MAX_EVO_TARGETS];
-  if (freeTargets(*this, speciesId, libres) == 0) return false;  // ya estan en la granja
-  return (evoBoost || ageMinutes >= evoAgeNeeded()) && lowestStat() >= 40;
+  if (freeTargets(*this, speciesId, libres) == 0) return EVO_FARM;  // ya estan en la granja
+  if (sleeping) return EVO_ASLEEP;
+  return EVO_OK;
 }
 
 uint32_t Pet::evoAgeNeeded() const {

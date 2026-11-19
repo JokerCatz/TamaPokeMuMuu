@@ -183,6 +183,11 @@ static const int16_t STARTER_DEX[3] = { 1, 4, 7 };
 #define EVO_BTN_H 64
 #define EVO_BTN_X (CX - EVO_BTN_W / 2)
 #define EVO_BTN_Y 172
+// el mismo boton en la ficha "成长" (ultima pagina): apagado si aun no puede evolucionar
+#define CEVO_BTN_W 200
+#define CEVO_BTN_H 44
+#define CEVO_BTN_X (CX - CEVO_BTN_W / 2)
+#define CEVO_BTN_Y 304
 // boton-CTA de despedida (mas ancho: lleva el nombre + frase)
 #define FAR_BTN_W 408
 #define FAR_BTN_H 58
