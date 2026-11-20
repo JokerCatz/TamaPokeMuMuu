@@ -131,7 +131,8 @@ Owner name, chess.com username, weather coordinates and time zone go in
 Wi-Fi page takes priority). Copy
 [`config_private.example.h`](config_private.example.h) to `config_private.h`
 and fill it in. Without it the firmware builds with neutral example values from
-[`config.h`](config.h) (New York, chess.com username only from the Wi-Fi page).
+[`config.h`](config.h) (location found from the connection, chess.com username
+only from the Wi-Fi page).
 
 | Setting | What it does |
 |---|---|

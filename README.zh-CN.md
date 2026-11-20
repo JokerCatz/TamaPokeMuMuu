@@ -114,7 +114,7 @@ arduino-cli upload --fqbn "$FQBN" -p /dev/cu.usbmodemXXXX --input-dir build .
 主人名字、chess.com 用户名、天气坐标和时区写在 `config_private.h` 里，这个文件不会被
 git 上传（Wi-Fi 设置页里填的城市和用户名优先）。把 [`config_private.example.h`](config_private.example.h) 复制成
 `config_private.h` 再填写。没有这个文件时，固件使用 [`config.h`](config.h) 里的中性
-示例值（纽约，chess.com 用户名只能在 Wi-Fi 设置页填）。
+示例值（地点按网络自动定位，chess.com 用户名只能在 Wi-Fi 设置页填）。
 
 | 设置 | 作用 |
 |---|---|
