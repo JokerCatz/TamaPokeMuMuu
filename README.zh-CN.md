@@ -105,14 +105,14 @@ arduino-cli upload --fqbn "$FQBN" -p /dev/cu.usbmodemXXXX --input-dir build .
 ```
 
 也可以不编译，直接用[网页安装](https://mu-muu.github.io/TamaPoke/web/)：在 Chrome 或 Edge
-里刷入本分叉。它用的是通用设置（界面英文，可在设置里切成中文；时间和天气按美国纽约）；
-要象棋积分，在 Wi-Fi 设置页填上 chess.com 用户名就行。SD 卡文件是
+里刷入本分叉。它用的是通用设置（界面英文，可在设置里切成中文；时间和天气按板子联网后自动定位到的
+地点，也可以在 Wi-Fi 设置页填城市）；要象棋积分，在同一页填上 chess.com 用户名就行。SD 卡文件是
 [最新发布版本](https://github.com/Mu-Muu/TamaPoke/releases/latest)里的 `tamapoke-sd.zip`。
 
 ### 个人设置
 
 主人名字、chess.com 用户名、天气坐标和时区写在 `config_private.h` 里，这个文件不会被
-git 上传。把 [`config_private.example.h`](config_private.example.h) 复制成
+git 上传（Wi-Fi 设置页里填的城市和用户名优先）。把 [`config_private.example.h`](config_private.example.h) 复制成
 `config_private.h` 再填写。没有这个文件时，固件使用 [`config.h`](config.h) 里的中性
 示例值（纽约，chess.com 用户名只能在 Wi-Fi 设置页填）。
 
@@ -120,9 +120,9 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 |---|---|
 | `OWNER_NAME` | 几句台词里用到的名字（"最喜欢……了！"、生日祝福），最多 16 字节 |
 | `CHESS_USER` | 默认的 chess.com 用户名；Wi-Fi 设置页里填的优先；留空就只用设置页里填的 |
-| `WX_LAT`、`WX_LON`、`WX_TZ` | Open-Meteo 的地点和 IANA 时区（`/` 写成 `%2F`） |
+| `WX_LAT`、`WX_LON`、`WX_TZ` | 天气的地点和 IANA 时区（`/` 写成 `%2F`）；不填（设置页也没填城市）时，板子按网络自动定位 |
 | `LOCAL_TZ` | 联网校时用的 POSIX 时区字符串 |
-| `TZ_STD_OFFSET_H`、`TZ_DST_NA` | 标准时间相对 UTC 的小时数，以及是否按美国/加拿大规则实行夏令时 |
+| `TZ_STD_OFFSET_H`、`TZ_DST_NA` | 标准时间相对 UTC 的小时数，以及是否按美国/加拿大规则实行夏令时（地点来自设置页或自动定位时不用这两项：时钟改用 Open-Meteo 给的该地当前时差，已含夏令时） |
 | `MAILBOX_URL`、`MAILBOX_KEY` | 和好友远程寄信用的信箱；默认 ntfy.sh，不用填。用自己的 Cloudflare Worker 时填它的地址和口令（见下面「好友」一节） |
 
 ### SD 卡
@@ -138,11 +138,18 @@ git 上传。把 [`config_private.example.h`](config_private.example.h) 复制�
 在设置页点 **Wi-Fi**，板子会开一个叫 `TamaPoke` 的热点。用手机连上后打开
 `192.168.4.1`（页面语言跟板子的界面语言一致），填入 Wi-Fi 名称和密码，最多三个（比如家里、
 学校和手机热点，板子会连能看到的、信号最强的那个；只支持 2.4 GHz，iPhone 热点要打开
-"最大兼容性"），也可以填 chess.com 用户名。
+"最大兼容性"），也可以填城市和 chess.com 用户名。城市决定时钟的时区（含夏令时）和天气的地点；
+有重名的城市，可以在逗号后面加上省、州或国家（`Springfield, IL`、`Lyon, France`）。板子下次联网时用
+[Open-Meteo](https://open-meteo.com/en/docs/geocoding-api) 查找，屏幕上会提示"城市已更新"
+（或"没查到这个城市"），再打开设置页就能看到它找到的是哪里。不填城市时，`config_private.h` 里没写地点的板子
+（比如网页安装的版本）会在联网后用 [ipapi.co](https://ipapi.co/) 按网络自动定位（这个服务能看到板子的公网
+IP，和板子访问的其他网站一样）。时钟按保存这个页面的手机的时区走（页面从手机设置里读出来），因为网络运营商的
+出口可能很远，甚至在另一个时区；这种情况下，天气改用手机时区所指的城市（`America/Chicago` → Chicago）。开了
+VPN 或用某些手机热点时地点可能不准，这时在这里填的城市优先。
 最后一栏 **Stack-chan 语音控制** 只有 Stack-chan 或其他小智语音设备才需要
 （见 [Stack-chan / 小智](#stack-chan--小智可选)），没有就留空。这些信息只保存在板子上，
-之后不会再显示（页面只标出哪几个 Wi-Fi 已经存过）。不改的项留空即可；填一个减号 `-` 会删掉
-某个 Wi-Fi（填在它的名称里）、用户名或语音控制地址。换了用户名后，
+之后不会再显示（页面只标出哪几个 Wi-Fi 已经存过，以及找到的城市）。不改的项留空即可；填一个减号 `-` 会删掉
+某个 Wi-Fi（填在它的名称里）、城市（回到默认地点或自动定位）、用户名或语音控制地址。换了用户名后，
 下一次同步只记录新账号当前的成绩。
 
 ## 怎么玩

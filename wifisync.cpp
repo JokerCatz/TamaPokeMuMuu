@@ -52,11 +52,38 @@ bool wifiHasCreds() {
 }
 bool mcpConfigured() { return credGet("mcp").length() > 0; }
 
+// el lugar (NVS "place"): q = la ciudad como se escribio en el portal, hasta que se busca; name,
+// lat, lon y tz (IANA) = lo encontrado; auto = como: 0 escrito, 1 por la conexion, 2 la ciudad
+// de la zona del movil; ptz = la zona del movil; off = el desfase de la ultima vez que llego el
+// tiempo. Sin nada, el de config.h (WX_*, TZ_STD_OFFSET_H...)
+static String lugarGet(const char *key) {
+  Preferences p;
+  p.begin("place", true);
+  String s = p.getString(key, "");
+  p.end();
+  return s;
+}
+
+static String htmlEsc(const String &s) {
+  String o;
+  for (size_t i = 0; i < s.length(); i++) {
+    char c = s[i];
+    if (c == '&') o += "&amp;";
+    else if (c == '<') o += "&lt;";
+    else if (c == '>') o += "&gt;";
+    else if (c == '"') o += "&quot;";
+    else o += c;
+  }
+  return o;
+}
+
 // ---------- pagina de configuracion ----------
 
 // La pagina sale en el idioma de la placa (el que se esta leyendo al abrir el
 // portal). No va en i18n.cpp: la pinta el navegador del movil, y los textos
-// chinos de i18n.cpp acaban en la fuente del firmware.
+// chinos de i18n.cpp acaban en la fuente del firmware. Manda tambien la zona
+// horaria del movil (ptz, la de sus ajustes: no hace falta red), para el reloj
+// de las placas sin lugar propio (buscarPorRed).
 static const char PAGINA_EN[] PROGMEM = R"(<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>TamaPoke</title>
 <style>body{font-family:sans-serif;max-width:420px;margin:24px auto;padding:0 16px}
@@ -73,6 +100,10 @@ get the weather.</p>
 <small>Up to three networks, e.g. home, school and a phone hotspot: the board joins the
 strongest one it can see. 2.4 GHz only: on an iPhone hotspot, turn on Maximize
 Compatibility.</small><br><br>
+<label>City (optional)</label>
+<input name="city" maxlength="60" placeholder="e.g. Lyon, France">
+<small>Sets the clock's time zone and where the weather comes from. If several places share the
+name, add the state or country after a comma (Springfield, IL). Now: {P}</small><br><br>
 <label>chess.com username (optional)</label>
 <input name="chess" maxlength="25" autocapitalize="none" autocorrect="off" spellcheck="false">
 <small>Turns your chess.com games into points. The first sync (and the first one after a new
@@ -82,8 +113,10 @@ username) only records your current results; earlier games don't pay.</small><br
 <small>Only if you have a Stack-chan or another xiaozhi voice assistant: paste the MCP endpoint
 from its app. Otherwise leave this empty.</small><br><br>
 <small>Leave a field empty to keep what was saved before. To remove a Wi-Fi network (in its name),
-the chess.com username or the voice control endpoint, enter a single -</small><br><br>
-<button>Save</button></form></body></html>)";
+the city, the chess.com username or the voice control endpoint, enter a single -</small><br><br>
+<button>Save</button><input type="hidden" name="ptz" id="ptz"></form>
+<script>try{document.getElementById("ptz").value=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}</script>
+</body></html>)";
 
 static const char PAGINA_ZH[] PROGMEM = R"(<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>TamaPoke</title>
@@ -98,14 +131,19 @@ button{width:100%;padding:12px;font-size:17px}small{color:#666}</style></head><b
 <p><b>Wi-Fi 3</b>（可不填）{3}</p>
 <label>名称</label><input name="ssid3"><label>密码</label><input name="pass3" type="password">
 <small>最多三个，比如家里、学校和手机热点：板子会连能看到的、信号最强的那个。只支持 2.4 GHz：iPhone 热点要打开"最大兼容性"。</small><br><br>
+<label>城市（可不填）</label>
+<input name="city" maxlength="60" placeholder="例如：上海，或 Lyon, France">
+<small>用来设定时钟的时区和天气的地点。有重名的城市，可以在逗号后面加上省、州或国家（Springfield, IL）。现在：{P}</small><br><br>
 <label>chess.com 用户名（可不填）</label>
 <input name="chess" maxlength="25" autocapitalize="none" autocorrect="off" spellcheck="false">
 <small>用来把 chess.com 上的对局换成积分。第一次同步（或换了用户名后）只记录当前成绩，不补发以前的分。</small><br><br>
 <label>Stack-chan 语音控制（可选）</label>
 <input name="mcp" placeholder="wss://api.xiaozhi.me/mcp/?token=...">
 <small>只有 Stack-chan 或其他小智语音设备才需要：把它 App 里 MCP 页面的接入点地址粘贴到这里。没有就留空。</small><br><br>
-<small>不改的项留空就行（会保留原来的）。要删掉某个 Wi-Fi（在它的名称里填）、chess.com 用户名或语音控制地址，填一个减号 -</small><br><br>
-<button>保存</button></form></body></html>)";
+<small>不改的项留空就行（会保留原来的）。要删掉某个 Wi-Fi（在它的名称里填）、城市、chess.com 用户名或语音控制地址，填一个减号 -</small><br><br>
+<button>保存</button><input type="hidden" name="ptz" id="ptz"></form>
+<script>try{document.getElementById("ptz").value=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}</script>
+</body></html>)";
 
 // respuestas de /save, en el orden de Lang (EN, ZH)
 static const char *const MSG_CHESS[LANG_COUNT] = {
@@ -129,6 +167,23 @@ static void paginaPortal() {
     char marca[4] = { '{', (char)('1' + i), '}', 0 };
     page.replace(marca, credGet(KEY_SSID[i]).length() ? (gLang == LANG_ZH ? "（已保存）" : " - saved") : "");
   }
+  String q = lugarGet("q"), lugar = lugarGet("name");
+  bool zh = gLang == LANG_ZH;
+  if (q.length()) {
+    lugar = htmlEsc(q) + (zh ? "（联网后查找）" : " (looked up once the board is online)");
+  } else if (lugar.length()) {
+    Preferences p;
+    p.begin("place", true);
+    uint8_t como = p.getUChar("auto", 0);
+    p.end();
+    if (como == 1) lugar = htmlEsc(lugar) + (zh ? "（按网络自动定位）" : " (found from your internet connection)");
+    else if (como == 2) lugar = htmlEsc(lugar) + (zh ? "（按手机的时区）" : " (from your phone's time zone)");
+    else lugar = htmlEsc(lugar);
+  } else {
+    lugar = WX_DEFAULT_PLACE ? (zh ? "纽约，联网后自动定位" : "New York, until the board finds where it is online")
+                             : (zh ? "固件里的默认地点" : "the built-in default");
+  }
+  page.replace("{P}", lugar);
   server->send(200, "text/html; charset=utf-8", page);
 }
 
@@ -141,8 +196,12 @@ static void paginaGuardado() {
   }
   String mcp = server->arg("mcp");
   String chess = server->arg("chess");
+  String city = server->arg("city");
+  String ptz = server->arg("ptz");
   mcp.trim();
   chess.trim();
+  city.replace("，", ",");  // la coma china: el geocodificador solo entiende la normal
+  city.trim();
   char usuario[CHESS_USER_MAX + 1] = "";
   if (chess.length() && chess != "-" && !chessNormUser(chess.c_str(), usuario, sizeof(usuario))) {
     server->send(400, "text/html; charset=utf-8", MSG_CHESS[gLang]);
@@ -155,7 +214,7 @@ static void paginaGuardado() {
     if (ssid[i].length() > 32 || pass[i].length() > 64) mal = true;
     if (ssid[i] != "-" && (ssid[i].length() || credGet(KEY_SSID[i]).length())) quedaRed = true;
   }
-  if (mal || !quedaRed || mcp.length() > 400 ||
+  if (mal || !quedaRed || mcp.length() > 400 || city.length() > 180 ||
       (mcp.length() > 1 && !mcp.startsWith("wss://") && !mcp.startsWith("ws://"))) {
     server->send(400, "text/html; charset=utf-8", MSG_BAD[gLang]);
     return;
@@ -176,6 +235,23 @@ static void paginaGuardado() {
   p.end();
   if (chess == "-") chessSaveUser("");  // vuelve a valer la de config_private.h (si la hay)
   else if (usuario[0]) chessSaveUser(usuario);
+  if (city.length()) {
+    p.begin("place", false);
+    if (city == "-") {  // vuelve el lugar de config.h
+      p.clear();
+      wallClearCityOffset();
+    } else {
+      p.putString("q", city);  // se busca al conectar (buscarLugar)
+    }
+    p.end();
+  }
+#if WX_DEFAULT_PLACE
+  if (zoneOk(ptz.c_str())) {  // la del movil: la hora de las placas sin lugar propio
+    p.begin("place", false);
+    if (p.getString("ptz", "") != ptz) p.putString("ptz", ptz);
+    p.end();
+  }
+#endif
   server->send(200, "text/html; charset=utf-8", MSG_SAVED[gLang]);
   guardado = true;
 }
@@ -221,10 +297,13 @@ bool wifiPortalLoop() {
 
 static volatile bool wxNow = true;  // pedir el tiempo en la proxima vuelta
 
+static volatile bool redBuscada = false;  // ya se miro donde esta la conexion (buscarPorRed)
+
 void wifiPortalStop() {
   portalCleanup();
   portalOn = false;
   wxNow = true;  // red nueva (o la misma): tiempo al momento
+  redBuscada = false;  // y, sin lugar propio, donde esta esa red (buscarPorRed)
 }
 
 // la pagina "见面" (ESP-NOW, link.cpp) necesita la radio en un canal fijo: como el portal,
@@ -336,18 +415,11 @@ static void desconectarSiSobra() {
 // hora real por NTP. Devuelve el UTC y deja el RTC en hora local (el firmware
 // guarda la hora local "de pared" como epoch, ver rtcbat.cpp)
 static time_t ponerEnHora() {
-  configTzTime(LOCAL_TZ, "pool.ntp.org", "time.google.com");
+  configTzTime("UTC0", "pool.ntp.org", "time.google.com");  // TZ sigue en UTC (rtcbat.cpp cuenta con ello)
   time_t utc = 0;
   for (int i = 0; i < 100 && (utc = time(nullptr)) < 1700000000; i++) delay(100);
   if (utc < 1700000000) return 0;
-  struct tm lt;
-  localtime_r(&utc, &lt);
-  // rtcEpoch()/rtcSetEpoch() cuentan con TZ = UTC: se vuelve a dejar asi y la
-  // hora local se convierte en epoch "de pared"
-  setenv("TZ", "UTC0", 1);
-  tzset();
-  uint32_t pared = (uint32_t)mktime(&lt);
-  rtcSetEpoch(pared);
+  rtcSetEpoch(wallFromUtc((uint32_t)utc));  // con el desfase de la ciudad o la zona de config.h (walltime.cpp)
   return utc;
 }
 
@@ -359,6 +431,8 @@ static bool bajarJson(const String &url, JsonDocument &doc, JsonDocument *filtro
   // chess.com pide que el user-agent diga como contactar con quien lo hizo (API publica, desde 2023)
   http.setUserAgent("TamaPoke/2026.11 (+https://github.com/Mu-Muu/TamaPoke)");
   if (!http.begin(cliente, url)) return false;
+  int q = url.indexOf('?');
+  String sitio = q < 0 ? url : url.substring(0, q);  // en el registro sin la consulta: ni la ciudad ni las coordenadas
   int code = http.GET();
   bool ok = false;
   if (code == 200) {
@@ -388,12 +462,12 @@ static bool bajarJson(const String &url, JsonDocument &doc, JsonDocument *filtro
           ? deserializeJson(doc, buf, n, DeserializationOption::Filter(*filtro))
           : deserializeJson(doc, buf, n);
       ok = !e;
-      Serial.printf("bajado %u/%d bytes %s%s\n", (unsigned)n, len, url.c_str(), e ? " (json mal)" : "");
+      Serial.printf("bajado %u/%d bytes %s%s\n", (unsigned)n, len, sitio.c_str(), e ? " (json mal)" : "");
       if (e) Serial.printf("json: %s\n", e.c_str());
       free(buf);
     }
   } else {
-    Serial.printf("http %d %s\n", code, url.c_str());
+    Serial.printf("http %d %s\n", code, sitio.c_str());
   }
   http.end();
   return ok;
@@ -487,8 +561,8 @@ bool chessSync(Pet &pet, ChessReport &rep) {
 // ---------- hora por NTP (al arrancar y cada hora, junto con el tiempo) ----------
 //
 // Sin tocar TZ (ver walltime.h): solo se apunta la UTC recibida y el bucle
-// principal corrige el reloj (netTimeTake). La sincronizacion del ajedrez sigue
-// usando configTzTime por su cuenta; el aviso de hora sirve para las dos.
+// principal corrige el reloj (netTimeTake). La sincronizacion del ajedrez pide la
+// hora por su cuenta (ponerEnHora); el aviso de hora sirve para las dos.
 static portMUX_TYPE ntpMux = portMUX_INITIALIZER_UNLOCKED;
 static volatile uint32_t ntpUtc = 0, ntpMs = 0, ntpCount = 0;
 static uint32_t ntpTaken = 0;
@@ -544,12 +618,125 @@ Weather weatherNow() {
 
 void weatherRefresh() { wxNow = true; }
 
+// la ciudad nueva del portal: se busca y se guarda lo encontrado; su desfase llega con el
+// tiempo, justo despues. Sin red o si el servicio no contesta, se queda pendiente
+static volatile uint8_t lugarAviso = 0;  // para el bucle principal: 1 = puesta, 2 = no se encontro
+
+uint8_t netPlaceNews() {
+  uint8_t a = lugarAviso;
+  lugarAviso = 0;
+  return a;
+}
+
+// lo encontrado (p abierta para escribir); el desfase llega con el tiempo, justo despues
+static void guardarLugar(Preferences &p, const Place &pl, uint8_t como) {
+  p.putString("name", pl.name);
+  p.putString("lat", pl.lat);
+  p.putString("lon", pl.lon);
+  p.putString("tz", pl.tz);
+  p.putUChar("auto", como);
+  p.remove("off");  // el del lugar de antes ya no vale
+  wallClearCityOffset();
+}
+
+// el geocodificador de Open-Meteo: -1 = no contesto, 0 = no hay ese sitio, 1 = encontrado
+static int8_t geocodificar(const char *nombre, Place &pl) {
+  static char enc[560];  // hasta 180 bytes, cada uno como %XX
+  urlEncode(nombre, enc, sizeof(enc));
+  String url = String("https://geocoding-api.open-meteo.com/v1/search?count=1&format=json&language=") +
+               (gLang == LANG_ZH ? "zh" : "en") + "&name=" + enc;
+  JsonDocument doc;
+  if (!bajarJson(url, doc, nullptr)) return -1;
+  return placeParse(doc.as<JsonVariantConst>(), pl) ? 1 : 0;
+}
+
+static void buscarLugar() {
+  String q = lugarGet("q");
+  if (!q.length()) return;
+  Place pl;
+  int8_t r = geocodificar(q.c_str(), pl);
+  if (r < 0) return;
+  bool ok = r > 0;
+  Preferences p;
+  p.begin("place", false);
+  p.remove("q");
+  if (ok) guardarLugar(p, pl, 0);
+  p.end();
+  lugarAviso = ok ? 1 : 2;
+  Serial.printf("lugar: %s\n", ok ? "puesto" : "no encontrado");  // sin el nombre
+}
+
+// Sin lugar propio en config.h (el instalador web) ni ciudad escrita: el de la conexion a
+// internet, por la IP (ipapi.co: ciudad, coordenadas y zona; ve la IP, como todos los
+// servicios a los que llama la placa). La salida a internet del proveedor puede estar lejos,
+// hasta en otra zona (en la prueba, una hora de menos): si la zona no es la del movil, el
+// tiempo sale de la ciudad que nombra la zona del movil y la hora, de esa zona. Una vez por
+// arranque y otra tras cerrar el portal (puede ser otra red); si falla, con el proximo tiempo
+static void buscarPorRed() {
+#if WX_DEFAULT_PLACE
+  if (redBuscada || lugarGet("q").length()) return;
+  Preferences p;
+  p.begin("place", true);
+  bool escrita = p.isKey("lat") && p.getUChar("auto", 0) == 0;
+  p.end();
+  if (escrita) {  // la ciudad del portal manda
+    redBuscada = true;
+    return;
+  }
+  String ptz = lugarGet("ptz");
+  JsonDocument doc;
+  Place pl;
+  bool hay = bajarJson("https://ipapi.co/json/", doc, nullptr) && placeFromIp(doc.as<JsonVariantConst>(), pl);
+  uint8_t como = 1;
+  if (ptz.length() && (!hay || ptz != pl.tz)) {
+    char ciudad[40];
+    zoneCity(ptz.c_str(), ciudad, sizeof(ciudad));
+    Place zc;
+    if (geocodificar(ciudad, zc) > 0 && ptz == zc.tz) {
+      pl = zc;
+      hay = true;
+      como = 2;
+    } else if (hay) {
+      snprintf(pl.tz, sizeof(pl.tz), "%s", ptz.c_str());  // el sitio de la conexion, la hora del movil
+    }
+  }
+  if (!hay) {
+    Serial.println("lugar: la conexion no dice donde esta");
+    return;
+  }
+  redBuscada = true;
+  if (lugarGet("name") == pl.name && lugarGet("tz") == pl.tz) return;  // el de siempre: se queda su desfase
+  p.begin("place", false);
+  guardarLugar(p, pl, como);
+  p.end();
+  lugarAviso = 1;
+  Serial.printf("lugar: puesto por %s\n", como == 2 ? "la zona del movil" : "la conexion");  // sin el nombre
+#endif
+}
+
 static bool bajarTiempo() {
-  String url = String("https://api.open-meteo.com/v1/forecast?latitude=") + WX_LAT + "&longitude=" + WX_LON +
-               "&current=weather_code,temperature_2m&daily=sunrise,sunset&timezone=" WX_TZ "&forecast_days=1";
+  String lat = lugarGet("lat"), lon = lugarGet("lon"), tz = lugarGet("tz");
+  bool lugar = lat.length() && lon.length() && tz.length();
+  String ptz = WX_DEFAULT_PLACE ? lugarGet("ptz") : String();
+  if (!lugar) {  // el de config.h; con la zona del movil, si la hay (la hora, al menos, buena)
+    lat = WX_LAT;
+    lon = WX_LON;
+    tz = ptz.length() ? ptz : String(WX_TZ);
+  }
+  bool ciudad = lugar || ptz.length();  // la hora sale del desfase que trae el tiempo
+  tz.replace("/", "%2F");  // WX_TZ ya viene asi
+  String url = String("https://api.open-meteo.com/v1/forecast?latitude=") + lat + "&longitude=" + lon +
+               "&current=weather_code,temperature_2m&daily=sunrise,sunset&timezone=" + tz + "&forecast_days=1";
   JsonDocument doc;
   Weather w;
   if (!bajarJson(url, doc, nullptr) || !weatherParse(doc.as<JsonVariantConst>(), w)) return false;
+  if (ciudad && w.utcOffset != INT32_MIN) {  // la hora de la ciudad, con su horario de verano de hoy
+    wallSetCityOffset(w.utcOffset);
+    Preferences p;
+    p.begin("place", false);
+    if (p.getInt("off", INT32_MIN) != w.utcOffset) p.putInt("off", w.utcOffset);  // solo si cambia (flash)
+    p.end();
+  }
   portENTER_CRITICAL(&wxMux);
   gWx = w;
   gWxMs = millis();
@@ -745,9 +932,11 @@ static void netTask(void *) {
     if (wxNow || (int32_t)(now - nextWx) >= 0) {
       wxNow = false;
       bool con = conectar();
+      if (con) buscarLugar();  // ciudad nueva del portal: el tiempo ya sale de ella
+      if (con) buscarPorRed();  // o, sin lugar propio, donde esta la conexion
+      bool ok = con && bajarTiempo();  // antes de la hora: trae el desfase de la ciudad
       if (con) pedirHora();
       if (con && !keep) mailNetSync();  // con bateria, el correo va con el tiempo (cada 3 h)
-      bool ok = con && bajarTiempo();
       desconectarSiSobra();
       nextWx = millis() + (ok ? (usbPower ? WX_EVERY_MS : WX_EVERY_BATT_MS) : 15UL * 60 * 1000);
     }
@@ -772,6 +961,18 @@ void netBegin() {
   // las credenciales se pasan siempre: que el wifi no las vuelva a escribir en la
   // NVS en cada intento (con varias redes, cada cambio era una escritura en flash)
   WiFi.persistent(false);
+  {  // el lugar del portal (o el de la conexion): su ultimo desfase, hasta que llegue el tiempo
+    Preferences p;
+    p.begin("place", false);
+#if !WX_DEFAULT_PLACE  // lo que dejo un firmware sin lugar propio: aqui manda el de config.h
+    if (p.getUChar("auto", 0)) p.clear();
+    p.remove("ptz");
+    if (!p.isKey("lat")) p.remove("off");
+#endif
+    int32_t off = p.getInt("off", INT32_MIN);
+    if (off != INT32_MIN) wallSetCityOffset(off);
+    p.end();
+  }
   netMx = xSemaphoreCreateMutex();
   cmdQ = xQueueCreate(1, sizeof(NetCmd));
   resQ = xQueueCreate(1, sizeof(NetRes));

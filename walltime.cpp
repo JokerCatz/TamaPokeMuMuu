@@ -31,6 +31,17 @@ bool localIsDst(uint32_t utc) {
 #endif
 }
 
+// lo escribe la tarea de red y lo leen las dos: 32 bits, se lee y se escribe de una vez
+#define SIN_CIUDAD INT32_MIN
+static volatile int32_t gCiudad = SIN_CIUDAD;
+
+void wallSetCityOffset(int32_t secs) {
+  if (secs >= -14 * 3600 && secs <= 14 * 3600) gCiudad = secs;
+}
+void wallClearCityOffset() { gCiudad = SIN_CIUDAD; }
+
 uint32_t wallFromUtc(uint32_t utc) {
+  int32_t ciudad = gCiudad;
+  if (ciudad != SIN_CIUDAD) return utc + (uint32_t)ciudad;
   return utc + (uint32_t)((TZ_STD_OFFSET_H + (localIsDst(utc) ? 1 : 0)) * 3600);
 }

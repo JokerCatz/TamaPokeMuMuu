@@ -124,7 +124,7 @@ const en = {
   build_s2_txt: "Unzip tamapoke-sd.zip to the root of the card. A card the board can't read gets formatted, so back it up first.",
   build_s2_btn: "Download tamapoke-sd.zip",
   build_s3: "Connect Wi-Fi",
-  build_s3_txt: "On the settings page tap Wi-Fi, join the TamaPoke network with a phone and open 192.168.4.1. Add your Wi-Fi and, if you like, a chess.com username.",
+  build_s3_txt: "On the settings page tap Wi-Fi, join the TamaPoke network with a phone and open 192.168.4.1. Add your Wi-Fi and, if you like, a chess.com username. The clock takes your phone's time zone, and the board finds where it is for the weather.",
   build_github: "Source code on GitHub",
 
   foot_fan: "TamaPoke with Chess is a non-commercial fan project, forked from socquique/TamaPoke. It is not affiliated with or endorsed by Nintendo, Game Freak, Creatures or The Pokémon Company. Pokémon names and characters belong to their owners.",
@@ -255,7 +255,7 @@ const zh: typeof en = {
   build_s2_txt: "把 tamapoke-sd.zip 解压到 SD 卡根目录。板子读不了的卡会被格式化，卡里有东西先备份。",
   build_s2_btn: "下载 tamapoke-sd.zip",
   build_s3: "连上 Wi-Fi",
-  build_s3_txt: "在设置页点 Wi-Fi，用手机连上名叫 TamaPoke 的热点，打开 192.168.4.1，填上家里的 Wi-Fi，想要的话再填 chess.com 用户名。",
+  build_s3_txt: "在设置页点 Wi-Fi，用手机连上名叫 TamaPoke 的热点，打开 192.168.4.1，填上家里的 Wi-Fi，想要的话再填 chess.com 用户名。时钟按手机的时区走，板子会自动定位来取天气。",
   build_github: "GitHub 上的源代码",
 
   foot_fan: "TamaPoke with Chess 是非商业的同人项目，分叉自 socquique/TamaPoke。与任天堂、Game Freak、Creatures 和宝可梦公司无关，也未获得其认可。宝可梦的名字和角色归其所有者。",

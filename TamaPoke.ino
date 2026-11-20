@@ -634,6 +634,8 @@ void loop() {
       Serial.printf("hora: corregida %+ld s\n", (long)diff);
     }
   }
+  uint8_t lugar = netPlaceNews();  // ciudad nueva del portal Wi-Fi (el reloj se corrige con el NTP de detras)
+  if (lugar) toast(T(lugar == 1 ? S_PLACE_OK : S_PLACE_BAD));
 
   // portal de configuracion del wi-fi: al guardar, cerrar y sincronizar
   if (wifiPortalActive() && wifiPortalLoop()) {

@@ -63,3 +63,17 @@ TEST(walltime, coincide_con_la_libc_y_local_tz) {
   else unsetenv("TZ");
   tzset();
 }
+
+// la ciudad del portal: manda su desfase (el que da Open-Meteo con el tiempo) y se puede quitar
+TEST(walltime, el_desfase_de_la_ciudad_manda_y_se_quita) {
+  const uint32_t julio = 1782921600u;  // 2026-07-01 16:00 UTC
+  const uint32_t cfg = wallFromUtc(julio);
+  wallSetCityOffset(8 * 3600);  // Shanghai
+  CHECK_EQ(wallFromUtc(julio), julio + 8 * 3600);
+  wallSetCityOffset(-(2 * 3600 + 30 * 60));  // Terranova en verano
+  CHECK_EQ(wallFromUtc(julio), julio - (2 * 3600 + 30 * 60));
+  wallSetCityOffset(20 * 3600);  // no existe: se queda el de antes
+  CHECK_EQ(wallFromUtc(julio), julio - (2 * 3600 + 30 * 60));
+  wallClearCityOffset();
+  CHECK_EQ(wallFromUtc(julio), cfg);
+}

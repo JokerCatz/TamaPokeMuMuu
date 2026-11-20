@@ -203,6 +203,8 @@ enum StrId : uint16_t {  // mas de 256 textos
   S_REWARD_BANNER, S_REWARD_FMT, S_REWARD_MAX_FMT, S_BOOK_EXTRA_FMT,
   // ficha "成长": por que el boton de evolucionar esta apagado
   S_EVO_ASLEEP, S_EVO_FARM,
+  // la ciudad del portal Wi-Fi, al buscarla
+  S_PLACE_OK, S_PLACE_BAD,
   STR_COUNT
 };
 

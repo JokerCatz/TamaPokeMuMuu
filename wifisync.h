@@ -9,12 +9,12 @@
 // real para el fondo y, con USB, el control por voz desde Stack-chan.
 //
 // Configuracion: la placa abre un punto de acceso "TamaPoke" con una pagina
-// (192.168.4.1) donde se escriben la red, la contraseña y (opcional) el punto
-// de acceso MCP de xiaozhi.me desde el movil. Se guardan en la NVS y la placa
-// no las enseña nunca.
+// (192.168.4.1) donde se escriben la red, la contraseña y (opcional) la ciudad,
+// la cuenta de chess.com y el punto de acceso MCP de xiaozhi.me desde el movil.
+// Se guardan en la NVS y la placa no enseña nunca las redes ni las claves.
 //
-// Sincronizacion: conecta, pone el reloj en hora (zona de config.h, con
-// horario de verano), baja /stats y los archivos mensuales necesarios de
+// Sincronizacion: conecta, pone el reloj en hora (zona de la ciudad o de config.h,
+// con horario de verano), baja /stats y los archivos mensuales necesarios de
 // chess.com, suma los puntos y desconecta.
 //
 // Tarea de red (nucleo 0, no congela la pantalla): el tiempo cada hora; con
@@ -23,7 +23,6 @@
 // ordenes se ejecutan en el bucle principal (netTakeCommand/netGiveResult).
 
 #define WIFI_AP_NAME "TamaPoke"
-// la zona horaria (LOCAL_TZ) esta en config.h
 
 bool wifiHasCreds();
 void wifiPortalStart();
@@ -47,6 +46,9 @@ void weatherRefresh();      // pedir el tiempo ya (consola WX)
 // hora UTC recibida del NTP desde la ultima llamada (al arrancar y cada hora,
 // con el tiempo): el bucle principal corrige el reloj con ella
 bool netTimeTake(uint32_t &utc);
+// la ciudad del portal, cuando la tarea de red la busca: 1 = puesta (hora y tiempo ya van
+// con ella), 2 = no se encontro; 0 = nada nuevo desde la ultima llamada
+uint8_t netPlaceNews();
 bool mcpConfigured();
 bool mcpOnline();           // xiaozhi conectado ahora mismo
 

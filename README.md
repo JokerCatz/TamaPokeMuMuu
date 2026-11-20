@@ -117,15 +117,18 @@ arduino-cli upload --fqbn "$FQBN" -p /dev/cu.usbmodemXXXX --input-dir build .
 ```
 
 Or skip the build: the [web installer](https://mu-muu.github.io/TamaPoke/web/) flashes this fork
-from Chrome or Edge. It has neutral settings (English UI, New York time and
-weather; for chess points, enter the chess.com username on the Wi-Fi page),
+from Chrome or Edge. It has neutral settings (English UI; time and weather for
+wherever your internet connection is, found once the board is online, or for a
+city you enter on the Wi-Fi page; for chess points, enter the chess.com username
+there too),
 and the SD files are `tamapoke-sd.zip` on the
 [latest release](https://github.com/Mu-Muu/TamaPoke/releases/latest).
 
 ### Personal settings
 
 Owner name, chess.com username, weather coordinates and time zone go in
-`config_private.h`, which is git-ignored. Copy
+`config_private.h`, which is git-ignored (a city or username entered on the
+Wi-Fi page takes priority). Copy
 [`config_private.example.h`](config_private.example.h) to `config_private.h`
 and fill it in. Without it the firmware builds with neutral example values from
 [`config.h`](config.h) (New York, chess.com username only from the Wi-Fi page).
@@ -134,9 +137,9 @@ and fill it in. Without it the firmware builds with neutral example values from
 |---|---|
 | `OWNER_NAME` | name used in a few lines ("I love you, …!", birthday); 16 bytes max |
 | `CHESS_USER` | default chess.com username; one entered on the Wi-Fi page takes priority; empty = only from the Wi-Fi page |
-| `WX_LAT`, `WX_LON`, `WX_TZ` | Open-Meteo location and IANA time zone (`/` written as `%2F`) |
+| `WX_LAT`, `WX_LON`, `WX_TZ` | weather location and IANA time zone (`/` written as `%2F`); without them (and without a city on the Wi-Fi page) the board finds its location from the internet connection |
 | `LOCAL_TZ` | POSIX time zone string for NTP |
-| `TZ_STD_OFFSET_H`, `TZ_DST_NA` | standard UTC offset in hours, and whether the US/Canada DST rule applies |
+| `TZ_STD_OFFSET_H`, `TZ_DST_NA` | standard UTC offset in hours, and whether the US/Canada DST rule applies (not used when the place comes from the Wi-Fi page or the connection: then the clock takes that place's current offset from Open-Meteo, daylight saving included) |
 | `MAILBOX_URL`, `MAILBOX_KEY` | mailbox for mail with friends; ntfy.sh by default, nothing to set. For your own Cloudflare Worker, its address and key (see "Friends" below) |
 
 ### SD card
@@ -156,13 +159,27 @@ On the settings page tap **Wi-Fi**. The board opens an access point called
 board's language). Enter up to three networks (for example home, school and a
 phone hotspot: the board joins the strongest one it can see; 2.4 GHz only, so
 on an iPhone hotspot turn on Maximize Compatibility), and optionally
-your chess.com username. The last field, **Stack-chan voice control**, is only
+your city and your chess.com username. The city sets the clock's time zone
+(with daylight saving) and the weather; if several places share the name, add
+the state or country after a comma (`Springfield, IL`, `Lyon, France`). The
+board looks it up on [Open-Meteo](https://open-meteo.com/en/docs/geocoding-api)
+the next time it is online, shows "City updated" (or "City not found"), and the
+page then shows which place it found. Without a city, a board with no location
+of its own in `config_private.h` (like the web installer build) finds it from
+its internet connection with [ipapi.co](https://ipapi.co/) once it is online
+(that service sees the board's public IP address, as every site it talks to
+does). The clock follows the time zone of the phone that saved this page (the
+page reads it from the phone's settings), because the internet provider's exit
+can be far away, even in another time zone; in that case the weather comes from
+the city the phone's time zone is named after (`America/Chicago` → Chicago). On
+a VPN or some phone hotspots the place can be wrong, and then a city entered
+here takes priority. The last field, **Stack-chan voice control**, is only
 for a Stack-chan or another xiaozhi voice assistant (see
 [Stack-chan / xiaozhi](#stack-chan--xiaozhi-optional)); otherwise leave it
 empty. Everything is stored on the board only and never shown again (the page
-only marks which networks are saved). Leave a field empty to keep what was
-saved before, or enter `-` to remove a network (in its name), the username or
-the voice control endpoint. After a new username, the next sync
+only marks which networks are saved, and shows the city it found). Leave a field empty to keep what was
+saved before, or enter `-` to remove a network (in its name), the city (back to
+the default, or to the place found from the connection), the username or the voice control endpoint. After a new username, the next sync
 only records that account's current marks.
 
 ## How to play

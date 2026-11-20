@@ -158,6 +158,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "BACKUP", "SAVE NOW", "Save a new backup?", "Backup saved", "Backup failed",
     "REWARD", "+%u pts (%u today)", "Today's %u pts are all given", "Hockey +%u  Reward +%u",
     "Can't evolve while asleep", "Its next form is in the farm",
+    "City updated", "City not found",
   },
   // ---------------- ZH ----------------
   // Chino simplificado. Los especificadores van en el orden de la fila
@@ -352,6 +353,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "备份", "立即备份", "保存一份新的备份？", "备份好了", "备份失败",
     "家长加分", "+%u 分（今天已加 %u 分）", "今天的加分已满 %u 分", "冰球 +%u  家长 +%u",
     "睡着时不能进化", "进化形态在农场里",
+    "城市已更新", "没查到这个城市",
   },
 };
 

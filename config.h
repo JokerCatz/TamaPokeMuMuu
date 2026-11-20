@@ -33,9 +33,14 @@ static_assert(sizeof(OWNER_NAME) <= 17, "OWNER_NAME: 16 bytes como mucho (cabe e
 #define CHESS_USER ""  // usuario de chess.com por defecto; manda el del portal Wi-Fi (vacio = solo el del portal)
 #endif
 
-// tiempo de Open-Meteo: coordenadas y zona IANA (con "/" escrito %2F)
+// lugar por defecto (manda la ciudad del portal Wi-Fi). Tiempo de Open-Meteo: coordenadas y zona
+// IANA (con "/" escrito %2F)
 #ifndef WX_LAT
 #define WX_LAT "40.71"
+#define WX_DEFAULT_PLACE 1  // sin lugar propio (el instalador web): se busca por la conexion (wifisync.cpp)
+#endif
+#ifndef WX_DEFAULT_PLACE
+#define WX_DEFAULT_PLACE 0
 #endif
 #ifndef WX_LON
 #define WX_LON "-74.01"
