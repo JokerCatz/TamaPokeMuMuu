@@ -251,10 +251,14 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
 - In its final form, after **7 days** it asks to retire (you can choose to stay
   together for a while). It then moves to the **farm**, where you can take it
   back any time; the album keeps the page, and you open a new egg.
-- **Abilities** (0-100, no battles): stamina (stamina potion) slows energy loss
-  by up to 50%, vitality (vitality potion) slows joy loss by up to 50%, and
-  resistance grows by 1 for every 3 hours of good care and cuts the chance of
-  getting sick by up to 60%.
+- **Abilities** (0-100, no battles): strength (strength potion) slows energy loss
+  by up to 50%, speed (speed potion) slows joy loss by up to 50%, and
+  endurance grows by 1 for every 3 hours of good care and cuts the chance of
+  getting sick by up to 60%. The endurance potion isn't sold: it turns up in the
+  grass on the main screen and on Fun treasure hunts, and waits on the harvest
+  page of the bag. In the tournament and the gyms each one helps where
+  its stats count: strength with Attack, speed with Speed, endurance with HP and
+  Defense.
 
 <table><tr><td align="center"><img src="docs/screenshots/en/abilities.png" width="220" alt="Abilities"><br>Abilities</td><td align="center"><img src="docs/screenshots/en/medals.png" width="220" alt="Medals"><br>Medals</td></tr></table>
 
@@ -283,7 +287,7 @@ You start with 10 points. Basic care is free.
 |---|---|
 | Candy (joy and food, but fattening) | 2 |
 | Medicine | 3 |
-| Stamina potion / vitality potion | 5 each |
+| Strength potion / speed potion | 5 each |
 | Evolution potion | 100 |
 | Mega Stone (also from a tournament gold, one a day) | 150 |
 | Shiny charm | 50 |
@@ -308,7 +312,7 @@ last week.
 
 Now and then a tuft of grass rustles on the ground of the main screen: tap it to
 find what's hidden there. One a day (two candies, a medicine, a potion or a
-common egg), one a week from Monday (a rare egg, a shiny charm or both potions,
+common egg), one a week from Monday (a rare egg, a shiny charm or two potions: endurance plus strength or speed,
 with blue sparkles) and one a month (a legendary egg, a Mega Stone or an
 evolution potion, with gold sparkles). The most valuable one shows first. They
 never give points.
@@ -411,7 +415,7 @@ Fun **costs points and never gives any**: points still come from chess. Chess
 also brings luck the same day: if you played, one more thing from every
 activity; if you won, the rare finds are twice as likely.
 
-- **Fruits** raise training: stamina fruit, resistance fruit and vitality fruit
+- **Fruits** raise training: strength fruit, endurance fruit and speed fruit
   +3 each, the gold fruit +3 to all three and full joy. Up to 3 a day per
   Pokémon raise anything (after that they're just a snack). Training helps in
   the tournament and the gyms, and farm Pokémon can eat fruits too (tap one at

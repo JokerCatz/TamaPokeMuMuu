@@ -68,6 +68,7 @@ enum : uint8_t {
   ITEM_PEARL,       // le alegra del todo
   ITEM_MEGA_SHARD,  // SHARDS_PER_STONE hacen una piedra megaevolucion (solas)
   ITEM_EGG_WATER, ITEM_EGG_FOSSIL,
+  ITEM_POTION_END,  // pocion de resistencia: no se vende (ocio y hierba); al final por la mochila guardada
   ITEM_COUNT
 };
 #define SHOP_ITEMS (ITEM_MEGA_STONE + 1)  // los que se venden (los primeros)
@@ -121,10 +122,12 @@ struct PtsWeek {
 static inline uint16_t ptWeekOf(uint32_t day) { return (uint16_t)((day + 3) / 7); }
 static inline uint8_t ptWeekday(uint32_t day) { return (uint8_t)((day + 3) % 7); }  // 0 = lunes
 #define POTION_GAIN 5      // cada pocion de fuerza/velocidad
-// Capacidades (no hay combates): cada una de 0 a 100 y cada una cuida algo.
-//   aguante (trAtk, pocion de fuerza): la energia baja hasta un 50% mas despacio
-//   vitalidad (trSpe, pocion de velocidad): el animo baja hasta un 50% mas despacio
-//   resistencia (trDef, solo cuidandolo bien): hasta un 60% menos de enfermar
+// Capacidades (no hay combates): cada una de 0 a 100, cuida algo y en las pruebas (sport.h)
+// ayuda con los stats de la especie que le tocan.
+//   fuerza (trAtk, pocion de fuerza): la energia baja hasta un 50% mas despacio; ataque
+//   velocidad (trSpe, pocion de velocidad): el animo baja hasta un 50% mas despacio; velocidad
+//   resistencia (trDef, cuidandolo bien y su pocion, que no se vende): hasta un 60% menos de
+//   enfermar; PS y defensa
 // Las rebajas son de verdad en minutos: con 50, uno de cada cuatro no baja.
 #define RES_GROW_MIN 180   // resistencia: +1 por cada 3 h seguidas bien cuidado (despierto)
 #define START_POINTS 10    // puntos al empezar
@@ -328,7 +331,7 @@ public:
   void feedCandy();
   void giveMedicine();  // cura la enfermedad con una de la mochila (sana: no gasta)
   bool buy(uint8_t item);      // paga y lo mete en la mochila
-  bool usePotion(uint8_t item);  // ITEM_POTION_STR / _SPD: +POTION_GAIN
+  bool usePotion(uint8_t item);  // ITEM_POTION_STR / _SPD / _END: +POTION_GAIN
   bool hatchEgg(uint8_t kind);   // sin compañero: abre un huevo de la mochila
   bool hatchRegionEgg();         // sin compañero: abre un huevo de region (el de la region mas baja)
   // pocion de evolucion: si aun le falta tiempo para evolucionar, ya puede. No

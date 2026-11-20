@@ -647,14 +647,15 @@ uint8_t Pet::collectGrass(GrassPrize &g) {
     static const uint8_t alto[3] = { ITEM_EGG_LEGEND, ITEM_MEGA_STONE, ITEM_POTION_EVO };
     g.item = alto[random(3)];
     grassMonth = monthOf(d);
-  } else if (tier == GRASS_WEEK) {  // medio: huevo raro, amuleto shiny o las dos pociones
-    uint8_t r = random(3);
-    g.item = r == 0 ? ITEM_EGG_RARE : r == 1 ? ITEM_SHINY_CHARM : ITEM_POTION_STR;
-    if (r == 2) g.item2 = ITEM_POTION_SPD;
+  } else if (tier == GRASS_WEEK) {  // medio: huevo raro, amuleto shiny o dos pociones (la de
+    uint8_t r = random(3);           // resistencia, que no se vende, y una de las otras)
+    g.item = r == 0 ? ITEM_EGG_RARE : r == 1 ? ITEM_SHINY_CHARM : ITEM_POTION_END;
+    if (r == 2) g.item2 = random(2) ? ITEM_POTION_STR : ITEM_POTION_SPD;
     grassWeek = weekOf(d);
   } else {  // poco: dos chuches, una medicina, una pocion o un huevo normal
-    static const uint8_t bajo[5] = { ITEM_CANDY, ITEM_MEDICINE, ITEM_POTION_STR, ITEM_POTION_SPD, ITEM_EGG_COMMON };
-    g.item = bajo[random(5)];
+    static const uint8_t bajo[6] = { ITEM_CANDY, ITEM_MEDICINE, ITEM_POTION_STR, ITEM_POTION_SPD, ITEM_POTION_END,
+                                     ITEM_EGG_COMMON };
+    g.item = bajo[random(6)];
     if (g.item == ITEM_CANDY) g.qty = 2;
     grassDay = d;
   }
@@ -1076,9 +1077,9 @@ bool Pet::buy(uint8_t item) {
 }
 
 bool Pet::usePotion(uint8_t item) {
-  if (item != ITEM_POTION_STR && item != ITEM_POTION_SPD) return false;
+  if (item != ITEM_POTION_STR && item != ITEM_POTION_SPD && item != ITEM_POTION_END) return false;
   if (ceremony != CER_NONE || isEgg() || bag[item] == 0) return false;
-  uint8_t &tr = (item == ITEM_POTION_STR) ? trAtk : trSpe;
+  uint8_t &tr = (item == ITEM_POTION_STR) ? trAtk : (item == ITEM_POTION_SPD) ? trSpe : trDef;
   if (tr >= 100) return false;  // ya al maximo: no se gasta
   bag[item]--;
   tr = (tr + POTION_GAIN > 100) ? 100 : tr + POTION_GAIN;

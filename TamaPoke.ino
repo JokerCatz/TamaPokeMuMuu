@@ -55,7 +55,7 @@
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
 // version de esta fork: la fecha en que se publica (la base es la v1.18 de socquique)
-#define FW_VERSION "2026.11.19"
+#define FW_VERSION "2026.11.20"
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
   LCD_CS, LCD_SCLK, LCD_SDIO0, LCD_SDIO1, LCD_SDIO2, LCD_SDIO3);
@@ -354,7 +354,7 @@ static const StrId ITEM_NAME[ITEM_COUNT] = {
   S_ITEM_CANDY, S_ITEM_MEDICINE, S_ITEM_POTION_STR, S_ITEM_POTION_SPD, S_ITEM_SHINY_CHARM,
   S_ITEM_EGG_COMMON, S_ITEM_EGG_RARE, S_ITEM_EGG_LEGEND, S_ITEM_POTION_EVO, S_ITEM_MEGA_STONE,
   S_ITEM_FRUIT_STA, S_ITEM_FRUIT_RES, S_ITEM_FRUIT_VIT, S_ITEM_FRUIT_GOLD, S_ITEM_FISH, S_ITEM_PEARL, S_ITEM_SHARD,
-  S_ITEM_EGG_WATER, S_ITEM_EGG_FOSSIL,
+  S_ITEM_EGG_WATER, S_ITEM_EGG_FOSSIL, S_ITEM_POTION_END,
 };
 
 // ---------- compartido entre pestañas (las .ino se unen por orden alfabetico) ----------

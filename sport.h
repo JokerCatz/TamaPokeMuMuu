@@ -148,7 +148,10 @@ static inline float athleteRating(const Athlete &a, uint8_t ev) {
   float base = w[0] * d.bHp + w[1] * d.bAtk * a.geneAtk / 100.0f + w[2] * d.bDef * a.geneDef / 100.0f +
                w[3] * d.bSpe * a.geneSpe / 100.0f;
   static const float ETAPA[4] = { 0.9f, 0.9f, 1.0f, 1.1f };
-  float entreno = 1.0f + 0.12f * (a.trAtk + a.trDef + a.trSpe) / 300.0f;  // hasta +12%
+  // cada capacidad, en lo que pese su stat (los pesos suman 1): fuerza al ataque, velocidad a la
+  // velocidad y resistencia a PS y defensa. Las tres a 100: +12% en cualquier prueba
+  float tr = w[0] * a.trDef + w[1] * a.trAtk + w[2] * a.trDef + w[3] * a.trSpe;
+  float entreno = 1.0f + 0.12f * tr / 100.0f;
   return base * ETAPA[evoStage(a.dex)] * entreno * (a.mega ? 1.15f : 1.0f) * typeBonus(ev, typeOf(a.dex));
 }
 

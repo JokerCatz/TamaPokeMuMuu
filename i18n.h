@@ -205,6 +205,7 @@ enum StrId : uint16_t {  // mas de 256 textos
   S_EVO_ASLEEP, S_EVO_FARM,
   // la ciudad del portal Wi-Fi, al buscarla
   S_PLACE_OK, S_PLACE_BAD,
+  S_ITEM_POTION_END,
   STR_COUNT
 };
 

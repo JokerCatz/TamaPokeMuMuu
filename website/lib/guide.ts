@@ -251,8 +251,8 @@ export const GUIDE: Chapter[] = [
         rows: [
           [t("Candy", "糖果"), t("2", "2"), t("Food +10 and joy +12, but fattening", "饱食 +10、心情 +12，但会长胖")],
           [t("Medicine", "药"), t("3", "3"), t("Cures a sick pet", "治病")],
-          [t("Stamina potion", "体力药剂"), t("5", "5"), t("Raises stamina: energy drops more slowly", "提高体力：精力掉得更慢")],
-          [t("Vitality potion", "活力药剂"), t("5", "5"), t("Raises vitality: joy drops more slowly", "提高活力：心情掉得更慢")],
+          [t("Strength potion", "力量药剂"), t("5", "5"), t("Raises strength: energy drops more slowly", "提高力量：精力掉得更慢")],
+          [t("Speed potion", "速度药剂"), t("5", "5"), t("Raises speed: joy drops more slowly", "提高速度：心情掉得更慢")],
           [t("Common / rare / legendary egg", "普通蛋 / 稀有蛋 / 传说蛋"), t("10 / 30 / 100", "10 / 30 / 100"), t("Your next companion", "下一位伙伴")],
           [t("Shiny charm", "异色符"), t("50", "50"), t("Makes the next egg four times as likely to be shiny", "让下一颗蛋出异色的机会变成四倍")],
           [t("Evolution potion", "进化药水"), t("100", "100"), t("Skips the wait in days (needs still 40+)", "省掉要等的天数（四项仍要 40 以上）")],
@@ -288,7 +288,7 @@ export const GUIDE: Chapter[] = [
         ],
       },
       { k: "h", t: t("Abilities", "能力") },
-      { k: "p", t: t("Three abilities from 0 to 100 (there are no battles): **stamina** slows energy loss by up to half, **vitality** slows joy loss by up to half, and **resistance** cuts the chance of getting sick by up to 60%. Potions raise the first two; resistance grows by 1 for every 3 hours of good care (all needs at 40 or more). Fruits from the orchard raise them as training, which also counts in the tournament and the gyms.", "三项能力，每项 0 到 100（没有对战）：**体力**让精力最多慢一半下降，**活力**让心情最多慢一半下降，**抵抗力**最多让生病几率降低 60%。前两项靠药剂提高；抵抗力靠好好照顾，四项需求都在 40 以上时每 3 小时加 1。果园的果子可以当训练来加能力，对锦标赛和道馆也有用。") },
+      { k: "p", t: t("Three abilities from 0 to 100 (there are no battles): **strength** slows energy loss by up to half, **speed** slows joy loss by up to half, and **endurance** cuts the chance of getting sick by up to 60%. Potions raise all three. The strength and speed potions are in the shop; the endurance potion is not sold: it turns up in the grass and on Fun treasure hunts. Endurance also grows by 1 for every 3 hours of good care (all needs at 40 or more). Fruits from the orchard raise them as training, which also counts in the tournament and the gyms: strength where Attack counts, speed where Speed counts and endurance where HP and Defense count.", "三项能力，每项 0 到 100（没有对战）：**力量**让精力最多慢一半下降，**速度**让心情最多慢一半下降，**耐力**最多让生病几率降低 60%。三项都能靠药剂提高：力量和速度药剂在商店买，耐力药剂不卖，在草丛和趣玩的寻宝里得到。耐力也会靠好好照顾增长，四项需求都在 40 以上时每 3 小时加 1。果园的果子可以当训练来加能力，对锦标赛和道馆也有用：力量帮看重攻击的项目，速度帮看重速度的项目，耐力帮看重 HP 和防御的项目。") },
       { k: "h", t: t("Eggs and shinies", "蛋和异色") },
       {
         k: "table",
@@ -440,7 +440,7 @@ export const GUIDE: Chapter[] = [
       {
         k: "list",
         items: [
-          t("**Fruits** raise training: stamina, resistance and vitality fruit +3 each; the gold fruit +3 to all three and full joy. Up to 3 a day per Pokémon count (after that they are just a snack).", "**果子**加训练值：体力果、抵抗果、活力果各 +3；金果三项都 +3，心情加满。每只宝可梦每天最多 3 个果子有效（再吃只是填肚子）。"),
+          t("**Fruits** raise training: strength, endurance and speed fruit +3 each; the gold fruit +3 to all three and full joy. Up to 3 a day per Pokémon count (after that they are just a snack).", "**果子**加训练值：力量果、耐力果、速度果各 +3；金果三项都 +3，心情加满。每只宝可梦每天最多 3 个果子有效（再吃只是填肚子）。"),
           t("Farm Pokémon can eat fruits too: open one in the farm and tap a fruit at the top of its page.", "农场里的宝可梦也能吃果子：在农场点开它，点上面那排果子就喂了。"),
           t("**Fish** fills it up and a **pearl** makes it very happy. Both, and the fruits, appear as a second row in the Feed menu.", "**鱼**能吃得很饱，**珍珠**让它特别开心。鱼、珍珠和果子都会出现在喂食菜单的第二排。"),
           t("While your companion is out on a treasure hunt, the main screen shows a sign with the minutes left.", "伙伴出门寻宝时，主屏幕上会挂一块牌子，写着还要多少分钟回来。"),
@@ -508,7 +508,7 @@ export const GUIDE: Chapter[] = [
     lead: t("Surprises in the grass, real weather, holidays, and points from a phone.", "草丛彩蛋、真实天气、节日，还有从手机来的积分。"),
     blocks: [
       { k: "h", t: t("Surprises in the grass", "草丛彩蛋") },
-      { k: "p", t: t("Now and then a tuft of grass rustles on the main screen. Tap it. There is one a day (two candies, a medicine, a potion or a common egg), one a week from Monday (a rare egg, a shiny charm or both potions; blue sparkles) and one a month (a legendary egg, a Mega Stone or an evolution potion; gold sparkles). They never give points.", "主屏幕地上有时会有一丛草在晃，点它。每天一个（两颗糖果、一颗药、一瓶药剂或一个普通蛋），每周一个（从周一算起；稀有蛋、异色符或两种药剂各一瓶，闪蓝光），每月一个（传说蛋、Mega石或进化药水，闪金光）。彩蛋不送积分。") },
+      { k: "p", t: t("Now and then a tuft of grass rustles on the main screen. Tap it. There is one a day (two candies, a medicine, a potion or a common egg), one a week from Monday (a rare egg, a shiny charm or two potions, endurance plus strength or speed; blue sparkles) and one a month (a legendary egg, a Mega Stone or an evolution potion; gold sparkles). They never give points.", "主屏幕地上有时会有一丛草在晃，点它。每天一个（两颗糖果、一颗药、一瓶药剂或一个普通蛋），每周一个（从周一算起；稀有蛋、异色符或两瓶药剂（耐力药剂加一瓶力量或速度药剂），闪蓝光），每月一个（传说蛋、Mega石或进化药水，闪金光）。彩蛋不送积分。") },
       { k: "h", t: t("Weather, seasons and holidays", "天气、季节和节日") },
       {
         k: "list",

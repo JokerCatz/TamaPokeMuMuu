@@ -546,6 +546,25 @@ static const char* const SPR_ICON_POTION_SPD[16] = {  // 16x16
   "................",
 };
 
+static const char* const SPR_ICON_POTION_END[16] = {  // 16x16 (verde: resistencia)
+  "................",
+  "................",
+  "......kkkkk.....",
+  ".......ksk......",
+  ".......ksk......",
+  ".......ksk......",
+  ".......ksk......",
+  "......kgggk.....",
+  ".....kgggggk....",
+  "....kgwgggggk...",
+  "....kgwgggggk...",
+  "....kgggggggk...",
+  "....kggggggGk...",
+  ".....kggggGk....",
+  "......kkkkk.....",
+  "................",
+};
+
 static const char* const SPR_GRASS_A[24] = {  // 24x24
   "........................",
   "........................",

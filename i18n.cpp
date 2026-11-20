@@ -20,7 +20,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "MEDAL!", "AWESOME!", "%u DAY STREAK!",
     "STREAK %u  best %u", "BOND",
     "AGE %lu days", "tap name: rename",
-    "ABILITY", "STA", "RES", "VIT", "WGT",
+    "ABILITY", "STR", "END", "SPD", "WGT",
     "MEDALS %d/%d", "tap: back",
     "NAME:", "tap: back",
     "FOOD", "JOY", "ENE", "HYG",
@@ -43,7 +43,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "KANTO", "JOHTO", "HOENN", "SINNOH", "UNOVA", "KALOS", "ALOLA", "GALAR", "PALDEA",
 
     "SHOP  %ld", "BAG",
-    "CANDY", "MEDICINE", "STA POTION", "VIT POTION", "CHARM",
+    "CANDY", "MEDICINE", "STR POTION", "SPD POTION", "CHARM",
     "EGG", "RARE EGG", "LEGEND EGG",
     "Bought!", "Not enough points", "None left - shop", "Done!", "Already at max", "Not sick",
     "Used on next egg",
@@ -121,13 +121,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "CAST", "Wait for a bite...", "Now! Tap!", "Great catch!",
     "Just a small one", "DIG", "Tap the rock!", "SET OFF",
     "Back in 1 hour", "COLLECT", "Someone is already out", "You got",
-    "STA FRUIT", "RES FRUIT", "VIT FRUIT", "GOLD FRUIT",
+    "STR FRUIT", "END FRUIT", "SPD FRUIT", "GOLD FRUIT",
     "FISH", "PEARL", "MEGA SHARD", "WATER EGG",
-    "FOSSIL EGG", "Full today: just a snack", "10 shards = 1 Mega Stone", "STA +3",
-    "RES +3", "VIT +3", "All +3, so happy!", "So happy!",
+    "FOSSIL EGG", "Full today: just a snack", "10 shards = 1 Mega Stone", "STR +3",
+    "END +3", "SPD +3", "All +3, so happy!", "So happy!",
     "Yum, so full!",
     "FARM", "%u Pokemon", "RESTORE", "x%u",
-    "Good at: %s, %s", "HP %u  ATK %u  DEF %u  SPD %u", "STA %u  RES %u  VIT %u", "Try other teammates,",
+    "Good at: %s, %s", "HP %u  ATK %u  DEF %u  SPD %u", "STR %u  END %u  SPD %u", "Try other teammates,",
     "or train with fruits", "Badges", "League titles", "Fun finds",
     "%u h", "%u min",
     "Buy for %u pts?", "Spend %u pts?",
@@ -159,6 +159,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "REWARD", "+%u pts (%u today)", "Today's %u pts are all given", "Hockey +%u  Reward +%u",
     "Can't evolve while asleep", "Its next form is in the farm",
     "City updated", "City not found",
+    "END POTION",
   },
   // ---------------- ZH ----------------
   // Chino simplificado. Los especificadores van en el orden de la fila
@@ -185,7 +186,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
 
     "年龄 %lu 天", "点名字：改名",
 
-    "能力", "体力", "抵抗力", "活力", "体重",
+    "能力", "力量", "耐力", "速度", "体重",
 
     "奖章 %d/%d", "点一下：返回",
 
@@ -219,7 +220,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "关都", "城都", "丰缘", "神奥", "合众", "卡洛斯", "阿罗拉", "伽勒尔", "帕底亚",
 
     "商店  %ld分", "背包",
-    "糖果", "药", "体力药剂", "活力药剂", "异色符",
+    "糖果", "药", "力量药剂", "速度药剂", "异色符",
     "普通蛋", "稀有蛋", "传说蛋",
     "买好了！", "积分不够", "没有了，去商店买", "用好了！", "已经满了", "没有生病",
     "下一颗蛋自动生效",
@@ -316,13 +317,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "抛竿", "等鱼上钩……", "快点屏幕收竿！", "钓得好！",
     "只钓到一条小鱼", "开挖", "点石头把它敲开！", "出发",
     "1 小时后回来", "领取", "已经有宝可梦出门了", "收获",
-    "体力果", "抵抗果", "活力果", "金果",
+    "力量果", "耐力果", "速度果", "金果",
     "鱼", "珍珠", "Mega石碎片", "水属性蛋",
-    "化石蛋", "今天吃够了，只填饱肚子", "集齐 10 片自动变成 Mega石", "体力 +3",
-    "抵抗力 +3", "活力 +3", "三项都 +3，好开心！", "好开心！",
+    "化石蛋", "今天吃够了，只填饱肚子", "集齐 10 片自动变成 Mega石", "力量 +3",
+    "耐力 +3", "速度 +3", "三项都 +3，好开心！", "好开心！",
     "好吃，吃得好饱！",
     "农场", "%u 只宝可梦", "恢复备份", "有 %u",
-    "擅长：%s、%s", "HP %u  攻 %u  防 %u  速 %u", "体力 %u  抵抗力 %u  活力 %u", "试试换别的队友，",
+    "擅长：%s、%s", "HP %u  攻 %u  防 %u  速 %u", "力量 %u  耐力 %u  速度 %u", "试试换别的队友，",
     "或者吃果子练训练值", "徽章总数", "联盟冠军", "趣玩收获",
     "%u 小时", "%u 分钟",
     "花 %u 分购买？", "花 %u 分？",
@@ -354,28 +355,29 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "家长加分", "+%u 分（今天已加 %u 分）", "今天的加分已满 %u 分", "冰球 +%u  家长 +%u",
     "睡着时不能进化", "进化形态在农场里",
     "城市已更新", "没查到这个城市",
+    "耐力药剂",
   },
 };
 
 // Nombres de medalla en sus tres longitudes [idioma][medalla].
 static const char *const MED_NAME[LANG_COUNT][MED_COUNT] = {
   { "Lv.10", "Lv.25", "Lv.50", "7 STREAK", "BOND", "TOP FORM", "IN SHAPE",
-    "CURED", "SHINY", "LEGEND", "TIRELESS", "LIVELY", "30 STREAK", "CHESS WIN", "CHESS RECORD" },
+    "CURED", "SHINY", "LEGEND", "STRONG", "SPEEDY", "30 STREAK", "CHESS WIN", "CHESS RECORD" },
   { "Lv.10", "Lv.25", "Lv.50", "连续7天", "羁绊", "最终形态", "精神饱满",
-    "康复", "异色", "传说", "精力充沛", "活力满满", "连续30天", "棋局胜利", "棋艺新高" },
+    "康复", "异色", "传说", "大力士", "飞毛腿", "连续30天", "棋局胜利", "棋艺新高" },
 };
 static const char *const MED_LBL[LANG_COUNT][MED_COUNT] = {
   { "Lv10", "Lv25", "Lv50", "7DAYS", "BOND", "TOP", "FIT",
-    "CURED", "SHINY", "LEGEND", "STA", "VIT", "30DAYS", "WIN", "RECORD" },
+    "CURED", "SHINY", "LEGEND", "STR", "SPD", "30DAYS", "WIN", "RECORD" },
   { "Lv10", "Lv25", "Lv50", "7天", "羁绊", "最终", "健康",
-    "康复", "异色", "传说", "体力", "活力", "30天", "胜利", "新高" },
+    "康复", "异色", "传说", "力量", "速度", "30天", "胜利", "新高" },
 };
 static const char *const MED_DSC[LANG_COUNT][MED_COUNT] = {
   { "LEVEL 10", "LEVEL 25", "LEVEL 50", "7 DAY STREAK", "MAX BOND", "FINAL FORM", "IN SHAPE",
-    "GOT CURED", "SHINY FORM", "LEGENDARY", "STAMINA 50", "VITALITY 50",
+    "GOT CURED", "SHINY FORM", "LEGENDARY", "STRENGTH 50", "SPEED 50",
     "30DAY STREAK", "WON CHESS", "CHESS RECORD" },
   { "等级 10", "等级 25", "等级 50", "连续 7 天", "羁绊 MAX", "最终进化", "精神饱满",
-    "吃药治好病", "异色伙伴", "传说宝可梦", "体力练到 50", "活力练到 50",
+    "吃药治好病", "异色伙伴", "传说宝可梦", "力量练到 50", "速度练到 50",
     "连续 30 天", "陪伴时下棋赢了", "陪伴时棋艺新高" },
 };
 

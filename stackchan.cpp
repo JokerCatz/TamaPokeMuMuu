@@ -29,8 +29,8 @@ static const char *const TOOL_DESC[T_COUNT] = {
   "查宠物游戏的其他信息。kind：chess " OWNER_NAME " 在 chess.com 下棋赚积分的最近一次同步结果（每晚 12 点）、"
   "现在的积分和最好等级分；pokedex 宝可梦图鉴进度（共 1025 只，各地区、异色）；farm 农场里收藏的宝可梦。"
   "Chess points, Pokedex progress or the farm.",
-  "用积分在商店买东西放进背包。只能买：candy 糖果(2分)、medicine 药(3分)、strength_potion 体力药剂(5分，"
-  "喝了精力掉得慢)、speed_potion 活力药剂(5分，喝了心情掉得慢)；蛋、异色护符和进化药水要在板子上买。"
+  "用积分在商店买东西放进背包。只能买：candy 糖果(2分)、medicine 药(3分)、strength_potion 力量药剂(5分，"
+  "喝了精力掉得慢)、speed_potion 速度药剂(5分，喝了心情掉得慢)；蛋、异色护符和进化药水要在板子上买。"
   "Buy cheap items with points.",
 };
 static const char *const CARE_ID[8] = { "feed", "play", "bath", "pet", "sleep", "wake", "candy", "medicine" };
@@ -42,10 +42,10 @@ static const char *const BUY_ID[4] = { "candy", "medicine", "strength_potion", "
 static const uint8_t BUY_ITEM[4] = { ITEM_CANDY, ITEM_MEDICINE, ITEM_POTION_STR, ITEM_POTION_SPD };
 // un nombre por objeto, en el orden de ITEM_*: un hueco era un puntero nulo en el "%s" de la mochila
 // (la placa se reiniciaba en cuanto Stack-chan preguntaba con una megapiedra o una fruta en la mochila)
-static const char *const ITEM_ZH[] = { "糖果", "药", "体力药剂", "活力药剂", "异色护符",
+static const char *const ITEM_ZH[] = { "糖果", "药", "力量药剂", "速度药剂", "异色护符",
                                        "普通蛋", "稀有蛋", "传说蛋", "进化药水", "Mega石",
-                                       "体力果", "抵抗果", "活力果", "金果", "鱼", "珍珠", "Mega石碎片",
-                                       "水属性蛋", "化石蛋" };
+                                       "力量果", "耐力果", "速度果", "金果", "鱼", "珍珠", "Mega石碎片",
+                                       "水属性蛋", "化石蛋", "耐力药剂" };
 static_assert(sizeof(ITEM_ZH) / sizeof(ITEM_ZH[0]) == ITEM_COUNT, "falta el nombre de algun objeto");
 static const char *const NAT_ZH[NAT_COUNT] = { "乖巧", "贪吃", "爱玩", "爱干净", "懒洋洋" };
 static const char *const REGION_ZH[REGION_COUNT] = { "关都", "城都", "丰缘", "神奥", "合众",

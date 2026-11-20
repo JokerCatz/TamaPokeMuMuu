@@ -74,6 +74,7 @@ void drawItemIcon(int item, int x, int y) {
     case ITEM_MEDICINE:    drawMap(SPR_ICON_PILL, 16, x, y, 3, false); break;
     case ITEM_POTION_STR:  drawMap(SPR_ICON_POTION_STR, 16, x, y, 3, false); break;
     case ITEM_POTION_SPD:  drawMap(SPR_ICON_POTION_SPD, 16, x, y, 3, false); break;
+    case ITEM_POTION_END:  drawMap(SPR_ICON_POTION_END, 16, x, y, 3, false); break;
     case ITEM_SHINY_CHARM: drawMap(SPR_ICON_STAR, 16, x, y, 3, false); break;
     case ITEM_POTION_EVO: {  // frasco con un remolino de colores y un destello
       gfx->fillRoundRect(x + 18, y + 2, 12, 10, 3, C565(0x9a, 0x70, 0x50));
@@ -171,6 +172,7 @@ void useItem(int item) {
       break;
     case ITEM_POTION_STR:
     case ITEM_POTION_SPD:
+    case ITEM_POTION_END:
       if (pet.isEgg()) return;
       toast(pet.usePotion(item) ? T(S_USED) : T(S_MAXED));
       break;

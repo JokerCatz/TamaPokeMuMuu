@@ -99,7 +99,8 @@ static inline FunLoot questLoot(float u, float u2, uint8_t luck, uint8_t &acc) {
   acc = 0xFF;
   if (u < amuleto) l.add(ITEM_SHINY_CHARM, 1);
   else if (u < amuleto + 0.15f && quiere != 0xFF) acc = quiere;
-  else if (u < amuleto + 0.35f) l.add(u2 < 0.5f ? ITEM_POTION_STR : ITEM_POTION_SPD, 1);
+  else if (u < amuleto + 0.35f)  // una de las tres pociones (la de resistencia solo sale asi y en la hierba)
+    l.add(u2 < 1.0f / 3 ? ITEM_POTION_STR : u2 < 2.0f / 3 ? ITEM_POTION_SPD : ITEM_POTION_END, 1);
   else if (u < amuleto + 0.55f) l.add(ITEM_MEDICINE, 1);
   else l.add(ITEM_CANDY, 2);
   if (luck >= LUCK_PLAYED) l.add(ITEM_CANDY, 1);

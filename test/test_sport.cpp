@@ -59,6 +59,29 @@ TEST(sport, genes_entrenamiento_y_mega_suman) {
   CHECK(athleteRating(b, EV_SPRINT) > athleteRating(a, EV_SPRINT) * 1.1f);
 }
 
+// cada capacidad ayuda con lo suyo: fuerza al ataque, velocidad a la velocidad y resistencia a
+// PS y defensa, en lo que pesen en cada prueba; las tres a 100 son +12% en todas
+TEST(sport, cada_capacidad_ayuda_en_sus_pruebas) {
+  const Athlete a = normal(6);
+  Athlete fuerza = a, veloz = a, resiste = a, todo = a;
+  fuerza.trAtk = 100;
+  veloz.trSpe = 100;
+  resiste.trDef = 100;
+  todo.trAtk = todo.trSpe = todo.trDef = 100;
+  CHECK(athleteRating(fuerza, EV_LIFT) > athleteRating(a, EV_LIFT));
+  CHECK_EQ(athleteRating(fuerza, EV_SWIM), athleteRating(a, EV_SWIM));      // nadar: PS y velocidad
+  CHECK(athleteRating(veloz, EV_SPRINT) > athleteRating(a, EV_SPRINT));
+  CHECK_EQ(athleteRating(veloz, EV_LIFT), athleteRating(a, EV_LIFT));        // pesas: sin velocidad
+  CHECK(athleteRating(resiste, EV_TORCH) > athleteRating(a, EV_TORCH));
+  CHECK_EQ(athleteRating(resiste, EV_SPRINT), athleteRating(a, EV_SPRINT));  // 100 m: ni PS ni defensa
+  // en el 100 m pesa mas la velocidad (75%) que la fuerza (25%)
+  CHECK(athleteRating(veloz, EV_SPRINT) > athleteRating(fuerza, EV_SPRINT));
+  for (int ev = 0; ev < EV_COUNT; ev++) {
+    float r = athleteRating(todo, ev) / athleteRating(a, ev);
+    CHECK(r > 1.1199f && r < 1.1201f);
+  }
+}
+
 TEST(sport, marcas_razonables_y_mejores_cuanto_mas_fuerte) {  // en las 11 pruebas
   for (int ev = 0; ev < EV_COUNT; ev++) {
     float flojo = eventMark(ev, 50), medio = eventMark(ev, 100), fuerte = eventMark(ev, 150);

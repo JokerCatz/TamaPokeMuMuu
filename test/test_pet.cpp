@@ -496,6 +496,23 @@ TEST(potion, la_pocion_de_fuerza_sube_5_y_se_gasta) {
   CHECK_EQ(p.trAtk, (uint8_t)(2 * POTION_GAIN));
 }
 
+TEST(potion, la_de_resistencia_sube_la_resistencia) {  // no se vende: sale del ocio y de la hierba
+  Pet p;
+  makePet(p, 4);
+  CHECK_EQ(ITEM_PRICE[ITEM_POTION_END], (uint16_t)0);
+  CHECK(ITEM_POTION_END >= FUN_ITEM0);  // en la pagina de la cosecha de la mochila
+  p.bag[ITEM_POTION_END] = 1;
+  CHECK(p.usePotion(ITEM_POTION_END));
+  CHECK_EQ(p.trDef, (uint8_t)POTION_GAIN);
+  CHECK_EQ(p.trAtk, (uint8_t)0);
+  CHECK_EQ(p.trSpe, (uint8_t)0);
+  CHECK_EQ(p.bag[ITEM_POTION_END], (uint16_t)0);
+  p.trDef = 100;
+  p.bag[ITEM_POTION_END] = 1;
+  CHECK_MSG(!p.usePotion(ITEM_POTION_END), "al 100 no se gasta");
+  CHECK_EQ(p.bag[ITEM_POTION_END], (uint16_t)1);
+}
+
 TEST(potion, la_de_velocidad_sube_la_velocidad) {
   Pet p;
   makePet(p, 4);
@@ -1997,13 +2014,45 @@ TEST(grass, primero_el_del_mes_luego_la_semana_luego_el_dia) {
   CHECK(g.item == ITEM_EGG_LEGEND || g.item == ITEM_MEGA_STONE || g.item == ITEM_POTION_EVO);
   CHECK_EQ((int)p.grassReady(), (int)GRASS_WEEK);
   CHECK_EQ((int)p.collectGrass(g), (int)GRASS_WEEK);
-  CHECK(g.item == ITEM_EGG_RARE || g.item == ITEM_SHINY_CHARM || g.item == ITEM_POTION_STR);
+  CHECK(g.item == ITEM_EGG_RARE || g.item == ITEM_SHINY_CHARM || g.item == ITEM_POTION_END);
   CHECK_EQ((int)p.grassReady(), (int)GRASS_DAY);
   CHECK_EQ((int)p.collectGrass(g), (int)GRASS_DAY);
   CHECK(g.item == ITEM_CANDY || g.item == ITEM_MEDICINE || g.item == ITEM_POTION_STR ||
-        g.item == ITEM_POTION_SPD || g.item == ITEM_EGG_COMMON);
+        g.item == ITEM_POTION_SPD || g.item == ITEM_POTION_END || g.item == ITEM_EGG_COMMON);
   CHECK_EQ((int)p.grassReady(), (int)GRASS_NONE);  // hoy ya no hay mas
   CHECK_EQ((int)p.collectGrass(g), (int)GRASS_NONE);
+}
+
+// la pocion de resistencia no se vende: sale en la hierba (la del dia, y la de la semana con
+// otra pocion) y en las expediciones del ocio
+TEST(grass, la_pocion_de_resistencia_sale_en_la_hierba) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  GrassPrize g;
+  bool enDia = false, enSemana = false;
+  for (int d = 0; d < 400; d++, p.lastSeenEpoch += 86400) {
+    uint8_t t;
+    while ((t = p.collectGrass(g)) != GRASS_NONE) {
+      if (g.item != ITEM_POTION_END) continue;
+      if (t == GRASS_DAY) enDia = true;
+      if (t == GRASS_WEEK) {
+        enSemana = true;
+        CHECK(g.item2 == ITEM_POTION_STR || g.item2 == ITEM_POTION_SPD);
+      }
+    }
+  }
+  CHECK(enDia);
+  CHECK(enSemana);
+  uint8_t acc = 0xFF;
+  FunLoot l = questLoot(0.3f, 0.9f, LUCK_NONE, acc);
+  CHECK(l.n == 1 && l.item[0] == ITEM_POTION_END);
+  acc = 0xFF;
+  l = questLoot(0.3f, 0.1f, LUCK_NONE, acc);
+  CHECK(l.n == 1 && l.item[0] == ITEM_POTION_STR);
+  acc = 0xFF;
+  l = questLoot(0.3f, 0.5f, LUCK_NONE, acc);
+  CHECK(l.n == 1 && l.item[0] == ITEM_POTION_SPD);
 }
 
 TEST(grass, cada_dia_uno_cada_lunes_otro_y_cada_mes_otro) {
