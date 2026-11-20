@@ -710,6 +710,7 @@ SPRITES = {
     "ICON_PILL": icon_pill(),
     "ICON_POTION_STR": icon_potion('r', 'R'),
     "ICON_POTION_SPD": icon_potion('b', 'B'),
+    "ICON_POTION_END": icon_potion('g', 'G'),
     "GRASS_A": GRASS_A,
     "GRASS_B": GRASS_B,
     "ICON_FARM": ICON_FARM,

@@ -546,7 +546,7 @@ static const char* const SPR_ICON_POTION_SPD[16] = {  // 16x16
   "................",
 };
 
-static const char* const SPR_ICON_POTION_END[16] = {  // 16x16 (verde: resistencia)
+static const char* const SPR_ICON_POTION_END[16] = {  // 16x16
   "................",
   "................",
   "......kkkkk.....",
