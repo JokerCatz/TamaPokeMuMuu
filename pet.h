@@ -129,7 +129,8 @@ static inline uint8_t ptWeekday(uint32_t day) { return (uint8_t)((day + 3) % 7);
 //   resistencia (trDef, cuidandolo bien y su pocion, que no se vende): hasta un 60% menos de
 //   enfermar; PS y defensa
 // Las rebajas son de verdad en minutos: con 50, uno de cada cuatro no baja.
-#define RES_GROW_MIN 180   // resistencia: +1 por cada 3 h seguidas bien cuidado (despierto)
+#define RES_GROW_MIN 180   // resistencia: +1 por cada 3 h seguidas bien cuidado (despierto, o de
+                           // dia con la pantalla apagada)
 #define START_POINTS 10    // puntos al empezar
 // completar la pokedex de una region (todas sus especies criadas alguna vez):
 // puntos, corona en la pokedex y un huevo legendario shiny de esa region
@@ -549,7 +550,8 @@ private:
   uint32_t farDeclinedAge = 0;  // "quedaros juntos": no ofrecer despedida hasta esta edad
   bool starterPick = false;     // primera partida: esperando que el jugador elija inicial
   uint8_t neglectTicks = 0;
-  uint16_t goodTicks = 0;  // racha bien cuidado: forja la DEF
+  uint16_t goodTicks = 0;  // racha bien cuidado: forja la DEF (se guarda)
+  void forgeEndurance();   // un minuto mas de racha (o se rompe si algo baja de 40)
   uint32_t ceremonyUntil = 0;
   uint8_t bondToday = 0;       // tope diario de subida de vinculo
   uint32_t medalUntil = 0;     // celebracion de medalla en pantalla

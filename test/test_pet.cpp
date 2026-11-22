@@ -255,6 +255,61 @@ TEST(tick, buen_cuidado_3h_forja_resistencia) {
   CHECK_EQ(p.trDef, (uint8_t)1);
 }
 
+// issue #8: con la pantalla apagada (boton o apagado solo a los 5 min con bateria) se echa una
+// siesta, pero de dia la racha de buen cuidado sigue contando (antes se paraba)
+TEST(tick, la_resistencia_sigue_con_la_pantalla_apagada_de_dia) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = 1000u * 86400 + 15 * 3600;  // las 3 de la tarde
+  p.screenNap(true);
+  for (int m = 0; m < RES_GROW_MIN; m++) {
+    setStats(p, 100, 100, 100, 100);
+    advance(p, 1);
+  }
+  CHECK(p.sleeping);
+  CHECK_EQ(p.trDef, (uint8_t)1);
+}
+
+// dormir de verdad (luz apagada, o de noche) sigue siendo una pausa
+TEST(tick, dormido_de_verdad_la_resistencia_espera) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = 1000u * 86400 + 15 * 3600;
+  p.toggleLight();
+  for (int m = 0; m < RES_GROW_MIN; m++) {
+    setStats(p, 100, 100, 100, 100);
+    advance(p, 1);
+  }
+  CHECK_EQ(p.trDef, (uint8_t)0);
+  Pet q;
+  makePet(q, 4);
+  q.lastSeenEpoch = 1000u * 86400 + 2 * 3600;  // las 2 de la madrugada
+  q.screenNap(true);
+  for (int m = 0; m < RES_GROW_MIN; m++) {
+    setStats(q, 100, 100, 100, 100);
+    advance(q, 1);
+  }
+  CHECK_EQ(q.trDef, (uint8_t)0);
+}
+
+// la racha se guarda: un reinicio (corte, reflasheo) no la tira
+TEST(tick, la_racha_de_resistencia_sobrevive_a_un_reinicio) {
+  Pet p;
+  makePet(p, 4);
+  for (int m = 0; m < 120; m++) {  // 2 h (se guarda cada 5 min, cuando el loop vuelca)
+    setStats(p, 100, 100, 100, 100);
+    advance(p, 1);
+    p.flushSave();
+  }
+  Pet q;
+  q.begin();
+  for (int m = 0; m < RES_GROW_MIN - 120; m++) {  // la hora que falta
+    setStats(q, 100, 100, 100, 100);
+    advance(q, 1);
+  }
+  CHECK_EQ(q.trDef, (uint8_t)1);
+}
+
 // ---------------------------------------------------------------- niveles
 TEST(level, un_nivel_por_hora_de_juego) {
   Pet p;

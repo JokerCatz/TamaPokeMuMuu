@@ -253,7 +253,8 @@ laying it face down puts it to sleep, and a hard shake makes it dizzy.
   back any time; the album keeps the page, and you open a new egg.
 - **Abilities** (0-100, no battles): strength (strength potion) slows energy loss
   by up to 50%, speed (speed potion) slows joy loss by up to 50%, and
-  endurance grows by 1 for every 3 hours of good care and cuts the chance of
+  endurance grows by 1 for every 3 hours of good care (screen off counts in the
+  daytime; night sleep and lights off pause it) and cuts the chance of
   getting sick by up to 60%. The endurance potion isn't sold: it turns up in the
   grass on the main screen and on Fun treasure hunts, and waits on the harvest
   page of the bag. In the tournament and the gyms each one helps where

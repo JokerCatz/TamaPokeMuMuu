@@ -165,7 +165,9 @@ void Pet::tick() {
   // el sueño es descanso: la energia se recupera y las necesidades bajan MUCHO
   // mas lento que despierto y con suelo (amanece pidiendo algo de mimo, no a
   // cero, sin descuidos ni escapadas). despierto: comida -2/min, hig/joy -1/min.
-  // El peso aun se quema; la racha de buen cuidado (goodTicks) queda en pausa.
+  // El peso aun se quema. La racha de buen cuidado (goodTicks) queda en pausa, salvo en la
+  // siesta de pantalla apagada de dia (issue #8: con bateria la pantalla se apaga sola a los
+  // 5 min y la resistencia casi no subia); de noche o con la luz apagada es dormir de verdad.
   if (sleeping) {
     energy = clamp100(energy + (nature == NAT_LAZY ? 8 : 6));  // al perezoso le sienta mejor
     if (weight > 0 && ageMinutes % 3 == 0) weight--;
@@ -174,6 +176,7 @@ void Pet::tick() {
       joy = dropTo(joy, 1, 35);
     }
     if (ageMinutes % 3 == 0) hygiene = dropTo(hygiene, 1, 45);
+    if (napping && !(lastSeenEpoch && isNightMinute((int)((lastSeenEpoch / 60) % 1440)))) forgeEndurance();
     checkMedals();  // aun puede cruzar un nivel por edad mientras duerme
     if (++ticksSinceSave >= 5) pendingSave = true;
     return;
@@ -191,15 +194,7 @@ void Pet::tick() {
   if (weight > 50) energy = clamp100(energy - 1);
   if (weight > 0 && ageMinutes % 3 == 0) weight--;
 
-  // la disciplina forja la resistencia: 3 h seguidas bien cuidado = +1
-  if (lowestStat() >= 40) {
-    if (++goodTicks >= RES_GROW_MIN) {
-      goodTicks = 0;
-      if (trDef < 100) trDef++;
-    }
-  } else {
-    goodTicks = 0;
-  }
+  forgeEndurance();
 
   // enfermedad: el mal cuidado da una probabilidad por mil y por minuto de
   // ponerse malo. Enfermo, la comida y el animo caen mas rapido y cada 2 h sin
@@ -1266,6 +1261,18 @@ void Pet::screenNap(bool screenOff) {
   }
 }
 
+// la disciplina forja la resistencia: 3 h seguidas bien cuidado = +1
+void Pet::forgeEndurance() {
+  if (lowestStat() >= 40) {
+    if (++goodTicks >= RES_GROW_MIN) {
+      goodTicks = 0;
+      if (trDef < 100) trDef++;
+    }
+  } else {
+    goodTicks = 0;
+  }
+}
+
 void Pet::toggleLight() {
   if (ceremony != CER_NONE) return;
   if (isEgg()) return;
@@ -1444,6 +1451,7 @@ void Pet::save() {
   prefs.putUChar("accw", accWorn);
   prefs.putBool("asl", autoSlept);
   prefs.putBool("nap", napping);  // si no, tras un reinicio no despertaria al encender
+  prefs.putUShort("gtk", goodTicks);  // la racha de la resistencia: un reinicio no la tira
   prefs.putUInt("hday", harvestDay);
   prefs.putUChar("evoc", evoCount);
   prefs.putBool("evob", evoBoost);
@@ -1533,6 +1541,7 @@ void Pet::load() {
   accWorn = prefs.getUChar("accw", 0);
   autoSlept = prefs.getBool("asl", false);
   napping = prefs.getBool("nap", false);
+  goodTicks = prefs.getUShort("gtk", 0);
   harvestDay = prefs.getUInt("hday", 0);
   evoCount = prefs.getUChar("evoc", 0);
   evoBoost = prefs.getBool("evob", false);
