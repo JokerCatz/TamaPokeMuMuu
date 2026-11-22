@@ -274,6 +274,45 @@ bool mailSyncDue(bool usb) {
 
 // ---------- la red ----------
 
+// El cuerpo de la respuesta, leido a mano. HTTPClient::getString() espera los datos dando vueltas
+// sin soltar la CPU (delay(0)): en la tarea de red (CPU 0) el perro guardian salta a los 5 s y
+// reinicia la placa, y al encenderla vuelta a empezar. Aqui se espera de verdad, como mucho
+// MAIL_BODY_MS; si no llega entero se quedan solo las lineas completas (lo demas, la proxima vez).
+#define MAIL_BODY_MS 8000
+#define MAIL_BODY_MAX 16384
+static void leerCuerpo(HTTPClient &h, String &out) {
+  out = "";
+  int len = h.getSize();  // -1: sin Content-Length, hasta que cierren (HTTP/1.0: nunca troceado)
+  WiFiClient *st = h.getStreamPtr();
+  if (!st || len > MAIL_BODY_MAX) return;
+  if (len > 0) out.reserve(len);
+  uint8_t buf[256];
+  uint32_t t0 = millis();
+  while (len != 0 && millis() - t0 < MAIL_BODY_MS && out.length() <= MAIL_BODY_MAX) {
+    int n = st->available();
+    if (n <= 0) {
+      if (!st->connected()) break;  // ya no llega nada mas
+      delay(10);
+      continue;
+    }
+    if (n > (int)sizeof(buf)) n = sizeof(buf);
+    if (len > 0 && n > len) n = len;
+    n = st->read(buf, n);
+    if (n <= 0) {
+      delay(1);
+      continue;
+    }
+    out.concat((const char *)buf, n);
+    if (len > 0) len -= n;
+  }
+  bool entero = len == 0 || (len < 0 && !st->connected());
+  Serial.printf("correo: %u B en %lu ms%s\n", out.length(), (unsigned long)(millis() - t0), entero ? "" : " (incompleto)");
+  if (!entero) {
+    int k = out.lastIndexOf('\n');
+    out = k >= 0 ? out.substring(0, k + 1) : String();
+  }
+}
+
 static int http(bool post, const String &url, const char *auth, const String &body, String *resp) {
   bool tls = url.startsWith("https://");
   WiFiClientSecure sc;
@@ -282,6 +321,7 @@ static int http(bool post, const String &url, const char *auth, const String &bo
   HTTPClient h;
   h.setTimeout(8000);
   h.setUserAgent("TamaPoke/2026.11 (+https://github.com/Mu-Muu/TamaPoke)");
+  if (resp) h.useHTTP10(true);  // la respuesta se lee a mano (leerCuerpo): entera, sin trozos
   if (!h.begin(tls ? (WiFiClient &)sc : pc, url)) return -1;
   if (auth && *auth) h.addHeader("X-Key", auth);
   int code;
@@ -291,10 +331,7 @@ static int http(bool post, const String &url, const char *auth, const String &bo
   } else {
     code = h.GET();
   }
-  if (resp && code == 200) {
-    int len = h.getSize();
-    if (len < 0 || len <= 16384) *resp = h.getString();
-  }
+  if (resp && code == 200) leerCuerpo(h, *resp);
   h.end();
   return code;
 }
