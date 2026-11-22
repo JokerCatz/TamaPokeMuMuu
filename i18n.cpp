@@ -162,6 +162,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "END POTION",
     "HIGH", "MEDIUM", "LOW",
     "%uh %umin to Lv.%u",
+    "Set up WI-FI first",
   },
   // ---------------- ZH ----------------
   // Chino simplificado. Los especificadores van en el orden de la fila
@@ -360,6 +361,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "耐力药剂",
     "大声", "中等", "小声",
     "%u小时%u分钟后 Lv.%u",
+    "先设置 Wi-Fi",
   },
 };
 
