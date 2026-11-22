@@ -94,7 +94,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "In the grass: ",
     "Phone steps code",
     "WEIGHTS", "CLIMBING", "DIVING", "SKATING",
-    "TORCH RUN", "TRAIL RUN", "Power counts", "Power and agility",
+    "TORCH RUN", "TRAIL RUN", "Power counts", "Power and speed",
     "Technique counts", "Speed counts", "Stamina counts", "A bit of everything",
     "Bonus: Fighting, Steel, Rock", "Bonus: Rock, Ground, Bug", "Bonus: Water, Psychic, Flying", "Bonus: Ice, Fairy",
     "Bonus: Fire, Dragon", "Bonus: Dark, Ghost, Poison", "%u kg", "%u.%u pts",
@@ -160,6 +160,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "Can't evolve while asleep", "Its next form is in the farm",
     "City updated", "City not found",
     "END POTION",
+    "HIGH", "MEDIUM", "LOW",
   },
   // ---------------- ZH ----------------
   // Chino simplificado. Los especificadores van en el orden de la fila
@@ -290,7 +291,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "草丛里有：",
     "手机步数配对码",
     "举重", "攀岩", "跳水", "速度滑冰",
-    "火炬长跑", "越野障碍", "比力量", "比力量和敏捷",
+    "火炬长跑", "越野障碍", "比力量", "比力量和速度",
     "比技巧", "比速度", "比耐力", "什么都比一点",
     "格斗、钢、岩石属性有加成", "岩石、地面、虫属性有加成", "水、超能力、飞行属性有加成", "冰、妖精属性有加成",
     "火、龙属性有加成", "恶、幽灵、毒属性有加成", "%u 公斤", "%u.%u 分",
@@ -356,6 +357,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "睡着时不能进化", "进化形态在农场里",
     "城市已更新", "没查到这个城市",
     "耐力药剂",
+    "大声", "中等", "小声",
   },
 };
 

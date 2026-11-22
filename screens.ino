@@ -95,7 +95,7 @@ static void setButton(int x, int y, const char *l, bool on, bool apagado, int ts
   setCur(x + (SET_BTN_W - textW(l, ts)) / 2, y0);
   printT(l);
   if (sub) {
-    gfx->setTextColor(apagado ? UI_HINT : UI_INK);
+    gfx->setTextColor(on ? UI_BG_DAY : apagado ? UI_HINT : UI_INK);
     setSize(2);
     setCur(x + (SET_BTN_W - textW(sub, 2)) / 2, y0 + 7 * ts + 4);
     printT(sub);
@@ -152,7 +152,9 @@ void renderClock() {
     if (textW(l, 3) > SET_BTN_W - 16) ts = 2;
   for (StrId id : bl)
     if (textW(T(id), 3) > STATS_BTN_W - 14) ts = 2;
-  setButton(SET_BTN_X0, SET_BTN_Y0, snd, audioEnabled(), false, ts);
+  static const StrId VOL_TXT[VOL_LEVELS] = { S_VOL_HIGH, S_VOL_MED, S_VOL_LOW };  // debajo, el volumen
+  setButton(SET_BTN_X0, SET_BTN_Y0, snd, audioEnabled(), false, ts,
+            audioEnabled() ? T(VOL_TXT[audioVolume() % VOL_LEVELS]) : nullptr);
   setButton(SET_BTN_X1, SET_BTN_Y0, T(S_WIFI_SETUP), wifiHasCreds(), false, ts);
   setButton(SET_BTN_X0, SET_BTN_Y1, lp, false, false, ts);
   setButton(SET_BTN_X1, SET_BTN_Y1, T(S_BACKUP), false, !sdReady, ts, hayCopia ? fecha : nullptr);
@@ -343,8 +345,10 @@ void clockTap(int16_t x, int16_t y) {
   }
   bool row0 = y >= SET_BTN_Y0 && y < SET_BTN_Y0 + SET_BTN_H, row1 = y >= SET_BTN_Y1 && y < SET_BTN_Y1 + SET_BTN_H;
   if (row0 && col0) {  // sonido
-    audioSetEnabled(!audioEnabled());
-    if (audioEnabled()) sfxPlay(SFX_TAP);  // confirma al encender
+    uint8_t n = volCycle(audioEnabled() ? audioVolume() : VOL_LEVELS);  // alto, medio, bajo, apagado
+    if (n < VOL_LEVELS) audioSetVolume(n);
+    if (audioEnabled() != (n < VOL_LEVELS)) audioSetEnabled(n < VOL_LEVELS);
+    if (audioEnabled()) sfxPlay(SFX_TAP);  // se oye el nivel nuevo
   } else if (row0 && col1) {  // configurar wi-fi
     clockOpen = false;
     if (linkActive()) linkStop();  // la radio no puede estar en las dos cosas

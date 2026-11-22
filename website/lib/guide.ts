@@ -367,7 +367,7 @@ export const GUIDE: Chapter[] = [
           [t("Long jump", "跳远"), t("Power and speed", "力量和速度"), t("Fighting, Flying +15% (Rock, Steel -10%)", "格斗、飞行 +15%（岩石、钢 -10%）")],
           [t("High jump", "跳高"), t("Power", "力量"), t("Flying +25%, Psychic +15% (Rock, Steel -15%)", "飞行 +25%、超能力 +15%（岩石、钢 -15%）")],
           [t("Weights", "举重"), t("Power and steadiness", "力量和稳定"), t("Fighting +20%, Steel, Rock +15% (Flying, Fairy, Bug -10%)", "格斗 +20%、钢、岩石 +15%（飞行、妖精、虫 -10%）")],
-          [t("Climbing", "攀岩"), t("Power and agility", "力量和敏捷"), t("Rock +20%, Ground +15%, Bug +10% (Water, Steel -10%)", "岩石 +20%、地面 +15%、虫 +10%（水、钢 -10%）")],
+          [t("Climbing", "攀岩"), t("Power and speed", "力量和速度"), t("Rock +20%, Ground +15%, Bug +10% (Water, Steel -10%)", "岩石 +20%、地面 +15%、虫 +10%（水、钢 -10%）")],
           [t("Diving", "跳水"), t("Technique", "技巧"), t("Water +20%, Psychic, Flying, Fairy +10% (Fire, Rock -15%)", "水 +20%、超能力、飞行、妖精 +10%（火、岩石 -15%）")],
           [t("Skating", "速度滑冰"), t("Speed", "速度"), t("Ice +25%, Fairy +10% (Fire -15%)", "冰 +25%、妖精 +10%（火 -15%）")],
           [t("Torch run", "火炬长跑"), t("Stamina", "耐力"), t("Fire +25%, Dragon +10% (Water, Ice -10%)", "火 +25%、龙 +10%（水、冰 -10%）")],

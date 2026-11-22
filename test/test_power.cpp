@@ -1,6 +1,7 @@
 // Politica de consumo (power.h).
 #include "framework.h"
 #include "../power.h"
+#include "../audio.h"
 
 static PowerCtx ctx(uint32_t idle) {
   PowerCtx c = {};
@@ -261,4 +262,21 @@ TEST(power, con_bateria_y_5_min_sin_tocarla_se_apaga_sola_como_con_pwr) {
   c.screenOff = true;
   CHECK(!autoScreenOff(c, 60000));             // ya apagada
   CHECK(!touchWakes(c));                       // y apagada asi tampoco la enciende un toque: solo el boton
+}
+
+// issue #9: volumen en tres niveles. El alto es el de siempre; los otros bajan
+TEST(power, los_niveles_de_volumen_bajan_y_el_alto_es_el_de_siempre) {
+  CHECK_EQ((int)sfxAmp(0), 5000);
+  CHECK(sfxAmp(1) < sfxAmp(0));
+  CHECK(sfxAmp(2) < sfxAmp(1));
+  CHECK(sfxAmp(2) > 0);
+  CHECK_EQ((int)sfxAmp(7), (int)sfxAmp(2));  // un valor raro guardado no sube el volumen
+}
+
+// el boton de sonido cicla alto, medio, bajo y apagado (VOL_LEVELS = apagado)
+TEST(power, el_boton_de_sonido_cicla_alto_medio_bajo_apagado) {
+  CHECK_EQ((int)volCycle(0), 1);
+  CHECK_EQ((int)volCycle(1), 2);
+  CHECK_EQ((int)volCycle(2), VOL_LEVELS);
+  CHECK_EQ((int)volCycle(VOL_LEVELS), 0);  // de apagado, al alto
 }

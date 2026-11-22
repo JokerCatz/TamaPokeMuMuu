@@ -194,7 +194,7 @@ From the main screen:
 | swipe **right** | Pokédex: one cover per region, swipe on to the next region, tap a cover to open its grid (up/down for pages, tap a Pokémon for details) |
 | swipe **left** | activities: the farm (album button at the bottom), the tournament, the gyms and fun |
 | swipe **up** | the pet's card: profile, abilities, medals (swipe left/right for pages) |
-| swipe **down** | settings: clock, temperature unit (°C/°F), sound, Wi-Fi, language, backup (save one now or restore it), stats, screen brightness (three levels), sync chess now |
+| swipe **down** | settings: clock, temperature unit (°C/°F), sound (high, medium, low or off), Wi-Fi, language, backup (save one now or restore it), stats, screen brightness (three levels), sync chess now |
 | tap the **points** at the top | shop (items, eggs, accessories) |
 | **long press** the pet | send it to the farm, or release it |
 
@@ -363,7 +363,7 @@ event has a bit of luck, so the strongest doesn't always win.
 | Long jump | power and speed | Fighting, Flying +15% (Rock, Steel -10%) | run-up, board and sand pit |
 | High jump | power | Flying +25%, Psychic +15% (Rock, Steel -15%) | bar and mat |
 | Weights | power and steadiness | Fighting +20%, Steel, Rock +15% (Flying, Fairy, Bug -10%) | stage with spotlights |
-| Climbing | power and agility | Rock +20%, Ground +15%, Bug +10% (Water, Steel -10%) | climbing wall |
+| Climbing | power and speed | Rock +20%, Ground +15%, Bug +10% (Water, Steel -10%) | climbing wall |
 | Diving | technique | Water +20%, Psychic, Flying, Fairy +10% (Fire, Rock -15%) | platform and pool |
 | Skating | speed | Ice +25%, Fairy +10% (Fire -15%) | ice rink |
 | Torch run | stamina | Fire +25%, Dragon +10% (Water, Ice -10%) | city road |
