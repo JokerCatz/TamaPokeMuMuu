@@ -76,7 +76,7 @@ export const GUIDE: Chapter[] = [
         ],
       },
       { k: "warn", t: t("The card must be **FAT32**. If the board can't read it, it carries on without the card and leaves it untouched: format it as FAT32 on a computer and copy the files again.", "卡要是 **FAT32** 格式。板子读不了这张卡时，会不用卡继续运行，也不会动卡里的东西。请在电脑上把它格式化成 FAT32，再重新放入文件。") },
-      { k: "tip", t: t("Updating later is the same click in the web installer, and it keeps your game: only the program is replaced.", "以后更新也是在网页安装器里点一下，游戏进度会保留，只替换程序。") },
+      { k: "tip", t: t("Updating later is the same click in the web installer, and it keeps your game: only the program is replaced. Leave **Erase device** unticked.", "以后更新也是在网页安装器里点一下，游戏进度会保留，只替换程序。别勾选 **Erase device**（擦除设备）。") },
     ],
   },
   {

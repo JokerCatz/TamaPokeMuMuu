@@ -1054,6 +1054,7 @@ void Pet::chessMedals(uint16_t wins, bool record) {
 
 uint8_t Pet::chessLuck() const {
   uint16_t hoy = dayNow();
+  if (!hoy) return LUCK_NONE;  // sin reloj: 0 es tambien "nunca jugo", y salia "gano hoy"
   return chessWinDay == hoy ? LUCK_WON : chessDay == hoy ? LUCK_PLAYED : LUCK_NONE;
 }
 
@@ -1160,8 +1161,9 @@ bool Pet::hatchEgg(uint8_t kind) {
 void Pet::ptRoll() {
   uint16_t w = ptWeekOf(today());
   // la misma semana, o la anterior: la hora volvio atras un poco al cambiar de semana (NTP); sin esto
-  // se vaciaba el libro de la semana en curso
-  if (ptNow.week == w || w + 1 == ptNow.week) return;
+  // se vaciaba el libro de la semana en curso. Sin reloj (w 0: arranque sin hora valida hasta el NTP),
+  // tampoco: no se sabe en que semana estamos
+  if (w == 0 || ptNow.week == w || w + 1 == ptNow.week) return;
   bool hubo = false;
   for (int k = 0; k < PT_KINDS; k++) hubo |= ptNow.cat[k] != 0;
   if (ptNow.week && ptNow.week + 1 == w && hubo) {  // la semana pasada: para el resumen

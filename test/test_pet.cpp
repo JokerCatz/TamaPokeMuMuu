@@ -2592,6 +2592,28 @@ TEST(points, la_hora_que_vuelve_a_la_semana_anterior_no_vacia_el_libro) {
   CHECK_MSG(p.ptNow.cat[PT_CHESS] == 9, "una semana atras no vacia lo de esta semana");
 }
 
+TEST(points, sin_reloj_no_vacia_el_libro) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = SAB * 86400 + 43200;
+  p.earn(9, PT_CHESS);
+  uint16_t semana = p.ptNow.week;
+  p.lastSeenEpoch = 0;  // arranque sin hora valida (RTC sin pila) hasta que llega la del NTP
+  p.earn(2, PT_STEPS);
+  CHECK_EQ((int)p.ptNow.week, (int)semana);
+  CHECK_MSG(p.ptNow.cat[PT_CHESS] == 9, "sin reloj no se vacia el libro de la semana");
+  CHECK_MSG(p.ptLast.week != 65535, "ni se apunta una semana anterior imposible");
+}
+
+TEST(points, sin_reloj_no_hay_suerte_de_ajedrez) {
+  Pet p;
+  makePet(p, 4);  // nunca jugo: chessDay y chessWinDay son 0, como "hoy" sin reloj
+  p.lastSeenEpoch = 0;
+  CHECK_EQ((int)p.chessLuck(), (int)LUCK_NONE);
+  p.lastSeenEpoch = SAB * 86400;
+  CHECK_EQ((int)p.chessLuck(), (int)LUCK_NONE);
+}
+
 // ---------------------------------------------------------------- album
 TEST(memoir, cada_final_deja_una_pagina) {
   Pet p;
