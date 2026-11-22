@@ -296,9 +296,12 @@ void handleSerial() {
     Serial.flush();
     const uint8_t *b = (const uint8_t *)fb;
     size_t n = (size_t)LCD_WIDTH * LCD_HEIGHT * 2;
+    uint32_t avance = millis();
     for (size_t i = 0; i < n;) {
       size_t w = Serial.write(b + i, n - i < 512 ? n - i : 512);
-      if (!w) delay(2);  // bufer lleno: se reintenta el mismo trozo
+      if (w) avance = millis();
+      else if (millis() - avance > 3000) break;  // el PC dejo de leer (se desconecto): no colgar el juego
+      else delay(2);  // bufer lleno: se reintenta el mismo trozo
       i += w;
     }
     Serial.flush();
@@ -652,8 +655,9 @@ void consoleMail(String a) {
     int sp = a.indexOf(' '), sp2 = sp > 0 ? a.indexOf(' ', sp + 1) : -1;
     int fi = sp > 0 ? a.substring(sp + 1).toInt() : 0;
     int arg = sp2 > 0 ? a.substring(sp2 + 1).toInt() : 0;
+    if (arg < 0) arg = 0;  // negativo: m.item fuera de la mochila
     linkFriendsLoad();
-    if (fi >= linkFriendCount() || !mailFriendReady(linkFriendAt(fi).pid)) {
+    if (fi < 0 || fi >= linkFriendCount() || !mailFriendReady(linkFriendAt(fi).pid)) {
       Serial.println("correo: ese amigo no esta o aun no se sabe su buzon");
     } else {
       MailMsg m;

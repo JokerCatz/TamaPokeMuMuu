@@ -202,8 +202,8 @@ static void comprar(Pet &pet, uint8_t item, uint8_t count, char *out, size_t cap
              ok * ITEM_PRICE[item], ok < count ? "（积分只够买这么多）" : "", (long)pet.points, bolsa);
 }
 
-void stackchanTool(Pet &pet, uint8_t tool, uint8_t a, uint8_t b, const StackchanCtx &ctx, char *out,
-                   size_t cap) {
+static void herramienta(Pet &pet, uint8_t tool, uint8_t a, uint8_t b, const StackchanCtx &ctx, char *out,
+                        size_t cap) {
   // las que no dependen del compañero
   if (tool == MCP_CHESS) { ajedrez(pet, out, cap); return; }
   if (tool == MCP_POKEDEX) { pokedex(pet, out, cap); return; }
@@ -268,7 +268,24 @@ void stackchanTool(Pet &pet, uint8_t tool, uint8_t a, uint8_t b, const Stackchan
       break;
     default: break;  // MCP_STATUS: solo el estado
   }
-  char st[400];
-  resumen(pet, ctx.name, st, sizeof(st));
-  snprintf(out, cap, "%s%s", msg, st);
+  // el estado detras, directo en out (antes pasaba por 400 bytes y con la mochila llena se cortaba)
+  int n = snprintf(out, cap, "%s", msg);
+  if (n >= 0 && (size_t)n < cap) resumen(pet, ctx.name, out + n, cap - n);
+}
+
+// snprintf corta por bytes: si el final quedo a mitad de un caracter, se quita ese trozo (no seria
+// UTF-8 valido, y el texto va a xiaozhi por un WebSocket de texto)
+static void utf8Cut(char *s) {
+  size_t n = strlen(s), i = n;
+  while (i > 0 && ((uint8_t)s[i - 1] & 0xC0) == 0x80) i--;  // bytes de continuacion del final
+  if (i == 0) return;
+  uint8_t c = (uint8_t)s[i - 1];
+  size_t need = c >= 0xF0 ? 4 : c >= 0xE0 ? 3 : c >= 0xC0 ? 2 : 1;
+  if (n - (i - 1) < need) s[i - 1] = 0;
+}
+
+void stackchanTool(Pet &pet, uint8_t tool, uint8_t a, uint8_t b, const StackchanCtx &ctx, char *out,
+                   size_t cap) {
+  herramienta(pet, tool, a, b, ctx, out, cap);
+  utf8Cut(out);
 }

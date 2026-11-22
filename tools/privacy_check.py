@@ -127,11 +127,20 @@ def report(bad, what):
     return 0
 
 
+USO = 'uso: privacy_check.py [--tree REV | --commits REV | --hook [REMOTO URL]]'
+
+
 def main(argv):
+    # argumentos exactos: un error (p. ej. --tree sin REV) no puede acabar en un "limpio" de otra cosa
+    ok = (not argv or (argv[0] in ('--tree', '--commits') and len(argv) == 2)
+          or (argv[0] == '--hook' and len(argv) <= 3))
+    if not ok:
+        print(f'privacy_check: argumentos no validos: {" ".join(argv)}\n{USO}', file=sys.stderr)
+        return 2
     words = terms()
-    if len(argv) >= 2 and argv[0] == '--tree':
+    if argv and argv[0] == '--tree':
         return report(scan_blobs(tree_entries(argv[1]), words, argv[1]), f'arbol {argv[1]}')
-    if len(argv) >= 2 and argv[0] == '--commits':
+    if argv and argv[0] == '--commits':
         return report(scan_commits(argv[1], words), f'commits nuevos de {argv[1]}')
     if argv and argv[0] == '--hook':
         remote_url = argv[2] if len(argv) > 2 else ''

@@ -154,7 +154,9 @@ const uint8_t *SdThumbs::get(int16_t dex) const {
 
 bool sdBegin() {
   SD_MMC.setPins(SDMMC_CLK, SDMMC_CMD, SDMMC_DATA);
-  sdReady = SD_MMC.begin("/sdcard", true /* modo 1-bit */, true /* formatea si no monta */);
+  // nunca se formatea: un fallo pasajero al montar (un contacto) borraba la copia, la granja y el album.
+  // Si no monta, se sigue sin tarjeta y se formatea a FAT32 en el ordenador
+  sdReady = SD_MMC.begin("/sdcard", true /* modo 1-bit */, false /* no formatea si no monta */);
   if (sdReady) {
     Serial.printf("SD montada: %llu MB\n", SD_MMC.cardSize() / (1024ULL * 1024ULL));
     SD_MMC.mkdir("/mons");

@@ -149,6 +149,7 @@ static uint32_t screenKey() {
   } else if (clockOpen) {
     h = mixKey(h, pet.lastSeenEpoch / 60);  // la hora que se enseña
     h = mixKey(h, audioEnabled());
+    h = mixKey(h, audioVolume());  // alto/medio/bajo: sin esto el boton no cambiaba hasta el minuto siguiente
     h = mixKey(h, userDim);
     h = mixKey(h, tempF);
     h = mixKey(h, gLang);

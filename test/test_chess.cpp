@@ -113,6 +113,34 @@ TEST(chess, no_cuenta_dos_veces_la_misma_partida) {
   CHECK_EQ(st.watermark, (uint32_t)6000);  // sin partidas nuevas no retrocede
 }
 
+TEST(chess, un_mes_pasado_ya_bajado_avanza_la_marca_aunque_no_haya_partidas) {
+  ChessState st = deYo();
+  st.watermark = 1000;  // la ultima partida, hace mucho: sin esto se bajaban siempre los mismos 3 meses
+  chessArchiveDone(st, 2026, 7, 2026, 11);
+  CHECK_EQ(st.watermark, (uint32_t)1785542399);  // 2026-07-31 23:59:59 UTC
+  chessArchiveDone(st, 2026, 12, 2027, 1);       // diciembre: el mes siguiente es enero del otro año
+  CHECK_EQ(st.watermark, (uint32_t)1798761599);  // 2026-12-31 23:59:59 UTC
+}
+
+TEST(chess, el_mes_actual_no_mueve_la_marca) {
+  ChessState st = deYo();
+  st.watermark = 1000;
+  chessArchiveDone(st, 2026, 11, 2026, 11);  // aun puede traer partidas
+  CHECK_EQ(st.watermark, (uint32_t)1000);
+  chessArchiveDone(st, 2027, 1, 2026, 11);  // reloj raro: un mes "futuro"
+  CHECK_EQ(st.watermark, (uint32_t)1000);
+}
+
+TEST(chess, cerrar_un_mes_nunca_retrocede_la_marca) {
+  ChessState st = deYo();
+  st.watermark = 1798761599;  // ya en enero de 2027
+  chessArchiveDone(st, 2024, 2, 2027, 1);  // febrero bisiesto de 2024, muy atras
+  CHECK_EQ(st.watermark, (uint32_t)1798761599);
+  st.watermark = 0;
+  chessArchiveDone(st, 2024, 2, 2027, 1);
+  CHECK_EQ(st.watermark, (uint32_t)1709251199);  // 2024-02-29 23:59:59 UTC
+}
+
 TEST(chess, solo_cuenta_lo_posterior_a_la_marca) {
   JsonDocument doc;
   cargar(doc, ARCHIVO);

@@ -6,7 +6,8 @@
 # config_private.h (nombre, usuario de chess.com, ubicacion: sale con los
 # valores neutros de config.h) ni cambios sin confirmar.
 # Uso: bash tools/build_web.sh
-set -e
+# pipefail: si falla arduino-cli (con su salida filtrada por grep), que pare aqui y no siga
+set -eo pipefail
 cd "$(dirname "$0")/.."
 ROOT=$PWD
 FQBN="esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PSRAM=opi,PartitionScheme=app3M_fat9M_16MB"
@@ -15,7 +16,8 @@ trap 'git -C "$ROOT" worktree remove --force "$TMP/TamaPoke" >/dev/null 2>&1; rm
 
 git worktree add --detach "$TMP/TamaPoke" HEAD >/dev/null
 REV=$(git rev-parse --short HEAD)
-VER=$(sed -n 's/^#define FW_VERSION "\(.*\)"/\1/p' TamaPoke.ino)
+# la version del codigo que se compila (HEAD), no la del directorio de trabajo, que puede llevar cambios
+VER=$(sed -n 's/^#define FW_VERSION "\(.*\)"/\1/p' "$TMP/TamaPoke/TamaPoke.ino")
 echo "Compilando $REV (v$VER) sin ajustes personales..."
 # rutas sin el nombre de usuario: __FILE__ de asserts y bibliotecas acaban en el firmware
 MAP="-ffile-prefix-map=$HOME=/home/builder -ffile-prefix-map=/$HOME=/home/builder -ffile-prefix-map=$TMP=/src"

@@ -37,6 +37,20 @@ static size_t readValue(nvs_handle_t h, const char *key, nvs_type_t t, uint8_t *
   }
 }
 
+// lo leido de la copia cuadra con su tipo (cada numero, su tamaño; un texto, con su 0 final): si no,
+// el fichero esta roto y no se restaura nada
+static bool valueOk(uint8_t t, const uint8_t *b, size_t n) {
+  switch (t) {
+    case NVS_TYPE_U8: case NVS_TYPE_I8: return n == 1;
+    case NVS_TYPE_U16: case NVS_TYPE_I16: return n == 2;
+    case NVS_TYPE_U32: case NVS_TYPE_I32: return n == 4;
+    case NVS_TYPE_U64: case NVS_TYPE_I64: return n == 8;
+    case NVS_TYPE_STR: return n >= 1 && b[n - 1] == 0;
+    case NVS_TYPE_BLOB: return true;
+    default: return false;
+  }
+}
+
 static esp_err_t writeValue(nvs_handle_t h, const char *key, nvs_type_t t, const uint8_t *b, size_t n) {
   switch (t) {
     case NVS_TYPE_U8: return nvs_set_u8(h, key, *(const uint8_t *)b);
@@ -179,7 +193,8 @@ bool backupRestore() {
     uint8_t kl;
     ok = get(f, &e.ns, 1) && get(f, &e.type, 1) && get(f, &kl, 1) && kl < sizeof(e.key) && e.ns < NS_COUNT &&
          get(f, e.key, kl) && get(f, &e.len, 2) && e.len <= sizeof(buf) && used + e.len <= DATA_CAP &&
-         get(f, data + used, e.len);
+         get(f, data + used, e.len) && valueOk(e.type, data + used, e.len);
+    if (!ok) break;  // kl puede no valer (sin leer, o >= 16): e.key[kl] escribiria fuera
     e.key[kl] = 0;
     e.off = used;
     used += e.len;

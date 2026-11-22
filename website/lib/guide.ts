@@ -75,7 +75,7 @@ export const GUIDE: Chapter[] = [
           { t: t("Download the SD files", "下载 SD 卡文件"), href: "https://github.com/Mu-Muu/TamaPoke/releases/latest" },
         ],
       },
-      { k: "warn", t: t("If the board can't read the card, it **formats** it. Back up anything on the card first.", "如果板子读不了这张卡，会直接把它**格式化**。卡里有东西的话先备份。") },
+      { k: "warn", t: t("The card must be **FAT32**. If the board can't read it, it carries on without the card and leaves it untouched: format it as FAT32 on a computer and copy the files again.", "卡要是 **FAT32** 格式。板子读不了这张卡时，会不用卡继续运行，也不会动卡里的东西。请在电脑上把它格式化成 FAT32，再重新放入文件。") },
       { k: "tip", t: t("Updating later is the same click in the web installer, and it keeps your game: only the program is replaced.", "以后更新也是在网页安装器里点一下，游戏进度会保留，只替换程序。") },
     ],
   },
@@ -610,7 +610,7 @@ export const GUIDE: Chapter[] = [
           },
           {
             q: t("Will an update erase my game?", "更新固件会丢进度吗？"),
-            a: t("No. The web installer only replaces the program. The backup on the SD card is a second copy: tap **BACKUP** and **SAVE NOW** in settings before updating if you want it fresh, and **RESTORE** brings it back.", "不会。网页安装器只替换程序。SD 卡上的备份是第二份保险：想要最新的，更新前在设置里点**备份** → **立即备份**；需要时点**恢复备份**就能找回来。"),
+            a: t("No. The web installer only replaces the program, as long as you leave **Erase device** unticked: ticking it wipes the game. The backup on the SD card is a second copy: tap **BACKUP** and **SAVE NOW** in settings before updating if you want it fresh, and **RESTORE** brings it back.", "不会。只要安装时不勾选 **Erase device**（擦除设备），网页安装器就只替换程序；勾了它会清空进度。SD 卡上的备份是第二份保险：想要最新的，更新前在设置里点**备份** → **立即备份**；需要时点**恢复备份**就能找回来。"),
           },
         ],
       },

@@ -286,6 +286,7 @@ bool mailSyncDue(bool usb) {
 // MAIL_BODY_MS; si no llega entero se quedan solo las lineas completas (lo demas, la proxima vez).
 #define MAIL_BODY_MS 8000
 #define MAIL_BODY_MAX 16384
+#define MAIL_LOOKBACK_S 120  // segundos que se vuelven a pedir antes del cursor (ver mailNetSync)
 static void leerCuerpo(HTTPClient &h, String &out) {
   out = "";
   int len = h.getSize();  // -1: sin Content-Length, hasta que cierren (HTTP/1.0: nunca troceado)
@@ -351,9 +352,13 @@ static String boxUrl(const MailBox &b) {
   return u + b.box;
 }
 
-// manda lo que toque (copia fuera del cerrojo: la red tarda)
-static void sendDue(uint32_t now) {
+// manda lo que toque (copia fuera del cerrojo: la red tarda). fallos: lo que ya fallo en esta vuelta,
+// que no se reintenta en la misma (cada intento sin respuesta tarda hasta 8 s con la radio cogida); sin
+// conexion con el buzon, nada mas hasta la proxima vuelta
+static_assert(MAIL_OUTQ <= 8, "fallos es un uint8_t: un bit por mensaje");
+static void sendDue(uint32_t now, uint8_t &fallos) {
   for (int i = 0; i < MAIL_OUTQ; i++) {
+    if (fallos & (1u << i)) continue;
     lock();
     MailOut o = outq[i];
     bool due = mailOutDue(o, now);
@@ -374,7 +379,10 @@ static void sendDue(uint32_t now) {
     if (!sn || !b64Encode(sealed, sn, b64, sizeof(b64))) continue;
     int code = http(true, boxUrl(f.box), f.box.auth, String(b64), nullptr);
     Serial.printf("correo: manda tipo %u a %08lx: http %d\n", o.msg.type, (unsigned long)(o.to >> 32), code);
-    if (code != 200) continue;
+    if (code != 200) {
+      fallos |= (uint8_t)(code < 0 ? 0xFF : 1u << i);  // < 0: no hubo respuesta (sin red, caido, tiempo)
+      continue;
+    }
     lock();
     if (outq[i].on && outq[i].msg.id == o.msg.id) {
       mailOutSent(outq[i], now);
@@ -440,13 +448,18 @@ void mailNetSync() {
   unlock();
   if (!self || !n || WiFi.status() != WL_CONNECTED) return;
   uint32_t now = wallNow;
-  sendDue(now);
+  uint8_t fallos = 0;
+  sendDue(now, fallos);
   // lo mio: lo que haya en mi buzon desde la ultima vez (incluida esa hora: los repetidos se reconocen)
   if (myBox[0]) {
     MailBox me;
     mailMyBox(me);
     String resp;
-    String url = boxUrl(me) + "/json?poll=1&since=" + (cursor ? String(cursor) : String("all"));
+    // un poco antes del cursor: la lista del buzon (Cloudflare KV) tarda en enseñar lo recien escrito,
+    // y una visita de hora anterior al cursor que aun no salia se saltaba para siempre (las visitas no
+    // se reenvian). Lo repetido ya se reconoce (seen) y no se vuelve a entregar
+    uint32_t desde = cursor > MAIL_LOOKBACK_S ? cursor - MAIL_LOOKBACK_S : cursor;
+    String url = boxUrl(me) + "/json?poll=1&since=" + (cursor ? String(desde) : String("all"));
     int code = http(false, url, me.auth, String(), &resp);
     uint32_t maxT = cursor;
     int lines = 0;
@@ -468,7 +481,7 @@ void mailNetSync() {
     }
     Serial.printf("correo: recoge http %d, %d mensajes\n", code, lines);
   }
-  sendDue(now);  // los acuses de lo que acaba de llegar
+  sendDue(now, fallos);  // los acuses de lo que acaba de llegar (lo que fallo arriba, la proxima vuelta)
 }
 
 void mailInfo() {

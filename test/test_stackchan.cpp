@@ -172,6 +172,41 @@ TEST(stackchan, la_lista_de_herramientas) {
 // la mochila con objetos de todo tipo (frutas, pesca, mina, megapiedra...): cada uno con su nombre.
 // Faltaban los de despues de la piedra megaevolucion y el "%s" recibia un puntero nulo: en la placa
 // eso era un LoadProhibited en cuanto Stack-chan preguntaba como estaba el bicho
+// el texto entero es UTF-8 valido (ningun caracter cortado a medias)
+static bool utf8Valido(const std::string &s) {
+  for (size_t i = 0; i < s.size();) {
+    uint8_t c = (uint8_t)s[i];
+    size_t n = c < 0x80 ? 1 : (c & 0xE0) == 0xC0 ? 2 : (c & 0xF0) == 0xE0 ? 3 : (c & 0xF8) == 0xF0 ? 4 : 0;
+    if (!n || i + n > s.size()) return false;
+    for (size_t k = 1; k < n; k++)
+      if (((uint8_t)s[i + k] & 0xC0) != 0x80) return false;
+    i += n;
+  }
+  return true;
+}
+
+TEST(stackchan, con_la_mochila_llena_el_estado_sale_entero) {
+  Pet p;
+  nacer(p, 4);
+  for (int i = 0; i < ITEM_COUNT; i++) p.bag[i] = 99;
+  p.points = 12345;
+  std::string r = usar(p, MCP_FEED);
+  CHECK_MSG(tiene(r, "今天走了"), r);  // el final: antes se cortaba a los 400 bytes
+  CHECK_MSG(utf8Valido(r), r);
+}
+
+TEST(stackchan, cortado_por_falta_de_sitio_sigue_siendo_utf8) {
+  Pet p;
+  nacer(p, 4);
+  StackchanCtx ctx;
+  ctx.name = "CHARMANDER";
+  for (size_t cap = 8; cap < 120; cap++) {
+    char out[128];
+    stackchanTool(p, MCP_STATUS, 0, 0, ctx, out, cap);
+    CHECK_MSG(utf8Valido(out), std::to_string(cap) + ": " + out);
+  }
+}
+
 TEST(stackchan, la_mochila_nombra_todos_los_objetos) {
   Pet p;
   nacer(p, 4);

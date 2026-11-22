@@ -179,21 +179,22 @@ void farmSwapIn(int idx) {
   if (pet.ceremony || idx < 0 || idx >= farmCount()) return;
   int16_t dex = farmAt(idx).speciesId;
   PetRec cur, sale;
+  // se lee sin sacarlo y se borra de la granja lo ultimo, ya guardado el cambio (importRec guarda en
+  // la NVS): si algo falla o se va la luz en medio, como mucho queda repetido, nunca se pierde
+  if (!farmPeek(dex, sale)) return;
   if (pet.vacant) {
-    if (farmTake(pet, dex, sale)) {
-      pet.importRec(sale);
-      closeFarm();
-    }
+    pet.importRec(sale);
+    farmTake(pet, dex, sale);
+    closeFarm();
     return;
   }
   pet.exportRec(cur);
-  if (!farmTake(pet, dex, sale)) return;
-  if (!farmPut(pet, cur)) {  // no se pudo guardar al actual: se deshace
-    farmPut(pet, sale);
+  if (!farmPut(pet, cur)) {  // no se pudo guardar al actual: todo sigue como estaba
     toast(T(S_NEED_SD));
     return;
   }
   pet.importRec(sale);
+  if (cur.speciesId != dex) farmTake(pet, dex, sale);  // misma especie: su fichero ya es el del que entro
   closeFarm();
 }
 

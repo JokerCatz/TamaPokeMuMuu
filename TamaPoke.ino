@@ -496,10 +496,11 @@ void setup() {
     f.end();
   }
 
+  // el correo antes que la tarea de red: ella usa su cerrojo y su cola (mailNetSync)
+  mailBegin();  // correo con amigos lejos (lo que salia o llego se conserva)
   netSetUsb(usbPresent());
   netBegin();  // tiempo cada hora y, con USB, Stack-chan (en el otro nucleo)
   linkSetGameHandler(friendRx);  // "见面": los mensajes de los juegos con un amigo
-  mailBegin();                   // correo con amigos lejos (lo que salia o llego se conserva)
 
   lastInteract = lastUserAt = millis();
 }
@@ -700,7 +701,9 @@ void loop() {
     nextBackupTry = now + 60000;
     uint32_t d = pet.lastSeenEpoch / 86400, e;
     if (!backupDay) backupDay = backupInfo(e) ? e / 86400 : 1;  // 1: aun no hay ninguna
-    if (d != backupDay) {
+    // una partida recien empezada (NVS borrada, o placa nueva antes de RESTORE) no pisa la unica
+    // copia: aun eligiendo inicial, o con solo el inicial en la Pokedex. La copia a mano (SAVE NOW) si
+    if (d != backupDay && !pet.awaitingStarter() && pet.registeredCount() >= 2) {
       pet.flushSave();
       if (backupSave(pet.lastSeenEpoch)) backupDay = d;
       else nextBackupTry = now + 3600000UL;

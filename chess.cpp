@@ -151,6 +151,23 @@ void chessCommit(ChessState &st, const ChessReport &rep) {
   if (rep.newestEnd > st.watermark) st.watermark = rep.newestEnd;
 }
 
+// dias desde el 1970-01-01 (calendario gregoriano; sin depender de timegm ni de la zona horaria)
+static int32_t diasDesde1970(int y, int m, int d) {
+  y -= m <= 2;
+  int32_t era = (y >= 0 ? y : y - 399) / 400;
+  int32_t yoe = y - era * 400;
+  int32_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+  int32_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+  return era * 146097 + doe - 719468;
+}
+
+void chessArchiveDone(ChessState &st, int y, int m, int yNow, int mNow) {
+  if (y > yNow || (y == yNow && m >= mNow)) return;  // el mes actual aun puede traer partidas
+  int ny = m == 12 ? y + 1 : y, nm = m == 12 ? 1 : m + 1;
+  uint32_t fin = (uint32_t)diasDesde1970(ny, nm, 1) * 86400u - 1;  // ultimo segundo del mes (y, m)
+  if (fin > st.watermark) st.watermark = fin;
+}
+
 void chessLoad(ChessState &st) {
   Preferences p;
   p.begin("chess", true);

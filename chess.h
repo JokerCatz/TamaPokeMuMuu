@@ -84,6 +84,10 @@ void chessScoreArchive(JsonVariantConst archive, const ChessState &st, ChessRepo
 void chessScoreStats(JsonVariantConst stats, ChessState &st, ChessReport &rep);
 // tras sumar los puntos: avanza la marca de agua para no contar dos veces
 void chessCommit(ChessState &st, const ChessReport &rep);
+// el archivo del mes (y, m) se bajo entero y es de antes del mes actual (yNow, mNow) en UTC: ese mes
+// ya no cambia, asi que la marca de agua pasa a su ultimo segundo aunque no hubiera partidas nuevas.
+// Sin esto, tras mas de 3 meses sin jugar se bajaban siempre los mismos 3 meses viejos y nunca el actual
+void chessArchiveDone(ChessState &st, int y, int m, int yNow, int mNow);
 
 void chessLoad(ChessState &st);
 void chessSave(const ChessState &st);

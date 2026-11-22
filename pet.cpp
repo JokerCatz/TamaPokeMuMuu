@@ -224,7 +224,7 @@ void Pet::tick() {
       pendingSave = true;
     }
     if (sick && ++sickMinutes % SICK_MISTAKE_MIN == 0) {
-      careMistakes++;
+      if (careMistakes < 255) careMistakes++;  // uint8_t: con tope, que no vuelva a 0
       if (bond > 1) bond--;
     }
   }
@@ -260,7 +260,7 @@ void Pet::tick() {
   // cuidado (con enfriamiento para no contar el mismo descuido cada minuto)
   if (mistakeCooldown > 0) mistakeCooldown--;
   if (lowestStat() <= 10 && mistakeCooldown == 0) {
-    careMistakes++;
+    if (careMistakes < 255) careMistakes++;
     mistakeCooldown = 60;
     if (bond > 1) bond--;  // el descuido enfria el vinculo, pero sin arrasarlo:
                            // a -3 cada 30 min se perdia mucho mas de lo que se
@@ -449,7 +449,9 @@ int Pet::careBonus() const {
 void Pet::registerCare() {
   if (isEgg() || ceremony != CER_NONE) return;
   uint32_t d = today();
-  if (d == 0 || d == lastCareDay) return;  // sin reloj, o ya conto hoy
+  // sin reloj, o ya conto hoy. Un dia antes tambien: la hora volvio atras (NTP corrigio un reloj que iba
+  // adelantado cerca de medianoche) y "hoy" ya se conto; sin esto la racha volvia a 1
+  if (d == 0 || d == lastCareDay || d + 1 == lastCareDay) return;
   if (lastCareDay == 0 || d == lastCareDay + 1) {
     streak++;
   } else {
@@ -1157,7 +1159,9 @@ bool Pet::hatchEgg(uint8_t kind) {
 
 void Pet::ptRoll() {
   uint16_t w = ptWeekOf(today());
-  if (ptNow.week == w) return;
+  // la misma semana, o la anterior: la hora volvio atras un poco al cambiar de semana (NTP); sin esto
+  // se vaciaba el libro de la semana en curso
+  if (ptNow.week == w || w + 1 == ptNow.week) return;
   bool hubo = false;
   for (int k = 0; k < PT_KINDS; k++) hubo |= ptNow.cat[k] != 0;
   if (ptNow.week && ptNow.week + 1 == w && hubo) {  // la semana pasada: para el resumen

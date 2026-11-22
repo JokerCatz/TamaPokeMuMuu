@@ -217,8 +217,9 @@ root of the card, so the files end up in `/mons/` (about 290 MB: sprites, shiny 
 Pokédex thumbnails and the 9 region landscapes). `python3 tools/send_sd.py`
 can also send them over USB, but that is slow for the full set.
 
-**If the card can't be mounted, the firmware formats it.** Back up anything on
-it first.
+**The card must be FAT32.** If the board can't read it, it carries on without the
+card and leaves it untouched: format it as FAT32 on a computer, copy the files
+again and restart.
 
 ### Wi-Fi
 

@@ -31,12 +31,21 @@ static bool readRec(const char *path, PetRec &r) {
   return ok;
 }
 
+// primero a un fichero aparte (fuera de /farm: farmLoad no lo ve) y luego se cambia por el bueno: si
+// la escritura falla (tarjeta llena, un corte), el que ya habia sigue entero
+#define FARM_TMP "/farm.tmp"
 static bool writeRec(const char *path, const PetRec &r) {
-  File f = SD_MMC.open(path, FILE_WRITE);
+  SD_MMC.remove(FARM_TMP);
+  File f = SD_MMC.open(FARM_TMP, FILE_WRITE);
   if (!f) return false;
   bool ok = f.write((const uint8_t *)&r, sizeof(r)) == sizeof(r);
   f.close();
-  return ok;
+  if (!ok) {
+    SD_MMC.remove(FARM_TMP);
+    return false;
+  }
+  SD_MMC.remove(path);  // FAT no renombra encima de otro fichero
+  return SD_MMC.rename(FARM_TMP, path);
 }
 
 static FarmEntry entryOf(const PetRec &r) {
@@ -113,10 +122,7 @@ bool farmPut(Pet &p, const PetRec &r) {
   if (!sdReady || r.speciesId < 1 || r.speciesId > PET_DEX_MAX) return false;
   char path[32];
   farmPath(path, sizeof(path), r.speciesId);
-  if (!writeRec(path, r)) {
-    SD_MMC.remove(path);
-    return false;
-  }
+  if (!writeRec(path, r)) return false;  // el que hubiera de esta especie sigue como estaba
   indexPut(entryOf(r));
   setBit(p, r.speciesId, true);
   return true;

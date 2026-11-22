@@ -449,13 +449,16 @@ static bool bajarJson(const String &url, JsonDocument &doc, JsonDocument *filtro
     char *buf = (char *)ps_malloc(cap + 1);
     size_t n = 0;
     if (buf) {
-      WiFiClient *st = http.getStreamPtr();
+      WiFiClient *st = http.getStreamPtr();  // nulo si ya cerraron sin mandar nada
       uint32_t t = millis();
-      while ((len < 0 || n < (size_t)len) && n < cap && millis() - t < 20000) {
+      while (st && (len < 0 || n < (size_t)len) && n < cap && millis() - t < 20000) {
         int a = st->available();
-        if (a > 0) {
-          n += st->readBytes(buf + n, min((size_t)a, cap - n));
+        size_t r = a > 0 ? st->readBytes(buf + n, min((size_t)a, cap - n)) : 0;
+        if (r > 0) {
+          n += r;
           t = millis();
+        } else if (a > 0) {
+          delay(5);  // decia que habia algo y no dio nada: sin esto se daba vueltas sin parar
         } else if (!st->connected()) {
           break;
         } else {
@@ -532,6 +535,7 @@ static bool chessSyncLocked(Pet &pet, ChessReport &rep) {
       JsonDocument mes;
       ok = bajarJson(base + url, mes, &filtro);
       if (ok) chessScoreArchive(mes.as<JsonVariantConst>(), st, rep);
+      if (ok) chessArchiveDone(st, y, m, yFin, mFin);  // mes cerrado: la proxima vez, desde el siguiente
       if (++m > 12) { m = 1; y++; }
     }
   }
@@ -539,14 +543,17 @@ static bool chessSyncLocked(Pet &pet, ChessReport &rep) {
   if (!ok) return false;
 
   chessCommit(st, rep);
-  chessSave(st);
-  chessSaveReport(rep, pared / 86400);
   if (rep.total() > 0) {
     pet.chessPtsTotal += rep.total();
     pet.earn(rep.total(), PT_CHESS);  // al libro de puntos como ajedrez
   }
   pet.chessMedals(rep.wins, rep.newBestRapid || rep.newBestDaily || rep.hundreds ||
                                 rep.newTactics || rep.newRush);
+  // los puntos a la NVS antes que la marca de agua: si se va la luz en medio, como mucho se cuentan
+  // otra vez; al reves (marca guardada, puntos aun sin volcar) se perdian para siempre
+  pet.flushSave();
+  chessSave(st);
+  chessSaveReport(rep, pared / 86400);
   Preferences p;
   p.begin("chess", false);
   p.putUInt("sday", pared / 86400);

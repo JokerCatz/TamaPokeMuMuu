@@ -210,6 +210,17 @@ TEST(tick, dormir_recupera_energia_con_suelos) {
   CHECK_EQ(p.careMistakes, (uint8_t)0);
 }
 
+TEST(tick, los_descuidos_topan_en_255) {
+  Pet p;
+  makePet(p, 4);
+  p.careMistakes = 254;
+  setStats(p, 0, 0, 0, 0);
+  advance(p, 1);
+  CHECK_EQ(p.careMistakes, (uint8_t)255);
+  advance(p, 61);
+  CHECK_MSG(p.careMistakes == 255, "uint8_t: sin tope volvia a 0 y borraba todos los descuidos");
+}
+
 TEST(tick, sobrepeso_se_quema_solo) {
   Pet p;
   makePet(p, 4);
@@ -1352,6 +1363,32 @@ TEST(streak, un_dia_perdido_reinicia) {
   p.caress();
   CHECK_EQ(p.streak, (uint16_t)1);
   CHECK_MSG(p.bestStreak == 2, "el record de racha se conserva");
+}
+
+TEST(streak, la_hora_que_vuelve_atras_un_dia_no_reinicia) {
+  Pet p;
+  makePet(p, 4);
+  p.setClock(100u * 86400);
+  p.caress();
+  p.setClock(101u * 86400 + 60);  // el reloj iba adelantado: ya era "mañana" a las 00:01
+  p.caress();
+  CHECK_EQ(p.streak, (uint16_t)2);
+  p.setClock(101u * 86400 - 60);  // NTP lo corrige: vuelve a ser ayer, 23:59
+  p.caress();
+  CHECK_MSG(p.streak == 2, "un dia atras no cuenta como hueco: la racha sigue");
+  p.setClock(102u * 86400);
+  p.caress();
+  CHECK_EQ(p.streak, (uint16_t)3);
+}
+
+TEST(streak, la_hora_muy_atras_si_reinicia) {
+  Pet p;
+  makePet(p, 4);
+  p.setClock(100u * 86400);
+  p.caress();
+  p.setClock(90u * 86400);  // diez dias atras: el reloj estaba mal, se empieza de nuevo
+  p.caress();
+  CHECK_EQ(p.streak, (uint16_t)1);
 }
 
 TEST(streak, sin_reloj_no_hay_racha) {
@@ -2540,6 +2577,19 @@ TEST(points, la_semana_siguiente_trae_el_resumen) {
   p.ptRoll();
   CHECK(!p.ptReport);
   CHECK_EQ((int)p.ptLast.cat[PT_CHESS], 0);
+}
+
+TEST(points, la_hora_que_vuelve_a_la_semana_anterior_no_vacia_el_libro) {
+  Pet p;
+  makePet(p, 4);
+  p.lastSeenEpoch = (SAB + 2) * 86400 + 60;  // lunes 00:01 (reloj adelantado): semana nueva
+  p.ptRoll();
+  p.earn(9, PT_CHESS);
+  uint16_t semana = p.ptNow.week;
+  p.lastSeenEpoch = (SAB + 2) * 86400 - 60;  // NTP: aun era domingo 23:59
+  p.ptRoll();
+  CHECK_EQ((int)p.ptNow.week, (int)semana);
+  CHECK_MSG(p.ptNow.cat[PT_CHESS] == 9, "una semana atras no vacia lo de esta semana");
 }
 
 // ---------------------------------------------------------------- album

@@ -16,6 +16,30 @@ TOOLS = os.path.join(ROOT, 'tools')
 sys.path.insert(0, TOOLS)
 
 
+class TestPrivacyCheck(unittest.TestCase):
+    """Es la red de seguridad antes de publicar: un argumento mal puesto no puede acabar en un "limpio"
+    sobre otra cosa (antes, --tree sin REV escaneaba en silencio los archivos locales)."""
+
+    def correr(self, *args):
+        return subprocess.run([sys.executable, os.path.join(TOOLS, 'privacy_check.py'), *args],
+                              capture_output=True, text=True, cwd=ROOT, stdin=subprocess.DEVNULL, timeout=60)
+
+    def test_tree_y_commits_sin_rev_fallan(self):
+        for opt in ('--tree', '--commits'):
+            with self.subTest(opt=opt):
+                r = self.correr(opt)
+                self.assertNotEqual(r.returncode, 0, r.stdout)
+                self.assertNotIn('limpio', r.stdout)
+
+    def test_argumentos_de_mas_o_desconocidos_fallan(self):
+        for args in (('--tree', 'HEAD', 'otro'), ('--commits', 'HEAD', 'otro'), ('--arbol', 'HEAD'),
+                     ('HEAD',), ('--hook', 'a', 'b', 'c')):
+            with self.subTest(args=args):
+                r = self.correr(*args)
+                self.assertNotEqual(r.returncode, 0, r.stdout)
+                self.assertNotIn('limpio', r.stdout)
+
+
 class TestToolsCompile(unittest.TestCase):
     def test_todos_los_scripts_compilan(self):
         scripts = sorted(f for f in os.listdir(TOOLS) if f.endswith('.py'))
