@@ -12,6 +12,8 @@ Files added for the Fake Pod: `rtcbat_fakepod.cpp` (RTC, battery, side keys), `a
 4. `tools/build_fakepod.sh` (add `--upload PORT` to flash). Download mode: hold both side keys while connecting USB.
 
 ## Notes
-- **The TF card must be FAT32**: arduino-esp32's FatFs has no exFAT. The firmware never formats a card.
+- **The TF card can be FAT32 or exFAT.** arduino-esp32's FatFs has no exFAT, so on this board the card is read through SdFat (MIT) on the ESP-IDF SDMMC host (`sdfat_fs.cpp`, build flag `-DUSE_BLOCK_DEVICE_INTERFACE=1`). The firmware never formats a card.
+- Install SdFat 2.3.0 in addition to the libraries in README.md.
+- `tools/fakepod/sd_uploader` + `tools/send_sd_fp.py` copy the sprite pack to the card over USB (the game firmware itself does not read USB input).
 - The AXP2101 is read-only here: no voltage / rail / charger / power-key-timing register is written. The AMOLED supply is GPIO44, not a PMU rail.
 - The RTC chip keeps UTC (shared with other projects on the same board); the game's wall time is derived through the time zone of `config_private.h`.

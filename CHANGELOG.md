@@ -6,6 +6,12 @@ bottom of the clock/settings screen (swipe down) and `web/manifest.json`.
 Updating from the [web installer](https://socquique.github.io/TamaPoke/web/)
 **without** ticking "Erase device" keeps your Pokémon.
 
+## [Fake Pod 0.1.0]
+
+- New board: Fake Pod Nano Pro (ESP32-S31), `-DBOARD_FAKEPOD_NANO_PRO=1`. exFAT cards via SdFat, CS43131 sound, RTC/battery/side keys.
+- Traditional Chinese (Taiwan) as a third language; first-run language picker; Chinese text is 24 px at minimum.
+- Square screen: full-screen backdrop instead of the round mask.
+
 ## [1.18] - 2026-10-27
 
 Three contributions from **ViezeVingertjes** (PRs #25, #26 and #27), merged together.

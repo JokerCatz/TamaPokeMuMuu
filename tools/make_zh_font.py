@@ -331,6 +331,9 @@ def used_chars():
     if os.path.exists(gyms):
         with open(gyms, encoding='utf-8') as fh:
             textos += re.findall(r'"((?:[^"\\]|\\.)*)"', fh.read())
+    for extra in ('langpick.ino',):  # literals drawn outside i18n.cpp (the first-run language picker)
+        with open(os.path.join(ROOT, extra), encoding='utf-8') as fh:
+            textos += re.findall(r'"((?:[^"\\]|\\.)*)"', fh.read())
     return sorted({ord(c) for t in textos for c in t if ord(c) > 126})
 
 

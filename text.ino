@@ -37,16 +37,10 @@ void setSize(uint8_t n) {
     gfx->setTextSize(n);
     return;
   }
-  // la fuente y la escala cuya altura mas se acerca a la del latino (7n px)
-  int objetivo = 7 * n, mejorErr = 1000;
-  bool chica = false;
-  uint8_t escala = 1;
-  for (uint8_t k = 1; k <= 4; k++) {
-    for (int alto : { 16, 12 }) {  // a igual distancia, la de 16 (se lee mejor)
-      int err = abs(alto * k - objetivo);
-      if (err < mejorErr) { mejorErr = err; chica = (alto == 12); escala = k; }
-    }
-  }
+  // Fake Pod fork: no 16 px glyphs (too small on the 460 px panel). Only the 12 px font, scaled by an integer:
+  // sizes 1-3 -> 24 px (24 is the minimum), size 4 -> 36 px, size 5+ -> 48 px
+  bool chica = true;
+  uint8_t escala = n <= 3 ? 2 : n == 4 ? 3 : 4;
   gfx->setFont(chica ? CJK_FONT_ZH_S : CJK_FONT_ZH);
   gFontAscent = chica ? gAsc12 : gAsc16;
   // gTextSize guarda la escala REALMENTE aplicada: setCur() multiplica el

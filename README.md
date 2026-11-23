@@ -15,11 +15,15 @@ Play chess, earn points, and spend them on candy, eggs and potions for a compani
 
 **[chess.com points](#why-this-fork)** · **[What's different](#whats-different-from-upstream)** · **[Hardware](#hardware)** · **[Case](#3d-printed-case)** · **[Build and flash](#build-and-flash)** · **[How to play](#how-to-play)**
 
-**English** · [简体中文](README.zh-CN.md)
+**English** · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
 <a href="https://mu-muu.github.io/TamaPoke/#build"><img src="docs/demo.gif" alt="The real board in its case: turned in the hand, then a tap wakes it and the pet walks around" width="360"></a>
 
 </div>
+
+> ### Fake Pod Nano Pro (ESP32-S31) port: TamaPokeMuMuu
+> This repository is a fork of [Mu-Muu/TamaPoke](https://github.com/Mu-Muu/TamaPoke) (MIT, itself from [socquique/TamaPoke](https://github.com/socquique/TamaPoke)) that also runs on the square 460×460 **Fake Pod Nano Pro**: board layer for the CO5300 AMOLED, CST820 touch, AXP2101, PCF85063 RTC, QMI8658, CS43131 headphone-DAC sound, side keys, and exFAT TF cards (SdFat). Added: **Traditional Chinese (Taiwan)**, a first-run language picker, a full-square background (no round mask) and 24 px minimum Chinese text. See [tools/fakepod/README.md](tools/fakepod/README.md) to build, and the Releases page for a ready-to-flash image.
+
 
 **[Website](https://mu-muu.github.io/TamaPoke/)**: hatch an egg, try a chess puzzle and run a race in your browser, and watch a [clip of the real board](https://mu-muu.github.io/TamaPoke/#build). New to the game? Read the **[player's guide](https://mu-muu.github.io/TamaPoke/guide/)**.
 
