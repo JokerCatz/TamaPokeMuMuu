@@ -1,3 +1,4 @@
+#if !defined(BOARD_FAKEPOD_NANO_PRO)  // the Fake Pod build uses audio_fakepod.cpp instead
 #include "audio.h"
 #include "pin_config.h"
 #include <Arduino.h>
@@ -229,3 +230,4 @@ void audioSetIdle(bool idle) {
   gIdle = idle;
   updateAmplifierPower();  // tambien cuando vence el mantenimiento de un aviso
 }
+#endif  // !BOARD_FAKEPOD_NANO_PRO

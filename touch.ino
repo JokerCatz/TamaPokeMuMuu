@@ -130,6 +130,7 @@ void handleTouch() {
   if (Wire.endTransmission() != 0) return;  // no responde: se reintenta en 20 ms
   int16_t x, y;
   bool pressed = touch.getPoint(&x, &y, 1) > 0;
+  if (pressed) x = (int16_t)((int32_t)x * TOUCH_X_NUM / TOUCH_X_DEN);  // Fake Pod: the CST820's x calibration (1/1 = none)
 
   if (pressed && !wasPressed) {  // empieza el gesto
     tX0 = tXl = x;

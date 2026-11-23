@@ -1,3 +1,4 @@
+#if !defined(BOARD_FAKEPOD_NANO_PRO)  // the Fake Pod build uses rtcbat_fakepod.cpp instead
 #include "batcurve.h"
 #include "rtcbat.h"
 #include "power.h"
@@ -121,3 +122,4 @@ bool pwrShortPressed() {
   if (hit) pmu.clearIrqStatus();
   return hit;
 }
+#endif  // !BOARD_FAKEPOD_NANO_PRO

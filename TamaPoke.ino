@@ -61,15 +61,14 @@
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
   LCD_CS, LCD_SCLK, LCD_SDIO0, LCD_SDIO1, LCD_SDIO2, LCD_SDIO3);
 Arduino_CO5300 *panel = new Arduino_CO5300(
-  bus, LCD_RESET, 0 /*rotation*/, LCD_WIDTH, LCD_HEIGHT, 6, 0, 0, 0);
+  bus, LCD_RESET, 0 /*rotation*/, LCD_WIDTH, LCD_HEIGHT, LCD_COL_OFFSET, 0, 0, 0);
 // Framebuffer completo en PSRAM: dibujamos todo y hacemos flush() (sin parpadeo)
 Arduino_Canvas *gfx = new Arduino_Canvas(LCD_WIDTH, LCD_HEIGHT, panel);
 
-TouchDrvCST92xx touch;
+TOUCH_DRIVER touch;
 // fuente CJK activa: de momento siempre false, la carga llegara con el
 // soporte de japones/coreano/chino (ver PR #13)
 bool gCjkFont = false;
-#define TOUCH_ADDR 0x5A  // CST9217
 Pet pet;
 
 // sprite animado de la SD para la especie actual (si existe el archivo)
@@ -404,7 +403,7 @@ void setup() {
 
   // QSPI a 80MHz (por defecto 40): el flush del framebuffer es el cuello de
   // botella del fps (~56ms a 40MHz). Si el panel mostrara basura, bajar a 40M.
-  if (!gfx->begin(80000000)) Serial.println("gfx->begin() fallo");
+  if (!gfx->begin(DISPLAY_BEGIN_HZ)) Serial.println("gfx->begin() fallo");
   {  // nivel de brillo (ya desde el primer fotograma, sin fogonazo) y unidad de temperatura
     Preferences p;
     p.begin("tamapoke", true);
@@ -418,7 +417,7 @@ void setup() {
   touch.setPins(TP_RESET, TP_INT);
   bool touchOk = false;
   for (int i = 0; i < 3 && !touchOk; i++) {  // a veces falla al primer intento
-    touchOk = touch.begin(Wire, 0x5A, IIC_SDA, IIC_SCL);
+    touchOk = touch.begin(Wire, TOUCH_ADDR, IIC_SDA, IIC_SCL);
     if (!touchOk) delay(150);
   }
   if (!touchOk) Serial.println("CST9217 no detectado");
@@ -426,7 +425,7 @@ void setup() {
   // hace falta un reset por hardware para que vuelva a reportar toques
   touch.reset();
   touch.setMaxCoordinates(LCD_WIDTH, LCD_HEIGHT);
-  touch.setMirrorXY(true, true);  // el panel esta montado girado 180 grados
+  touch.setMirrorXY(TOUCH_MIRROR_X, TOUCH_MIRROR_Y);  // pin_config.h: Waveshare = mounted rotated 180 degrees
   // INT activo-bajo: salta cuando hay datos. Gatea las lecturas I2C (ver loop)
   pinMode(TP_INT, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(TP_INT), touchIsr, FALLING);
