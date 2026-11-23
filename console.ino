@@ -106,6 +106,9 @@ void openClock();  // prototipo (consola CLOCK)
 void orientation(float gy, float gz, uint32_t now) {
   static uint32_t downSince = 0, tiltSince = 0, tiltWalkUntil = 0;
   static bool tiltDone = false;
+#if defined(BOARD_FAKEPOD_NANO_PRO) && defined(FP_IMU_DEBUG)
+  { static uint32_t lastDbg = 0; if (now - lastDbg > 2000) { lastDbg = now; Serial.printf("imu gy=%.2f gz=%.2f faceUpSign=%d screenOff=%d\n", gy, gz, (int)faceUpSign, (int)screenOff); } }
+#endif
   bool bocaAbajo = gz * faceUpSign < -0.75f;
   if (bocaAbajo) {
     if (!downSince) downSince = now;

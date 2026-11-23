@@ -39,6 +39,7 @@
 // side keys: the top one is the AXP2101 power key (nIRQ on GPIO49), the bottom one is BOOTMODE (GPIO61, a strapping pin: input only, never hold it at reset)
 #define PMU_IRQ_PIN 49
 #define KEY_BOTTOM_PIN 61
+#define IMU_FACE_UP_SIGN 1     // the sign of the accelerometer's z with the screen facing up (measured: +0.88 g lying flat). Wrong sign = the game thinks the board is face down and blanks the screen
 // CS43131 headphone DAC (audio_fakepod.cpp)
 #define I2S_BCK_IO 52
 #define I2S_WS_IO 51
@@ -79,6 +80,7 @@
 #define SDMMC_CS 41
 #define LCD_COL_OFFSET 6
 #define DISPLAY_BEGIN_HZ 80000000
+#define IMU_FACE_UP_SIGN (-1)  // Waveshare: z is negative with the screen facing up
 #define TOUCH_ADDR 0x5A        // CST9217
 #define TOUCH_DRIVER TouchDrvCST92xx
 #define TOUCH_X_NUM 1

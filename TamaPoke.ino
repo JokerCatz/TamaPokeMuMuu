@@ -338,7 +338,7 @@ uint32_t lastPetTap = 0, tapTimes[16];
 uint8_t tapCount = 0;
 uint32_t lastTickle = 0, lastAnnoy = 0;
 // orientacion: boca abajo apaga y duerme; inclinado, el bicho va hacia abajo
-int8_t faceUpSign = -1;   // signo de z con la pantalla hacia arriba (se aprende al tocarla)
+int8_t faceUpSign = IMU_FACE_UP_SIGN;   // signo de z con la pantalla hacia arriba (se aprende al tocarla); el valor inicial es de cada placa (pin_config.h)
 bool faceDownOff = false; // la pantalla la apago ponerla boca abajo
 #define TILT_SIGN 1       // si al inclinar va hacia el lado alto, cambiar a -1
 // celebraciones: subir de nivel y cosecha de la granja
@@ -569,6 +569,9 @@ void loop() {
   if (now - lastPwr > 250) {
     lastPwr = now;
     if (pwrShortPressed()) {
+#if defined(BOARD_FAKEPOD_NANO_PRO)
+      Serial.printf("side key: screenOff %d -> %d (pet sleeping=%d)\n", screenOff, !screenOff, pet.sleeping);
+#endif
       screenOff = !screenOff;
       pet.screenNap(screenOff);  // pantalla apagada = a dormir; encendida = despierta
       if (!screenOff) wakeUI();
@@ -925,6 +928,9 @@ void updateBrightness(uint32_t now) {
   uint8_t target = brightnessFor(c);
   static uint8_t current = 255;
   if (target != current) {
+#if defined(BOARD_FAKEPOD_NANO_PRO)
+    Serial.printf("brightness %u -> %u (screenOff=%d sleeping=%d usb=%d idle=%lu stage=%u userDim=%u)\n", current, target, c.screenOff, c.sleeping, c.usb, (unsigned long)c.idleMs, dimStage, userDim);
+#endif
     current = target;
     panel->setBrightness(target);
   }

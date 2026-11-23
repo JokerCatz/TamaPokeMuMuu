@@ -9,7 +9,7 @@ export ARDUINO_CONFIG_FILE="${ARDUINO_CONFIG_FILE:-$HOME/.arduino15/arduino-cli.
 FQBN="esp32:esp32:esp32s31:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=app3M_fat9M_16MB"
 rm -rf "$C/TamaPoke"; mkdir -p "$C/TamaPoke" "$C/build"
 (cd "$R" && cp *.ino *.cpp *.h "$C/TamaPoke/"; ls *.c >/dev/null 2>&1 && cp *.c "$C/TamaPoke/"; [ -d bsp ] && cp -r bsp "$C/TamaPoke/"; [ -d pc ] && cp -r pc "$C/TamaPoke/"; true)
-FLAGS="-DBOARD_FAKEPOD_NANO_PRO=1 -DUSE_BLOCK_DEVICE_INTERFACE=1"   # the second: SdFat on a generic block device (sdfat_fs.cpp)
+FLAGS="-DBOARD_FAKEPOD_NANO_PRO=1 -DUSE_BLOCK_DEVICE_INTERFACE=1 ${EXTRA_FLAGS:-}"   # the second: SdFat on a generic block device (sdfat_fs.cpp)
 cd "$C"
 arduino-cli compile --fqbn "$FQBN" --build-path "$C/build" --warnings none \
   --build-property "compiler.cpp.extra_flags=$FLAGS" --build-property "compiler.c.extra_flags=$FLAGS" TamaPoke
