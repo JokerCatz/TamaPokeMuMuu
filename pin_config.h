@@ -29,10 +29,13 @@
 #define TOUCH_X_DEN 30
 #define TOUCH_MIRROR_X false
 #define TOUCH_MIRROR_Y false
-// TF slot, SDMMC (1-bit mode on D0 is enough for the sprites); the card must be FAT32 (arduino-esp32's FatFs has no exFAT)
+// TF slot, SDMMC 4-bit through SdFat (sdfat_fs.cpp): exFAT cards work (arduino-esp32's own FatFs has no exFAT)
 #define SDMMC_CLK 24
 #define SDMMC_CMD 25
 #define SDMMC_DATA 20
+#define SDMMC_D1 21
+#define SDMMC_D2 22
+#define SDMMC_D3 23
 // side keys: the top one is the AXP2101 power key (nIRQ on GPIO49), the bottom one is BOOTMODE (GPIO61, a strapping pin: input only, never hold it at reset)
 #define PMU_IRQ_PIN 49
 #define KEY_BOTTOM_PIN 61

@@ -1,7 +1,11 @@
 #include "memoir.h"
 #include "sdmon.h"
 #include <FS.h>
+#if defined(BOARD_FAKEPOD_NANO_PRO)
+#include "sdfat_fs.h"  // exFAT-capable SD_MMC replacement (SdFat, SPI mode)
+#else
 #include <SD_MMC.h>
+#endif
 
 #define MEMOIR_PATH "/memoir.bin"
 
