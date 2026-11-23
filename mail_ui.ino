@@ -619,8 +619,10 @@ bool mailVisitorTap(int16_t x, int16_t y) {
   if (mv.phase == MV_WAIT) {  // abrirlo: lo que trae, ahora (un regalo, a la mochila)
     bool regalo = mv.m.type == MT_GIFT && mv.m.item < ITEM_COUNT && !friendTestMode();
     if (regalo) pet.give(mv.m.item, mv.m.qty ? (mv.m.qty > 5 ? 5 : mv.m.qty) : 1);
+    // la mochila a la NVS antes de borrar la llegada: un corte entre las dos escrituras repite el
+    // regalo (vuelve a llegar), al reves se perdia
+    if (regalo) pet.flushSave();
     mailPopArrival();
-    if (regalo) pet.flushSave();  // la llegada ya se borro de la NVS: si no, un reinicio perdia el regalo
     mv.phase = MV_OPEN;
     mv.until = now + 8000;
     sfxPlay(SFX_MEDAL);

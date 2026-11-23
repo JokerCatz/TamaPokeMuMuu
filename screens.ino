@@ -307,6 +307,9 @@ void clockTap(int16_t x, int16_t y) {
         delay(500);
         ESP.restart();  // sin guardar nada mas: la mascota en RAM es la de antes
       }
+      // no se pudo (copia rota, o la NVS fallo a medio escribir): la partida de la RAM vuelve a la NVS
+      pet.markDirty();
+      pet.flushSave();
       toast(T(S_NO_BACKUP));
     }
     return;

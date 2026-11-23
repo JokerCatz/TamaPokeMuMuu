@@ -67,8 +67,42 @@ static esp_err_t writeValue(nvs_handle_t h, const char *key, nvs_type_t t, const
   }
 }
 
+static bool openHeader(const char *path, File &f, uint32_t &epoch, uint16_t &count) {
+  if (!sdReady) return false;
+  f = SD_MMC.open(path, FILE_READ);
+  if (!f) return false;
+  char mag[4];
+  uint8_t ver;
+  if (!get(f, mag, 4) || memcmp(mag, "TPBK", 4) || !get(f, &ver, 1) || ver != BK_VER || !get(f, &epoch, 4) ||
+      !get(f, &count, 2)) {
+    f.close();
+    return false;
+  }
+  return true;
+}
+
+// una copia que se quedo a medio cambiar: se borro la vieja y la nueva no llego a renombrarse (un
+// corte entre los dos pasos, o fallo el rename). La nueva ya estaba entera: el numero de entradas se
+// escribe lo ultimo, asi que con count > 0 esta completa. Pasa a ser la copia; sin esto el menu no la
+// veia y la siguiente copia automatica la borraba
+static void recuperarTmp() {
+  if (!sdReady || SD_MMC.exists(BK_PATH) || !SD_MMC.exists(BK_TMP)) return;
+  File f;
+  uint32_t epoch;
+  uint16_t count;
+  if (!openHeader(BK_TMP, f, epoch, count)) return;
+  f.close();
+  if (count > 0 && SD_MMC.rename(BK_TMP, BK_PATH)) Serial.println("copia: recuperada la que quedo a medio guardar");
+}
+
+static bool openBackup(File &f, uint32_t &epoch, uint16_t &count) {
+  recuperarTmp();
+  return openHeader(BK_PATH, f, epoch, count);
+}
+
 bool backupSave(uint32_t wallEpoch) {
   if (!sdReady) return false;
+  recuperarTmp();  // antes de borrar backup.tmp: podria ser la unica copia buena
   static uint8_t buf[1024];  // el blob mas grande es la pokedex (129 bytes) y la mochila
   SD_MMC.remove(BK_TMP);
   File f = SD_MMC.open(BK_TMP, FILE_WRITE);
@@ -107,20 +141,6 @@ bool backupSave(uint32_t wallEpoch) {
   ok = SD_MMC.rename(BK_TMP, BK_PATH);
   Serial.printf("copia: %u entradas %s\n", count, ok ? "guardada" : "FALLO");
   return ok;
-}
-
-static bool openBackup(File &f, uint32_t &epoch, uint16_t &count) {
-  if (!sdReady) return false;
-  f = SD_MMC.open(BK_PATH, FILE_READ);
-  if (!f) return false;
-  char mag[4];
-  uint8_t ver;
-  if (!get(f, mag, 4) || memcmp(mag, "TPBK", 4) || !get(f, &ver, 1) || ver != BK_VER || !get(f, &epoch, 4) ||
-      !get(f, &count, 2)) {
-    f.close();
-    return false;
-  }
-  return true;
 }
 
 bool backupInfo(uint32_t &wallEpoch) {
@@ -206,11 +226,17 @@ bool backupRestore() {
       ok = false;
       break;
     }
-    nvs_erase_all(h);
-    for (uint16_t i = 0; i < count; i++)
-      if (ents[i].ns == ns) writeValue(h, ents[i].key, (nvs_type_t)ents[i].type, data + ents[i].off, ents[i].len);
-    nvs_commit(h);
+    // cada paso se comprueba: si la NVS no deja escribir, no se da por restaurada (la pantalla no
+    // reinicia y la partida de la RAM se vuelve a guardar). Se para ahi: lo que falta queda como estaba
+    esp_err_t r = nvs_erase_all(h);
+    for (uint16_t i = 0; r == ESP_OK && i < count; i++)
+      if (ents[i].ns == ns) r = writeValue(h, ents[i].key, (nvs_type_t)ents[i].type, data + ents[i].off, ents[i].len);
+    if (r == ESP_OK) r = nvs_commit(h);
     nvs_close(h);
+    if (r != ESP_OK) {
+      Serial.printf("copia: no se pudo restaurar \"%s\": %s\n", NS[ns], esp_err_to_name(r));
+      ok = false;
+    }
   }
   free(ents);
   free(data);

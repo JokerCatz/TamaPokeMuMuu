@@ -93,6 +93,14 @@ bool farmLoad(Pet &p) {
   if (!entries) entries = (FarmEntry *)ps_malloc(PET_DEX_MAX * sizeof(FarmEntry));
   if (!entries) return false;
   SD_MMC.mkdir("/farm");
+  // una ficha que se quedo a medio cambiar (writeRec: un corte entre borrar la vieja y renombrar la
+  // nueva): si su especie se quedo sin fichero, la nueva, que ya estaba entera, pasa a serlo
+  PetRec t;
+  if (SD_MMC.exists(FARM_TMP) && readRec(FARM_TMP, t)) {
+    char path[32];
+    farmPath(path, sizeof(path), t.speciesId);
+    if (!SD_MMC.exists(path) && SD_MMC.rename(FARM_TMP, path)) Serial.println("granja: recuperada una ficha a medio guardar");
+  }
   File dir = SD_MMC.open("/farm");
   if (!dir) return false;
   for (File f = dir.openNextFile(); f; f = dir.openNextFile()) {
