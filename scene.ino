@@ -932,7 +932,7 @@ void drawScene(uint8_t biome, uint32_t now, bool night) {
 // primera partida: elige inicial entre Bulbasaur / Charmander / Squirtle
 void renderStarterSelect() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   const char *t = T(S_CHOOSE_STARTER);
   gfx->setTextColor(UI_INK);
   setSize(2);

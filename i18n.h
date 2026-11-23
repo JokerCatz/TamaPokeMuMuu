@@ -4,9 +4,9 @@
 // Idiomas soportados: ingles y chino. El ingles usa la fuente 5x7 de Arduino_GFX
 // (tabla CP437, un byte por caracter: la UI centra con strlen(t)*6, asi que nada
 // de UTF-8 ahi). El chino va en UTF-8 con una fuente U8g2.
-enum Lang : uint8_t { LANG_EN = 0, LANG_ZH, LANG_COUNT };
+enum Lang : uint8_t { LANG_EN = 0, LANG_ZH, LANG_ZHT, LANG_COUNT };  // LANG_ZH = Simplified Chinese, LANG_ZHT = Traditional Chinese (Taiwan; Fake Pod fork)
 // idiomas que necesitan una fuente U8g2 y texto UTF-8 en vez de la tabla CP437
-#define LANG_IS_CJK(l) ((l) == LANG_ZH)
+#define LANG_IS_CJK(l) ((l) == LANG_ZH || (l) == LANG_ZHT)
 // idioma por defecto (placa nueva o NVS borrada): ingles. El instalador web lo
 // usa gente de fuera; una placa que ya eligio idioma lo tiene en la NVS ("lang2").
 #define LANG_DEFAULT LANG_EN
@@ -217,5 +217,6 @@ const char *medalName(int i);  // banner de medalla (MED_COUNT)
 const char *medalLabel(int i); // etiqueta corta de medalla
 const char *medalDesc(int i);  // descripcion larga de medalla
 
+bool langSaved();            // true once a language has been chosen and stored (a fresh board: false, the first screen asks)
 void loadLang();             // lee el idioma de NVS (llamar en setup)
 void setLang(Lang l);        // cambia y persiste el idioma

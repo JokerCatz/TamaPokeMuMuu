@@ -71,7 +71,7 @@ static int muItems(uint8_t out[ITEM_COUNT]) {
 
 static void muTitle(const char *t) {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   uint8_t ts = textW(t, 3) <= 260 ? 3 : 2;  // arriba el circulo es estrecho: si no cabe, mas pequeño
   setSize(ts);

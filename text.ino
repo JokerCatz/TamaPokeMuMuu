@@ -133,7 +133,7 @@ void printT(const char *s) {
 // Pantallas que solo cambian con un toque (o con un dato que cambia muy de vez en cuando):
 // mientras su "clave" no cambie no se repintan ni se vuelcan por QSPI.
 static bool staticScreen() {
-  if (pet.awaitingStarter()) return true;
+  if (gLangPick || pet.awaitingStarter()) return true;
   if (galleryOpen || farmOpen || hubOpen || chOpen || gymsOpen || funOpen || linkOpen || friendsOpen || shopOpen) return false;  // gestionan su propio repintado
   if (kbOpen || clockOpen) return true;
   return cardOpen && cardPage != 0;  // la pagina 0 tiene el retrato animado
@@ -141,7 +141,7 @@ static bool staticScreen() {
 static uint32_t mixKey(uint32_t h, uint32_t v) { return (h ^ v) * 16777619u; }
 static uint32_t screenKey() {
   uint32_t h = 2166136261u;
-  h = mixKey(h, pet.awaitingStarter() ? 1 : kbOpen ? 2 : clockOpen ? 3 + statsOpen * 100 : 4 + cardPage);
+  h = mixKey(h, gLangPick ? 9 : pet.awaitingStarter() ? 1 : kbOpen ? 2 : clockOpen ? 3 + statsOpen * 100 : 4 + cardPage);
   h = mixKey(h, sdEpoch);
   if (kbOpen) {
     h = mixKey(h, nameLen);

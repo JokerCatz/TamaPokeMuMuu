@@ -77,7 +77,7 @@ def main():
     out.append(
         "// Nombres oficiales en chino simplificado, en UTF-8 (se pintan con la\n"
         "// fuente U8g2). nullptr = sin nombre propio.\n")
-    for lg in ('zh',):
+    for lg in ('zh', 'zht'):
         out.append(f"static const char *const DEX_NAME_{lg.upper()}[DEX_COUNT + 1] = {{\n")
         fila = []
         for num in range(0, len(DEX) + 1):
@@ -94,7 +94,7 @@ def main():
         "// idioma no tiene nombre propio para ella).\n"
         "static inline const char *dexName(int16_t dex) {\n"
         "  if (dex < 1 || dex > DEX_COUNT) return DEX_TBL[0].name;\n"
-        "  const char *n = (gLang == LANG_ZH) ? DEX_NAME_ZH[dex] : nullptr;\n"
+        "  const char *n = (gLang == LANG_ZH) ? DEX_NAME_ZH[dex] : (gLang == LANG_ZHT) ? DEX_NAME_ZHT[dex] : nullptr;\n"
         "  return n ? n : DEX_TBL[dex].name;\n"
         "}\n\n")
 

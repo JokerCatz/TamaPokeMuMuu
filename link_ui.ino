@@ -124,7 +124,7 @@ void renderLink() {
   }
   uint32_t now = millis();
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(S_LINK_TITLE), 3), 50);

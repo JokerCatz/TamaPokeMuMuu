@@ -377,7 +377,7 @@ void friendLoop(uint32_t now) {
 static const char *fpLeaderName(uint8_t r, uint8_t g) {
   if (r >= REGION_COUNT) return "?";
   const GymPerson &p = g >= 8 ? LEAGUE[r][0] : GYMS[r][g < 8 ? g : 0].leader;
-  return gLang == LANG_ZH ? p.zh : p.en;
+  return gLang == LANG_ZH ? p.zh : gLang == LANG_ZHT ? p.zht : p.en;
 }
 
 bool friendOverlay() { return fpIn != FPI_NONE || fpWaitHost >= 0 || fpGift.on || fpGiftAsk >= 0 || timeLeft(fpMsgUntil); }
@@ -500,7 +500,7 @@ static void fpMenuRow(int row, uint16_t fill, const char *const *icon, bool on, 
 
 static void renderFriendMenu() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   const char *n = friendName(fpFi);
@@ -668,7 +668,7 @@ static int fpGiftItems(uint8_t out[ITEM_COUNT]) {
 
 static void renderFriendGift() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(2);
   setCur(centerX(T(S_FR_GIFT_PICK), 2), 56);
@@ -702,7 +702,7 @@ static void renderFriendGift() {
 
 static void renderFriendPhotos() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(S_FR_PHOTO), 3), 44);

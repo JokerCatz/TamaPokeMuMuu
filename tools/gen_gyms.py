@@ -23,6 +23,14 @@ def lit(s):
     return '"' + s.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
 
+import opencc
+_cc = opencc.OpenCC('s2twp')   # Simplified -> Traditional (Taiwan): pip install opencc-python-reimplemented
+
+
+def zht(zh):
+    return _cc.convert(zh)
+
+
 def tipo(t):
     t = (t or '').lower()
     return f'TY_{t.upper()}' if t in TYPES else '0xFF'  # 0xFF: varios (campeones)
@@ -30,7 +38,7 @@ def tipo(t):
 
 def persona(en, zh, t, team):
     assert len(team) == 3 and all(1 <= d <= 1025 for d in team), (en, team)
-    return f'{{ {lit(en)}, {lit(zh)}, {tipo(t)}, {{ {team[0]}, {team[1]}, {team[2]} }} }}'
+    return f'{{ {lit(en)}, {lit(zh)}, {lit(zht(zh))}, {tipo(t)}, {{ {team[0]}, {team[1]}, {team[2]} }} }}'
 
 
 def main():
@@ -40,16 +48,16 @@ def main():
     out = ['#pragma once',
            '// GENERADO por tools/gen_gyms.py desde tools/gyms_data.json - no editar.',
            '// Gimnasios de las 9 regiones (8 cada una) y sus ligas (alto mando + campeon), con',
-           '// los nombres oficiales en ingles y chino simplificado y equipos del anime.',
+           '// los nombres oficiales en ingles y chino simplificado, el chino tradicional (convertido con OpenCC s2twp) y equipos del anime.',
            '#include <stdint.h>', '#include "sport.h"', '',
            'struct GymPerson {',
-           '  const char *en, *zh;',
+           '  const char *en, *zh, *zht;',
            '  uint8_t type;      // TY_* (0xFF: de varios tipos)',
            '  int16_t team[3];   // el mas fuerte, el ultimo',
            '};',
            'struct GymInfo {',
            '  GymPerson leader;',
-           '  const char *cityEn, *cityZh, *badgeEn, *badgeZh;',
+           '  const char *cityEn, *cityZh, *cityZht, *badgeEn, *badgeZh, *badgeZht;',
            '};', '',
            'static const GymInfo GYMS[9][8] = {']
     for name in ORDER:
@@ -58,8 +66,8 @@ def main():
         out.append(f'  {{  // {name}')
         for g in r['gyms']:
             p = persona(g['leader_en'], g['leader_zh'], g['type'], g['team'])
-            out.append(f'    {{ {p}, {lit(g["city_en"])}, {lit(g["city_zh"])}, {lit(g["badge_en"])}, '
-                       f'{lit(g["badge_zh"])} }},')
+            out.append(f'    {{ {p}, {lit(g["city_en"])}, {lit(g["city_zh"])}, {lit(zht(g["city_zh"]))}, {lit(g["badge_en"])}, '
+                       f'{lit(g["badge_zh"])}, {lit(zht(g["badge_zh"]))} }},')
         out.append('  },')
     out += ['};', '', '// alto mando (4) y campeon de cada region',
             'static const GymPerson LEAGUE[9][5] = {']

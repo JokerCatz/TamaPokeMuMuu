@@ -30,7 +30,9 @@ def main():
     for r in tabla('pokemon_species_names'):
         num = int(r['pokemon_species_id'])
         if num <= DEX_MAX and langs.get(r['local_language_id']) == 'zh-hans':
-            out[num] = {'zh': CORRECCIONES.get((num, 'zh'), r['name'])}
+            out.setdefault(num, {})['zh'] = CORRECCIONES.get((num, 'zh'), r['name'])
+        elif num <= DEX_MAX and langs.get(r['local_language_id']) == 'zh-hant':   # Traditional Chinese (Taiwan): the Fake Pod fork's third language
+            out.setdefault(num, {})['zht'] = r['name']
 
     path = os.path.join(os.path.dirname(__file__), 'dex_names.py')
     with open(path, 'w', encoding='utf-8') as f:

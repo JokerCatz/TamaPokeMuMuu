@@ -63,7 +63,7 @@ void openClock() { clockOpen = true; }
 #define TEMP_PILL_W 80
 #define TEMP_PILL_Y 155
 #define TEMP_PILL_H 28
-static const char *const LANG_CODES[LANG_COUNT] = { "EN", "ZH" };
+static const char *const LANG_CODES[LANG_COUNT] = { "EN", "ZH", "TW" };
 
 // Boton de brillo: un sol y tres barras, encendidas las del nivel de ahora.
 // Sin texto a proposito: cabe en poco sitio y se entiende en los dos idiomas.
@@ -104,7 +104,7 @@ static void setButton(int x, int y, const char *l, bool on, bool apagado, int ts
 
 void renderClock() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(S_SET_TIME), 3), 40);
@@ -235,7 +235,7 @@ static void statRow(int y, StrId label, const char *val) {
 
 void renderStats() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(S_STATS), 3), 40);
@@ -297,7 +297,7 @@ void clockTap(int16_t x, int16_t y) {
       toast(T(backupSave(pet.lastSeenEpoch) ? S_BK_SAVED : S_BK_FAIL));
     } else {  // SI: se restaura y se reinicia
       gfx->fillScreen(RGB565_BLACK);
-      gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+      fillBackdrop(UI_BG_DAY);
       gfx->setTextColor(UI_INK);
       setSize(2);
       setCur(centerX(T(S_RESTORING), 2), CY - 8);
@@ -631,7 +631,7 @@ void renderCardProgress() {
 
 void renderCard() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   if (cardPage == 0) renderCardProfile();
   else if (cardPage == 1) renderCardStats();
   else if (cardPage == 2) renderCardMedals(0);
@@ -669,7 +669,7 @@ void openKeyboard() {
 
 void renderKeyboard() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(2);
   setCur(centerX(T(S_NAME), 2), 56);

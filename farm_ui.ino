@@ -98,7 +98,7 @@ static void hubRow(int row, uint16_t fill, const char *const *icon, bool on, con
 
 void renderHub() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(S_HUB_TITLE), 3), 50);
@@ -317,7 +317,7 @@ void renderFarm() {
     const FarmEntry &e = farmAt(farmDetail);
     const DexEntry &d = DEX_TBL[e.speciesId];
     gfx->fillScreen(RGB565_BLACK);
-    gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+    fillBackdrop(UI_BG_DAY);
     char head[40];
     snprintf(head, sizeof(head), "%s%s", e.shiny ? "*" : "", e.nick[0] ? e.nick : dexName(e.speciesId));
     gfx->setTextColor(d.accent);
@@ -373,7 +373,7 @@ void renderFarm() {
   if (!farmDirty && !avisando) return;
   farmDirty = avisando;  // repinta una vez mas al apagarse el aviso
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   char head[24];
   snprintf(head, sizeof(head), T(S_FARM_FMT), (unsigned)farmCount());
   gfx->setTextColor(UI_INK);
@@ -444,7 +444,7 @@ void renderAlbum() {
   if (!farmDirty && !avisando) return;
   farmDirty = avisando;
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   int n = memoirCount();
   char head[24];
   snprintf(head, sizeof(head), T(S_ALBUM_FMT), n);

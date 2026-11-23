@@ -12,7 +12,7 @@ bool inPetZone(int16_t x, int16_t y) {
 // no debe accionar botones, pero sostenerlo 3 s sobre el bicho es a proposito
 // (antes se tragaba y "la pulsacion larga no hacia nada" al volver a la placa).
 bool holdOnPet() {
-  return !holdFired && !gestureMoved && !strokeFired && !dragFired && !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !linkOpen && !friendsOpen && !cardOpen && !pet.questAway() && !kbOpen && !clockOpen &&
+  return !gLangPick && !holdFired && !gestureMoved && !strokeFired && !dragFired && !galleryOpen && !farmOpen && !hubOpen && !chOpen && !gymsOpen && !funOpen && !linkOpen && !friendsOpen && !cardOpen && !pet.questAway() && !kbOpen && !clockOpen &&
          abs(tXl - tX0) < 30 && abs(tYl - tY0) < 30 && inPetZone(tX0, tY0) &&
          !pet.isEgg() && !confirmUntil && !actionUntil && !pet.ceremony;
 }
@@ -186,7 +186,7 @@ void handleTouch() {
 void openClock();  // prototipo
 
 void onSwipeV(int dir) {
-  if (pet.awaitingStarter()) return;  // bloqueado durante la eleccion de inicial
+  if (gLangPick || pet.awaitingStarter()) return;  // bloqueado durante la eleccion de inicial
   if (galleryOpen) {
     gallerySwipeV(dir);
     return;
@@ -207,7 +207,7 @@ void onSwipeV(int dir) {
 
 // deslizar: dir +1 = hacia la derecha
 void onSwipe(int dir) {
-  if (pet.awaitingStarter()) return;  // bloqueado durante la eleccion de inicial
+  if (gLangPick || pet.awaitingStarter()) return;  // bloqueado durante la eleccion de inicial
   if (kbOpen || clockOpen) return;
   if (shopOpen) {
     shopSwipe(dir);
@@ -298,6 +298,7 @@ void gallerySwipeV(int dir) {
 
 void onTap(int16_t x, int16_t y) {
   // Serial.printf("TOUCH %d %d\n", x, y);  // diagnostico (silenciado: satura el log)
+  if (gLangPick) { langPickTap(x, y); return; }
   if (pet.awaitingStarter()) {  // primera partida: elegir inicial
     for (int i = 0; i < 3; i++) {
       int ry = STARTER_ROW_Y + i * (STARTER_ROW_H + STARTER_ROW_GAP);

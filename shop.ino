@@ -317,7 +317,7 @@ void renderShop() {
   if (!shopDirty && !avisando) return;
   shopDirty = avisando;  // repinta una vez mas al apagarse el aviso
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   char head[32];
   if (shopPage == 0) snprintf(head, sizeof(head), T(S_SHOP_FMT), (long)pet.points);
   else if (shopPage == 4) snprintf(head, sizeof(head), T(S_BOOK_FMT), (long)pet.points);

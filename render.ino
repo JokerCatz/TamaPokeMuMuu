@@ -17,6 +17,10 @@ bool render() {
   } else {
     screenKeyValid = false;
   }
+  if (gLangPick) {  // first run: the language before anything else
+    renderLangPick();
+    return true;
+  }
   if (pet.awaitingStarter()) {  // primera partida: elegir inicial (prioridad total)
     renderStarterSelect();
     return true;

@@ -258,7 +258,7 @@ static void timeLeftText(char *b, size_t n, uint32_t secs, bool corto = false) {
 #define FL_H 124
 static void renderFunList() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   char t[40];
   snprintf(t, sizeof(t), T(S_FUN_TITLE_FMT), (long)pet.points);
   funHeader(t, UI_INK);
@@ -343,7 +343,7 @@ static void funListTap(int16_t x, int16_t y) {
 #define FP_CELL 92
 static void renderFunPick() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(S_WHO_GOES), 3), 40);
@@ -720,7 +720,7 @@ static void doQuest() {
 
 static void renderFunLoot() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   setSize(3);
   setCur(centerX(T(fnLootTitle), 3), 70);

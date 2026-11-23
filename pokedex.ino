@@ -38,7 +38,7 @@ void drawThumbIn(const uint8_t *b, int x, int y, int s, bool sil, int cell) {
 void renderGallery() {
   if (galleryDetail) {  // vista detalle: se redibuja siempre (animada)
     gfx->fillScreen(RGB565_BLACK);
-    gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+    fillBackdrop(UI_BG_DAY);
     const DexEntry &d = DEX_TBL[galleryDetail];
     bool reg = galleryShowAll || pet.isRegistered(galleryDetail);
     char head[32];
@@ -94,7 +94,7 @@ void renderGallery() {
   galleryDirty = false;
 
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   drawRegionDots();
   if (!galleryGrid) {
     renderRegionCover();

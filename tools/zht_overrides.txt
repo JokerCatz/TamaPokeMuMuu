@@ -1,0 +1,1 @@
+# game terms where OpenCC's Taiwan conversion needs a hand: `text => wanted` (applied before and after the conversion)

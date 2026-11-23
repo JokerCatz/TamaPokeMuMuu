@@ -27,7 +27,7 @@ static FAthlete gyFriendAth;
 static bool gyHelper = false;           // soy el amigo: solo se ve lo que manda el
 static uint32_t gyWaitAt = 0;
 
-static const char *gtx(const char *en, const char *zh) { return gLang == LANG_ZH ? zh : en; }
+static const char *gtx(const char *en, const char *zh, const char *zht) { return gLang == LANG_ZH ? zh : gLang == LANG_ZHT ? zht : en; }
 
 static const GymPerson &foe() { return gyLeague ? LEAGUE[gyRegion][lgMember] : GYMS[gyRegion][gySel].leader; }
 static uint8_t foeDifficulty() {
@@ -87,7 +87,7 @@ static void drawGymLock(int cx, int cy) {
 #define GL_H 56
 static void renderGymList() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   bool abierta = gyRegion < pet.unlockedRegions();
   char t[48];
   snprintf(t, sizeof(t), T(S_GYMS_TITLE_FMT), T((StrId)(S_REGION_1 + gyRegion)));
@@ -109,7 +109,7 @@ static void renderGymList() {
     drawBadge(x + 26, y + 24, 16, g.leader.type, won);
     if (!open && !won) drawGymLock(x + 26, y + 26);
     gfx->setTextColor(open || won ? UI_INK : UI_HINT);
-    const char *n = gtx(g.leader.en, g.leader.zh);
+    const char *n = gtx(g.leader.en, g.leader.zh, g.leader.zht);
     int ts = textW(n, 2) <= 108 ? 2 : 1;  // "Professor Kukui", "Crasher Wake"...
     setSize(ts);
     setCur(x + 50, y + (ts == 2 ? 16 : 20));
@@ -176,7 +176,7 @@ static void drawTeamThumbs(const int16_t dex[3], int y) {
 
 static void renderGymDetail() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   const GymPerson &p = foe();
   uint8_t type = p.type < TY_COUNT ? p.type : TY_NORMAL;
   char t[64];
@@ -185,15 +185,15 @@ static void renderGymDetail() {
              (unsigned)LEAGUE_SIZE);
   } else {
     const GymInfo &g = GYMS[gyRegion][gySel];
-    snprintf(t, sizeof(t), "%s", gtx(g.cityEn, g.cityZh));
+    snprintf(t, sizeof(t), "%s", gtx(g.cityEn, g.cityZh, g.cityZht));
   }
   gfx->setTextColor(UI_INK);
   setSize(2);
   setCur(centerX(t, 2), 34);
   printT(t);
   setSize(3);
-  setCur(centerX(gtx(p.en, p.zh), 3), 60);
-  printT(gtx(p.en, p.zh));
+  setCur(centerX(gtx(p.en, p.zh, p.zht), 3), 60);
+  printT(gtx(p.en, p.zh, p.zht));
   if (p.type < TY_COUNT) {
     gfx->setTextColor(TYPE_COL[type]);
     setSize(2);
@@ -207,7 +207,7 @@ static void renderGymDetail() {
     gfx->setTextColor(won ? UI_BAR_OK : UI_INK);
     setSize(2);
     setCur(CX - 68, 132);
-    printT(gtx(g.badgeEn, g.badgeZh));
+    printT(gtx(g.badgeEn, g.badgeZh, g.badgeZht));
   }
   // sus tres pruebas y sus tres pokemon
   gymEvents(type, gyEv);
@@ -283,7 +283,7 @@ static void drawFitMarks(int16_t dex, int x, int y, int w) {
 
 static void renderGymTeam() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   gfx->setTextColor(UI_INK);
   bool juntos = gyFriend >= 0;
   const char *h = T(juntos ? S_PICK_ONE : S_PICK_TWO);
@@ -392,9 +392,9 @@ static const char *memberName(int i) {
 #define OR_H 74
 static void renderGymOrder() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   char t[64];
-  if (gyLeague) snprintf(t, sizeof(t), "%s  %s", T(S_LINEUP), gtx(foe().en, foe().zh));
+  if (gyLeague) snprintf(t, sizeof(t), "%s  %s", T(S_LINEUP), gtx(foe().en, foe().zh, foe().zht));
   else snprintf(t, sizeof(t), "%s", T(S_LINEUP));
   gfx->setTextColor(UI_INK);
   setSize(2);
@@ -461,7 +461,7 @@ static void startRound() {
     pm = &rivalPmd[0];
   }
   rivalPmd[1].load(foe().team[his], false);
-  snprintf(roundTitle, sizeof(roundTitle), T(S_ROUND_FMT), gtx(foe().en, foe().zh), (unsigned)gyRound + 1);
+  snprintf(roundTitle, sizeof(roundTitle), T(S_ROUND_FMT), gtx(foe().en, foe().zh, foe().zht), (unsigned)gyRound + 1);
   sportsRound(ev, pm, memberName(mine), teamA[mine], &rivalPmd[1], dexName(foe().team[his]), foeAthlete(his),
               roundTitle, gyFriend >= 0, nullptr);
   if (gyFriend >= 0) {  // el amigo ve la misma prueba, con las mismas marcas
@@ -487,7 +487,7 @@ static void startRound() {
 void gymScoreLine(int y, bool won) {
   char t[48];
   snprintf(t, sizeof(t), "%s %u : %u %s", T(S_YOU), (unsigned)(gyWins + won), (unsigned)(gyLost + !won),
-           gtx(foe().en, foe().zh));
+           gtx(foe().en, foe().zh, foe().zht));
   gfx->setTextColor(UI_INK);
   setSize(2);
   setCur(centerX(t, 2), y);
@@ -539,7 +539,7 @@ void gymRoundDone(bool won) {
 
 static void renderGymEnd() {
   gfx->fillScreen(RGB565_BLACK);
-  gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
+  fillBackdrop(UI_BG_DAY);
   char t[64];
   if (!gyWon) {  // con quien se perdio, el marcador y que probar la proxima vez
     gfx->setTextColor(UI_INK);
@@ -548,7 +548,7 @@ static void renderGymEnd() {
     setCur(centerX(m, 2), 84);
     printT(m);
     drawTeamThumbs(foe().team, 120);
-    snprintf(t, sizeof(t), "%s %u : %u %s", T(S_YOU), (unsigned)gyWins, (unsigned)gyLost, gtx(foe().en, foe().zh));
+    snprintf(t, sizeof(t), "%s %u : %u %s", T(S_YOU), (unsigned)gyWins, (unsigned)gyLost, gtx(foe().en, foe().zh, foe().zht));
     setCur(centerX(t, 2), 212);
     printT(t);
     gfx->setTextColor(UI_HINT);
@@ -574,7 +574,7 @@ static void renderGymEnd() {
   } else {
     const GymInfo &g = GYMS[gyRegion][gySel];
     drawBadge(CX, 150, 40, g.leader.type, true);
-    snprintf(t, sizeof(t), T(S_GOT_BADGE_FMT), gtx(g.badgeEn, g.badgeZh));
+    snprintf(t, sizeof(t), T(S_GOT_BADGE_FMT), gtx(g.badgeEn, g.badgeZh, g.badgeZht));
     gfx->setTextColor(UI_INK);
     int ts = gyNewBadge && textW(t, 3) <= 380 ? 3 : 2;
     setSize(ts);
@@ -728,7 +728,7 @@ void gymsHelperRound(const FRound &r) {
   }
   rivalPmd[1].unload();
   rivalPmd[1].load(r.foeDex, false);
-  snprintf(roundTitle, sizeof(roundTitle), T(S_ROUND_FMT), gtx(foe().en, foe().zh), (unsigned)gyRound + 1);
+  snprintf(roundTitle, sizeof(roundTitle), T(S_ROUND_FMT), gtx(foe().en, foe().zh, foe().zht), (unsigned)gyRound + 1);
   float m[2] = { r.marks[0], r.marks[1] };
   sportsRound(r.ev < EV_COUNT ? r.ev : 0, pm, r.mineHelper ? T(S_YOU) : dexName(r.mineDex), athleteOf(r.mineDex),
               &rivalPmd[1], dexName(r.foeDex), athleteOf(r.foeDex), roundTitle, true, m);

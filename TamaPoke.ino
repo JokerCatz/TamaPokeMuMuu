@@ -141,6 +141,17 @@ int flashIdxForDex(int16_t dex) {
 
 #define CX 233  // centro de la pantalla redonda
 #define CY 233
+bool gLangPick = false;  // first-run language picker active (langpick.ino)
+
+// The menu screens fill the panel black and then a disc of radius 231 in the page colour: on the round panel the corners are cut off by the bezel, on a square panel they would show as
+// black corners. Fake Pod (square 460x460): fill the whole panel.
+static inline void fillBackdrop(uint16_t colour) {
+#if defined(BOARD_FAKEPOD_NANO_PRO)
+  gfx->fillScreen(colour);
+#else
+  gfx->fillCircle(CX, CY, 231, colour);
+#endif
+}
 #define PET_CY 202  // centro vertical del sprite
 
 static const uint16_t INK_K = 0x18C4;  // spriteColor('k')
@@ -389,6 +400,7 @@ void setup() {
   Serial.setTxTimeoutMs(0);
   Serial.printf("TamaPoke fw v%s\n", FW_VERSION);
   loadLang();  // idioma guardado (ES por defecto)
+  gLangPick = !langSaved();  // a fresh board asks for the language first (langpick.ino)
   Wire.begin(IIC_SDA, IIC_SCL);
   // CST9217 (tactil), AXP2101 (PMU) y PCF85063 (RTC) comparten este bus I2C.
   // Red de seguridad para PMU/RTC (SensorLib NO respeta este timeout en el
@@ -498,7 +510,9 @@ void setup() {
   // el correo antes que la tarea de red: ella usa su cerrojo y su cola (mailNetSync)
   mailBegin();  // correo con amigos lejos (lo que salia o llego se conserva)
   netSetUsb(usbPresent());
+#ifndef FP_NO_NET   // diagnostic builds only
   netBegin();  // tiempo cada hora y, con USB, Stack-chan (en el otro nucleo)
+#endif
   linkSetGameHandler(friendRx);  // "见面": los mensajes de los juegos con un amigo
 
   lastInteract = lastUserAt = millis();

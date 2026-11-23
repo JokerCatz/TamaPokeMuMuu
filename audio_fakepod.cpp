@@ -109,6 +109,9 @@ void audioBegin()
   gVol = p.getUChar("vol", 0) % VOL_LEVELS;
   p.end();
 
+#ifdef FP_NO_DAC
+  return;   // diagnostic build: no DAC / I2S bring-up at all
+#endif
   bsp_dac_set_volume(FP_DAC_VOLUME);     // stored until the chip is initialised; written and read back before any unmute
   if (bsp_dac_init() != ESP_OK) { ESP_LOGW(TAG, "CS43131 not ready: sound off"); return; }
 

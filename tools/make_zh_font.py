@@ -321,11 +321,12 @@ def used_chars():
 
     with open(os.path.join(ROOT, 'i18n.cpp'), encoding='utf-8') as fh:
         src = fh.read()
-    zh = fmt.LANGS.index('ZH')
     textos = []
-    for tabla in ('STRINGS', 'MED_NAME', 'MED_LBL', 'MED_DSC'):
-        textos += [lit[1:-1] for lit in fmt.extract_table(src, tabla, len(fmt.LANGS))[zh]]
-    textos += [n['zh'] for n in LOCAL_NAMES.values() if 'zh' in n]
+    for lang in ('ZH', 'ZHT'):   # Simplified and Traditional (the Fake Pod fork's third language)
+        col = fmt.LANGS.index(lang)
+        for tabla in ('STRINGS', 'MED_NAME', 'MED_LBL', 'MED_DSC'):
+            textos += [lit[1:-1] for lit in fmt.extract_table(src, tabla, len(fmt.LANGS))[col]]
+    textos += [n[k] for n in LOCAL_NAMES.values() for k in ('zh', 'zht') if k in n]
     gyms = os.path.join(ROOT, 'gyms.h')  # lideres, ciudades y medallas (tools/gen_gyms.py)
     if os.path.exists(gyms):
         with open(gyms, encoding='utf-8') as fh:
