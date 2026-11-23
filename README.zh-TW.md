@@ -11,6 +11,14 @@
 - 第一次開機先選語言（English / 繁體中文 / 简体中文）。
 - 方形螢幕：背景填滿整個畫面，沒有圓形遮罩；中文最小字體 24 px。
 
+## 安裝 release（Fake Pod Nano Pro）
+1. 從[最新的 Fake Pod release](https://github.com/JokerCatz/TamaPokeMuMuu/releases) 下載 `TamaPokeMuMuu-fakepod-0.1.0-merged.bin` 與 `TamaPokeMuMuu-sdcard-mons.zip`。
+2. **TF 卡**（FAT32 或 exFAT，韌體不會格式化）：把 zip 解壓縮到卡上，讓圖片放在 `/mons/`。
+3. **韌體**：讓板子進入下載模式（插 USB 時同時按住兩個側鍵），然後執行
+   `esptool --chip esp32s31 --port <連接埠> write_flash 0x0 TamaPokeMuMuu-fakepod-0.1.0-merged.bin`
+   release 內建的時區是 UTC+8；其他時區請自行從原始碼建置（見下）。
+4. 第一次開機會先選語言。想從頭開始，清除 NVS 區：`esptool --chip esp32s31 --port <連接埠> erase_region 0x9000 0x5000`。
+
 ## 建置與刷機
 請看 [tools/fakepod/README.md](tools/fakepod/README.md)（英文）。大致步驟：安裝 arduino-esp32 4.0.0 與函式庫、執行 `tools/fakepod/patch_arduino_gfx.sh`、複製 `config_private.example.h` 為 `config_private.h` 並設定時區，然後執行 `tools/build_fakepod.sh --upload 連接埠`。
 
