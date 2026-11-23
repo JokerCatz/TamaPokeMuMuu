@@ -15,11 +15,23 @@
 
 **[chess.com 联动](#初衷)** · **[和原项目的区别](#和原项目的区别)** · **[硬件](#硬件)** · **[外壳](#3d-打印外壳)** · **[编译和刷机](#编译和刷机)** · **[怎么玩](#怎么玩)**
 
-[English](README.md) · **简体中文**
+[English](README.md) · **简体中文** · [繁體中文](README.zh-TW.md)
 
 <a href="https://mu-muu.github.io/TamaPoke/?lang=zh#build"><img src="docs/demo.gif" alt="真机实拍：装在外壳里的板子拿在手里转一圈，点一下唤醒，宠物四处走动" width="360"></a>
 
 </div>
+
+> ### Fake Pod Nano Pro（ESP32-S31）移植：TamaPokeMuMuu
+> 本仓库是 [Mu-Muu/TamaPoke](https://github.com/Mu-Muu/TamaPoke)（MIT，源自 [socquique/TamaPoke](https://github.com/socquique/TamaPoke)）的分支，另外支持方形 460×460 的 **Fake Pod Nano Pro**：CO5300 AMOLED、CST820 触摸、AXP2101、PCF85063 RTC、QMI8658、CS43131 耳机 DAC 音效、侧键，以及 exFAT 的 TF 卡（SdFat）。新增：**繁体中文（台湾）**、首次开机选语言、铺满方屏的背景（没有圆形遮罩）、中文最小 24 px。构建方法见 [tools/fakepod/README.md](tools/fakepod/README.md)，也可以直接用 [Releases](https://github.com/JokerCatz/TamaPokeMuMuu/releases) 里的固件和 TF 卡图片包。
+
+### Fake Pod Nano Pro：安装 release
+1. 从[最新的 Fake Pod release](https://github.com/JokerCatz/TamaPokeMuMuu/releases) 下载 `TamaPokeMuMuu-fakepod-0.1.0-merged.bin` 和 `TamaPokeMuMuu-sdcard-mons.zip`。
+2. **TF 卡**（FAT32 或 exFAT，固件不会格式化）：把 zip 解压到卡上，让图片放在 `/mons/`。
+3. **固件**：让板子进入下载模式（插 USB 时同时按住两个侧键），然后运行
+   `esptool --chip esp32s31 --port <端口> write_flash 0x0 TamaPokeMuMuu-fakepod-0.1.0-merged.bin`
+   release 内置的时区是 UTC+8；其他时区请自行从源码构建。
+4. 第一次开机会先选语言。想从头开始，清除 NVS 区：`esptool --chip esp32s31 --port <端口> erase_region 0x9000 0x5000`。
+
 
 **[项目网站](https://mu-muu.github.io/TamaPoke/?lang=zh)**：在浏览器里孵蛋、做一道棋题、跑一场比赛，还有一段[真机实拍视频](https://mu-muu.github.io/TamaPoke/?lang=zh#build)。第一次玩可以先看**[玩法教程](https://mu-muu.github.io/TamaPoke/guide/?lang=zh)**。
 

@@ -146,6 +146,14 @@ Putting it together:
 The easiest way is the [web installer](#web-installer): a browser is all you
 need. To build the firmware yourself, see [Build with Arduino](#build-with-arduino).
 
+### Fake Pod Nano Pro: install the release
+1. Download `TamaPokeMuMuu-fakepod-0.1.0-merged.bin` and `TamaPokeMuMuu-sdcard-mons.zip` from the [latest Fake Pod release](https://github.com/JokerCatz/TamaPokeMuMuu/releases).
+2. **TF card** (FAT32 or exFAT; the firmware never formats it): unzip the zip onto the card so the sprites are in `/mons/`.
+3. **Firmware**: put the board in download mode (hold both side keys while plugging in USB), then
+   `esptool --chip esp32s31 --port <PORT> write_flash 0x0 TamaPokeMuMuu-fakepod-0.1.0-merged.bin`
+   The release image has the time zone UTC+8 built in; for another time zone build from source (below).
+4. First boot asks for the language. To start over, erase the NVS region: `esptool --chip esp32s31 --port <PORT> erase_region 0x9000 0x5000`.
+
 ### Web installer
 
 1. On a computer, open the [web installer](https://mu-muu.github.io/TamaPoke/web/)
